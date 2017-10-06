@@ -8,8 +8,7 @@ library(magrittr)
 library(stringr)
 library(tidyr)
 
-old_data <- read.csv("./Drafts/movie_metadata.csv", stringsAsFactors = FALSE)
-head(old_data)
+old_data <- read.csv("./movie_metadata.csv", stringsAsFactors = FALSE)
 
 film_country <- old_data %>%
   group_by(country) %>%
@@ -33,6 +32,7 @@ genre_types <- c("genre1", "genre2","genre3", "genre4", "genre5", "genre6", "gen
 genre_filter <- select_data_filter %>% separate(genres, into=genre_types,sep = "\\|")
 
 ##Establishing a Gross Revenue / Budget variable and cleaning up movie title names
+
 RB_data <- mutate(.data = genre_filter, return = gross / budget)
 RB_data$return <- round(RB_data$return, 2)
 #head(RB_data)
@@ -123,7 +123,7 @@ RB_data$movie_title[1] == as.character("The Dark Knight Rises")
 str_detect(RB_data$movie_title,"John Carter")
 
 ##cleaning awards data 
-awards_data <- read.csv("./Drafts/awards_metadata.csv", stringsAsFactors = FALSE, encoding = "UTF-8")
+awards_data <- read.csv("./awards_metadata.csv", stringsAsFactors = FALSE, encoding = "UTF-8")
 awards_data <- filter(awards_data, Winner!="NA")
 awards_data <- select(awards_data, Year, Award, Name, Film)
 movie_wins <- filter(awards_data, Award=="Best Picture" | Award=="Best Motion Picture")
@@ -134,7 +134,7 @@ director_wins <- filter(awards_data, Award=="Directing")
 director_wins$Name = director_wins$Film
 director_wins <- count(director_wins, Name)
 award_wins <- rbind(actor_wins,director_wins,movie_wins)
-head(data11_15)
+
 
 
 ##Getting the occurences of directors/actors in the database
@@ -166,11 +166,10 @@ RB_data = RB_data[ , !(names(RB_data) %in% c("act1_oscars","act2_oscars","act3_o
 
 ##Establishing separate datasets for time periods
 data11_15 <- filter(.data = RB_data, title_year < 2016)
-#head(data11_15)
+head(data11_15)
 data16 <- filter(.data = RB_data,title_year == 2016)
 #head(data16)
 #print(data11_15$movie_facebook_likes)
 #print(data11_15$movie_facebook_likes)
-
 
 
