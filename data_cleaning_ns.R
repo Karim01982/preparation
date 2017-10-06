@@ -5,7 +5,7 @@ library(tidyr)
 library(magrittr)
 library(stringr)
 
-old_data <- read.csv("./Drafts/movie_metadata.csv", stringsAsFactors = FALSE, encoding="UTF-8")
+old_data <- read.csv("./movie_metadata.csv", stringsAsFactors = FALSE, encoding="UTF-8")
 #head(old_data)
 filter_data <- filter(old_data, country=="USA", language=="English")
 #head(filter_data)
@@ -113,7 +113,7 @@ RB_data$westerndummy[is.na(RB_data$westerndummy)] <- 0
 str_detect(RB_data$movie_title,"John Carter")
 
 ##cleaning awards data 
-awards_data <- read.csv("./Drafts/awards_metadata.csv", stringsAsFactors = FALSE, encoding = "UTF-8")
+awards_data <- read.csv("./awards_metadata.csv", stringsAsFactors = FALSE, encoding = "UTF-8")
 awards_data <- filter(awards_data, Winner!="NA")
 awards_data <- select(awards_data, Year, Award, Name, Film)
 movie_wins <- filter(awards_data, Award=="Best Picture" | Award=="Best Motion Picture")
