@@ -33,6 +33,14 @@ cordata <- select(data11_15, imdb_score, movie_facebook_likes, gross, return, bu
 cor_table <- round(cor(cordata),2)
 print(cor_table)
 
+##Finding and removing outlier
+
+
+bieberoutlier <- data11_15[378,]
+newdata11_15 <- data11_15[-378,]
+newdata11_15[378,]
+
+
 ##Scatterplot data
 
 ggplot(data=data11_15) + geom_jitter(aes(x=return <1, y=movie_facebook_likes)) + xlab("How do facebook likes compare for films that have made <1.0x money?")
@@ -42,5 +50,18 @@ returns_imdb1 <- data11_15[data11_15[,"return"] >1, "imdb_score"]
 return_data <- data.frame(returns_higher1, returns_fb1, returns_imdb1)
 
 ggplot(data=return_data) + geom_jitter(aes(x=returns_higher1, y=returns_imdb1)) + xlab("How do facebook likes compare for films that have made <1.0x money?") +xlim(1,10)
+
+cor.test(returns_higher1, returns_imdb1)
+
+
+##Scatterplot data without outlier
+
+ggplot(data=newdata11_15) + geom_jitter(aes(x=return <1, y=movie_facebook_likes)) + xlab("How do facebook likes compare for films that have made <1.0x money?")
+returns_higher1 <- newdata11_15[newdata11_15[,"return"] >1, "return"]
+returns_fb1 <- newdata11_15[newdata11_15[,"return"] >1, "movie_facebook_likes"]
+returns_imdb1 <- newdata11_15[newdata11_15[,"return"] >1, "imdb_score"]
+return_data <- data.frame(returns_higher1, returns_fb1, returns_imdb1)
+
+ggplot(data=return_data) + geom_jitter(aes(x=returns_higher1, y=returns_imdb1)) + xlab("How do facebook likes compare for films that have made <1.0x money?") +xlim(1,5) + geom_smooth(aes(x=returns_higher1, y=returns_imdb1))
 
 cor.test(returns_higher1, returns_imdb1)
