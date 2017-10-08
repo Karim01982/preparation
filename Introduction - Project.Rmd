@@ -286,7 +286,19 @@ stargazer(data11_15, type="html", title="Table with Stargazer")
 
 ###Correlation analysis
 
+```{r, echo=FALSE}
+cordata <- select(data11_15, imdb_score, 
+                  movie_facebook_likes, gross, return, 
+                  budget, num_voted_users)
+cor_table <- round(cor(cordata),2)
+library(knitr)
+kable(cor_table)
 
+```
+
+The most surprising result is the lack of correlation with the ROI variable.
+
+[skewness]
 
 
 [^3]: Wikipedia (2017)
