@@ -1,0 +1,160 @@
+---
+title: "What makes a Hollywood film successful?"
+author: "Joanna Andari, Karim Awad, Jiye Ren, Nirbhay Sharma"
+date: "8 October 2017"
+output: pdf_document
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Section 1: Introduction
+
+The film industry is expected to generate global box office revenues of almost $49.3bn by 2020, from a forecast of US$38.3bn in 2016[^1], representing a CAGR of over 32%. These substantial growth levels are likely to result in vast resources being poured into the industry, in search of the next "big hit". Countries, recognising the value of developing a film industry to support a variety of local and national initiatives, have supported these activities, providing tax breaks to investors, to mitigate the material upfront costs involved.
+
+Outside of India, the US continues to lead the way in producing a substantial volume of films, accounting for an estimated US$10.7bn in box office revenues in 2016[^2]. Yet in contrast to Indian films, which principally serve a domestic audience, Hollywood films benefit from a global distribution network. This results in films having to cater for different audiences in different countries, overcoming issues varying from political censorship through to cultural sensitivities, to maximise their appeal and potential commercial success.
+
+```{r}
+
+library("ggplot2")
+names <- c(2016, 2017, 2018, 2019, 2020)
+globalboxoffice16_20 <- c(38.3, 41.2, 44, 46.7, 49.3)
+USboxoffice16_20 <- c(10.7, 10.6, 10.9, 11.1, 11.3)
+boxoff <- data.frame(names, globalboxoffice16_20, USboxoffice16_20)
+
+
+#####produce bar graph
+
+```
+
+With global audiences in mind, are there factors that can help predict a Hollywood film's popularity, and with that, guide future decisions on the types of films produced? In turn, can this better inform investors on potential risks involved with backing particular projects?
+
+This report seeks to examine a random sample of movie data pulled from IMDB data between 2011-16, concentrating on the US given its role in influencing the wider film industry. This will seek to understand how we should measure popularity, focusing on 2011-15 data, before devising a regression model that can help predict popularity. We will then test its capacity to predict 2016 trends, before noting the limitations of our work, and areas for further development.
+
+As this report shall conclude, [...]
+
+
+[^1]: Statista (2016) 
+[^2]: Statista (2016) 
+
+\pagebreak
+
+##Section 2: Data sampling and cleaning
+
+[NS to provide]
+
+##Section 3: How do we measure a film's popularity?
+
+###What metrics should we use to determine our dependent variable?
+
+Determining what variable should represent popularity, itself a subjective quality, gives rise to several potential proxy variables. These can be divided between those that are financially driven relative to social media metrics, of which we consider each in turn, arriving at five possible variables.
+
+An obvious proxy would be revenues, should we determine this a valid measure of commercial success. Contrary to the thoughts of those "voting with their wallets", this is not entirely a straightforward metric. A limitation of the data available is we are only able to track box-office ticket sales, rather than all associated revenues. This ignores digital sales from streaming, DVD sales, and any other merchandise or commercial agreements (e.g. in-film advertising). 
+
+An example of this shortcoming would be the motion picture, "The Interview". Although extreme given the political sensitivities with North Korea, which led to a limited global release, "The Interview grossed $40m in digital rentals...and earned an additional $11.2m worldwide at the box office on a $44m budget[^3]". By relying on box office revenues alone, we may not get a complete view on how commercially successful a film has been. This is something we discuss further as a limitation within our work, but which we do not explore further. 
+
+A second issue is whether a low grossing film is still a success, relative to its underlying budget? This may be more applicable to arthouse films, rather than a typical Hollywood blockbuster, but is something we are able to condition against by examining a film's return on investment; defined by its box office revenues divided by its total budget. 
+
+Social media provides us with three relevant metrics. The first surrounds the number of facebook likes a film has received. Although a singular expression of popularity, this provides some indication of fan reaction, premised on any "likes" resulting from watching the film, as opposed to being based on trailers or other promotional material. We are mindful this may not be entirely accurate, as we do not know at which point this data was collected (e.g. how many days / weeks after the film was released in the US, and how the latter is likely to vary by geography).
+
+The remaining two metrics concern IMDB scores, and the number of votes received. IMDB scores should provide a direct measure of popularity, with our initial assumption based on this most likely to be normally distributed (i.e. this theoretically should capture a broad range of views between a ranking of 0-10). The number of users may also help quantify the depth of support, and depending on the distribution of IMDB scores, represent a useful proxy for capturing popularity.
+
+###Descriptive analysis
+
+We produce boxplots and density graphs of the five variables above, along with budget, to provide a sense-check. These can all separately be found in the appendices.
+
+We produce a table below that summarises some of the key findings of these graphs, along with providing 
+
+[^3]: Wikipedia (2017)
+
+
+
+\pagebreak
+
+##Appendix 1 - Glossary of data definitions
+
+
+\pagebreak
+
+##Appendix 2 - Boxplots and Density graphs
+
+```{r, echo =FALSE}
+
+file.edit("data_cleaning_draft2.R")
+library(ggplot2)
+install.packages("gridExtra")
+library(gridExtra)
+
+#density plots
+
+imdbden <- ggplot(data=data11_15)+geom_density(aes(x=(imdb_score)))
+
+fbden <- ggplot(data=data11_15)+geom_density(aes(x=movie_facebook_likes))
+
+revden <- ggplot(data=data11_15)+geom_density(aes(x=gross))
+
+roiden <- ggplot(data=data11_15)+geom_density(aes(x=return))
+
+budden <- ggplot(data=data11_15)+geom_density(aes(x=budget))
+
+numuserden <- ggplot(data=data11_15)+geom_density(aes(x=num_voted_users))
+
+grid.arrange(imdbden, fbden, revden, roiden, budden, numuserden, ncol=2)
+
+#boxplots
+
+imdbbox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=imdb_score))
+
+fbbox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=movie_facebook_likes)) + ylim(0,100000)
+
+revbox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=gross))
+
+roibox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=return)) + ylim(0,5)
+
+budbox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=budget))
+
+numuserbox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=num_voted_users)) + ylim(0,500000)
+
+grid.arrange(imdbbox, fbbox, revbox, roibox, budbox, numuserbox, ncol=2)
+
+
+```
+\pagebreak
+
+##Bibliography and references
+
+We have made reference to various forums on coding best-practices, notably including Stackoverflow.com, and other relevant sources of R studio information available online. These have been cited during the main document, where they have been specific to our study, or represent the application of coding practices not within the Maths and Statistics Foundations for Analytics module. We have not referenced general R studio packages applied within this module (e.g. dplyr; stargazer; etc). 
+
+We obtained the original dataset, in conjunction with information on Oscar academy awards, from the following websites: 
+<https://www.kaggle.com/tmdb/tmdb-movie-metadata/data>
+<https://www.kaggle.com/theacademy/academy-awards>
+
+In terms of documents we have referenced:
+
+[1-2] "Film industry in the US", Statista, Dossier (2016) <https://www.statista.com/study/11472/film-industry-in-the-united-states-statista-dossier/>
+[3] "The Interview", Wikipedia page (2017) <https://en.wikipedia.org/wiki/The_Interview#Pre-release_reaction>
+
+
+
+\pagebreak
+
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
