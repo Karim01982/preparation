@@ -7,7 +7,7 @@ head(data11_15)
 
 ##Density plots
 
-ggplot(data=data11_15)+geom_density(aes(x=imdb_score))
+ggplot(data=data11_15)+geom_density(aes(x=(imdb_score)))
 
 ggplot(data=data11_15)+geom_density(aes(x=movie_facebook_likes))
 
@@ -19,7 +19,13 @@ ggplot(data=data11_15)+geom_density(aes(x=budget))
 
 ggplot(data=data11_15)+geom_density(aes(x=num_voted_users))
 
-ggplot(data=data11_15)+geom_density(aes(x=num_user_for_reviews))
+ggplot(data=data11_15)+geom_density(aes(x=log(num_voted_users)^4))
+
+
+ggplot(data=data11_15)+geom_density(aes(x=(duration)))
+
+
+log3(15)
 
 head(data11_15)
 
@@ -37,12 +43,18 @@ ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=budget))
 
 ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=num_voted_users)) + ylim(0,500000)
 
+log4numvoted_users <- (log(data11_15$num_voted_users)^4)
+
 
 ##Correlation table
 
-cordata <- select(data11_15, imdb_score, movie_facebook_likes, gross, return, budget, num_voted_users)
+cordata <- select(data11_15, imdb_score, 
+                  movie_facebook_likes, gross, return, 
+                  budget, num_voted_users)
 cor_table <- round(cor(cordata),2)
 print(cor_table)
+
+
 
 ##Finding and removing outlier
 

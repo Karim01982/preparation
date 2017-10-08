@@ -26,7 +26,7 @@ summary(usereg7)
 usereg8 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + duration + actor_oscars + familydummy + scifidummy )
 summary(usereg8)
 
-usereg9 <- lm(data = data11_15, num_voted_users ~ gross + duration + actor_oscars + familydummy + scifidummy)
+usereg9 <- lm(data = data11_15, log4numvoted_users ~ gross + duration + actor_oscars + familydummy + scifidummy)
 summary(usereg9)
 
 install.packages("car")
