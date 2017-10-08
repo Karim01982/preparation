@@ -11,5 +11,3 @@ Hypothesis testing
 US vs Non-US - 
 Between genres
 Backtesting
-
-install.packages("knitr")
