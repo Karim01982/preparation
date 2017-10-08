@@ -11,3 +11,10 @@ Hypothesis testing
 US vs Non-US - 
 Between genres
 Backtesting
+
+
+--------------
+
+```{r results="asis"}
+stargazer(cars, type="html", title="Table with Stargazer")
+```
