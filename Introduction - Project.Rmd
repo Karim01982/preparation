@@ -16,7 +16,7 @@ The film industry is expected to generate global box office revenues of almost $
 
 Outside of India, the US continues to lead the way in producing a substantial volume of films, accounting for an estimated US$10.7bn in box office revenues in 2016[^2]. Yet in contrast to Indian films, which principally serve a domestic audience, Hollywood films benefit from a global distribution network. This results in films having to cater for different audiences in different countries, overcoming issues varying from political censorship through to cultural sensitivities, to maximise their appeal and potential commercial success.
 
-```{r}
+```{r, echo=FALSE}
 
 library("ggplot2")
 names <- c(2016, 2017, 2018, 2019, 2020)
@@ -65,7 +65,25 @@ The remaining two metrics concern IMDB scores, and the number of votes received.
 
 We produce boxplots and density graphs of the five variables above, along with budget, to provide a sense-check. These can all separately be found in the appendices.
 
-We produce a table below that summarises some of the key findings of these graphs, along with providing 
+We produce a table below that summarises some of the key findings of these graphs, along with illustrating the results of our ROI boxplot and IMDB density graph:
+
+``` {r, results = 'asis'}
+install.packages("stargazer")
+library("stargazer")
+
+stargazer(cars, type="latex", title="Table with Stargazer")
+
+
+```
+
+```{r}
+grid.arrange(imdbden, roibox,  ncol=2)
+
+```
+
+
+###Correlation analysis
+
 
 [^3]: Wikipedia (2017)
 
@@ -82,7 +100,6 @@ We produce a table below that summarises some of the key findings of these graph
 
 ```{r, echo =FALSE}
 
-file.edit("data_cleaning_draft2.R")
 library(ggplot2)
 install.packages("gridExtra")
 library(gridExtra)
@@ -141,20 +158,3 @@ In terms of documents we have referenced:
 \pagebreak
 
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
