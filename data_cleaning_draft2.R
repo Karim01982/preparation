@@ -1,12 +1,9 @@
-
-
 ##Initial cleaning
 library(dplyr)
 library(readr)
 library(tidyr)
 library(magrittr)
 library(stringr)
-library(tidyr)
 
 old_data <- read.csv("./movie_metadata.csv", stringsAsFactors = FALSE)
 
@@ -111,12 +108,12 @@ RB_data$westerndummy[is.na(RB_data$westerndummy)] <- 0
 #sum(RB_data$actiondummy)
 
 ##To search for items within the Movie Title column
-row <- grep(RB_data$movie_title,"The Dark Knight ")
-as.character(RB_data$movie_title[1]) == as.character("The Dark Knight Rises ")
-head(RB_data)
-typeof(RB_data$genre1)
-typeof(RB_data$movie_title)
-RB_data$movie_title[1] == as.character("The Dark Knight Rises")
+# row <- grep(RB_data$movie_title,"The Dark Knight")
+# as.character(RB_data$movie_title[1]) == as.character("The Dark Knight Rises")
+# head(RB_data)
+# typeof(RB_data$genre1)
+# typeof(RB_data$movie_title)
+# RB_data$movie_title[1] == as.character("The Dark Knight Rises")
 
 
 #to search for a string in any column

@@ -3,6 +3,8 @@
 library(ggplot2)
 library(dplyr)
 
+head(data11_15)
+
 ##Density plots
 
 ggplot(data=data11_15)+geom_density(aes(x=imdb_score))
@@ -14,6 +16,12 @@ ggplot(data=data11_15)+geom_density(aes(x=gross))
 ggplot(data=data11_15)+geom_density(aes(x=return))
 
 ggplot(data=data11_15)+geom_density(aes(x=budget))
+
+ggplot(data=data11_15)+geom_density(aes(x=num_voted_users))
+
+ggplot(data=data11_15)+geom_density(aes(x=num_user_for_reviews))
+
+head(data11_15)
 
 ##Boxplots
 
@@ -27,9 +35,12 @@ ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=return)) + ylim(0,5)
 
 ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=budget))
 
+ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=num_voted_users)) + ylim(0,500000)
+
+
 ##Correlation table
 
-cordata <- select(data11_15, imdb_score, movie_facebook_likes, gross, return, budget)
+cordata <- select(data11_15, imdb_score, movie_facebook_likes, gross, return, budget, num_voted_users)
 cor_table <- round(cor(cordata),2)
 print(cor_table)
 
