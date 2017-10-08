@@ -10,42 +10,39 @@ output:
 ```{r setup, include=FALSE}
 library(stargazer)
 library(car)
-```
-
-
-```{r, echo=FALSE}
-##Initial cleaning
 library(dplyr)
 library(readr)
 library(tidyr)
 library(magrittr)
 library(stringr)
+library(ggplot2)
+```
 
+
+```{r, echo=FALSE}
+##Initial cleaning
 old_data <- read.csv("./movie_metadata.csv", stringsAsFactors = FALSE)
 
 film_country <- old_data %>%
   group_by(country) %>%
   summarise(n=n())
-print(film_country)
+#print(film_country)
 
 filter_data <- filter(old_data, country=="USA", language=="English")
 select_data <- select(filter_data, movie_title, title_year, director_name, duration, gross, genres, num_voted_users, num_user_for_reviews, budget, imdb_score, movie_facebook_likes, actor_1_name, actor_2_name, actor_3_name)
 select_data_filter <- filter(select_data, title_year >= 2011, gross !=0, gross != "NA", gross != "", imdb_score != 0, imdb_score != "NA", imdb_score != "", budget != 0, budget != "NA", budget != "", movie_facebook_likes != 0, movie_facebook_likes != "NA", movie_facebook_likes != "")
 
-head(select_data_filter)
+#head(select_data_filter)
 
 ##Genre conversion
-
-typeof(select_data_filter$genres)
-toString(select_data_filter$genres)
-str(select_data_filter)
-
+#typeof(select_data_filter$genres)
+#toString(select_data_filter$genres)
+#str(select_data_filter)
 genre_names <- c("Action","Adventure", "Animation", "Biography", "Comedy", "Crime", "Documentary", "Drama", "Family", "Fantasy", "History", "Horror", "Musical", "Mystery", "News", "Romance", "Sci-Fi", "Sport", "Thriller", "War", "Western")
 genre_types <- c("genre1", "genre2","genre3", "genre4", "genre5", "genre6", "genre7")
 genre_filter <- select_data_filter %>% separate(genres, into=genre_types,sep = "\\|")
 
 ##Establishing a Gross Revenue / Budget variable and cleaning up movie title names
-
 RB_data <- mutate(.data = genre_filter, return = gross / budget)
 RB_data$return <- round(RB_data$return, 2)
 #head(RB_data)
@@ -133,7 +130,7 @@ RB_data$westerndummy[is.na(RB_data$westerndummy)] <- 0
 
 
 #to search for a string in any column
-str_detect(RB_data$movie_title,"John Carter")
+#str_detect(RB_data$movie_title,"John Carter")
 
 ##cleaning awards data 
 awards_data <- read.csv("./awards_metadata.csv", stringsAsFactors = FALSE, encoding = "UTF-8")
@@ -179,7 +176,7 @@ RB_data = RB_data[ , !(names(RB_data) %in% c("act1_oscars","act2_oscars","act3_o
 
 ##Establishing separate datasets for time periods
 data11_15 <- filter(.data = RB_data, title_year < 2016)
-head(data11_15)
+#head(data11_15)
 data16 <- filter(.data = RB_data,title_year == 2016)
 #head(data16)
 #print(data11_15$movie_facebook_likes)
@@ -259,7 +256,7 @@ Determining what variable should represent popularity, itself a subjective quali
 
 An obvious proxy would be revenues, should we determine this a valid measure of commercial success. Contrary to the thoughts of those "voting with their wallets", this is not entirely a straightforward metric. A limitation of the data available is we are only able to track box-office ticket sales, rather than all associated revenues. This ignores digital sales from streaming, DVD sales, and any other merchandise or commercial agreements (e.g. in-film advertising). 
 
-An example of this shortcoming would be the motion picture, "The Interview". Although extreme given the political sensitivities with North Korea, which led to a limited global release, "The Interview grossed $40m in digital rentals...and earned an additional $11.2m worldwide at the box office on a $44m budget[^3]". By relying on box office revenues alone, we may not get a complete view on how commercially successful a film has been. This is something we discuss further as a limitation within our work, but which we do not explore further. 
+An example of this shortcoming would be the motion picture, "The Interview". Although extreme given the political sensitivities with North Korea, which led to a limited global release, "The Interview grossed $40m in digital rentals...and earned an additional \$11.2m worldwide at the box office on a \$44m budget[^3]". By relying on box office revenues alone, we may not get a complete view on how commercially successful a film has been. This is something we discuss further as a limitation within our work, but which we do not explore further. 
 
 A second issue is whether a low grossing film is still a success, relative to its underlying budget? This may be more applicable to arthouse films, rather than a typical Hollywood blockbuster, but is something we are able to condition against by examining a film's return on investment; defined by its box office revenues divided by its total budget. 
 
@@ -274,17 +271,15 @@ We produce boxplots and density graphs of the five variables above, along with b
 We summarises some of the key descriptive findings of these graphs, along with illustrating the results of our ROI boxplot and IMDB density graph:
 
 ``` {r results = "asis"}
-stargazer(cars, type="html", title="Table with Stargazer")
+stargazer(data11_15, type="html", title="Table with Stargazer")
 
 ```
 
 ```{r}
-
-
-imdbden <- ggplot(data=data11_15)+geom_density(aes(x=(imdb_score)))
-roibox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=return)) + ylim(0,5)
-
-grid.arrange(imdbden, roibox,  ncol=2)
+# imdbden <- ggplot(data=data11_15)+geom_density(aes(x=(imdb_score)))
+# roibox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=return)) + ylim(0,5)
+# 
+# grid.arrange(imdbden, roibox,  ncol=2)
 
 ```
 
