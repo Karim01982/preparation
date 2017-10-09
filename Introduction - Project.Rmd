@@ -3,10 +3,23 @@ title: "What makes a Hollywood film successful?"
 author: "Joanna Andari, Karim Awad, Jiye Ren, Nirbhay Sharma"
 date: "8 October 2017"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
+<style>
 
+table, td, th {
+  border: 1pt;
+  padding-left: 1em;
+  padding-right: 1em;
+  min-width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+</style>
 ```{r setup, include=FALSE}
 library(stargazer)
 library(car)
@@ -16,6 +29,8 @@ library(tidyr)
 library(magrittr)
 library(stringr)
 library(ggplot2)
+library(knitr)
+library(gridExtra)
 ```
 
 
@@ -270,9 +285,19 @@ We produce boxplots and density graphs of the five variables above, along with b
 
 We summarises some of the key descriptive findings of these graphs, along with illustrating the results of our ROI boxplot and IMDB density graph:
 
+\usepackage{dcolumn}
 ``` {r results = "asis"}
+
 stargazer(data11_15, type="latex", title="Table with Stargazer")
 
+temp_data <- data11_15 %>% select(gross, budget, num_voted_users, imdb_score, movie_facebook_likes, return)
+stargazer(temp_data, type="html", title="Summary of Dataset 2011 to 2015", median=TRUE, iqr=TRUE, nobs=FALSE, font.size="tiny", digits=2, align = TRUE, covariate.labels=c("Gross Revenue","Budget","No. of voted users","IMDB Score","Movie Facebook Likes","Movie ROI"))
+
+
+#stargazer(summary(data11_15),type="latex", title="Table with Stargazer")
+# iris_five %>% group_by(quintile) %>% # Group by quintile
+#   summarize(mean_sepal_length = mean(Sepal.Length), mean_sepal_width = mean(Sepal.Width), count = n()) %>%
+#   head()
 ```
 
 ```{r}
@@ -282,6 +307,14 @@ stargazer(data11_15, type="latex", title="Table with Stargazer")
 # grid.arrange(imdbden, roibox,  ncol=2)
 
 ```
+
+There are several intriguing observations. Firstly we observe that all our variables except IMDB scores are positively skewed, with the latter negatively skewed. This confounds our earlier thoughts on IMDB scores being normally distributed. With a median score of 6.7, this implies fans are likely to respond with favourable views, especially with our 1st and 3rd quartile scores between 6.1 and 7.2 respectively. MOre generally, we will need to proceed with any regression analysis carefully (see further comments below).
+
+Examining our financial metrics, our ROI variable suggests a median film will make a return of 1.2x, although this engenders significant volatility, reflected on our very wide range, and a standard deviation that would imply a negative mean on the downside. This seems consistent with the level of risk associated with producing films, with properties mimicking a financial option (e.g. an upfront payment with no certainty of exercise), given the uncertainty in audience receptiveness.
+
+This uncertainty is reinforced in the range of revenue figures, and corresponding budget figures respectively. With revenue, this volatility is likely to be more pronounced in practice, as our metric only focuses on box office tickets. These figures imply a median film will have a budget of US$40m and be expected to generate box office revenues of US$52m, consistent with our ROI estimate above.
+
+Our last observation is the comparative depth of number of IMDB votes relative to facebook likes. As alluded towards earlier, it is unclear how such facebook data has been collected, nor the interval between the film's release and collection. The latter is equally applicable to IMDB scores; however, given the negative skew with this statistic, the higher number of votes may prove a more desirable proxy in gauging popularity. We shall seek to confirm this by testing how these variables correlate with each other, to guide our final choice on our dependent variables. 
 
 
 ###Correlation analysis
@@ -301,14 +334,25 @@ The above correlations are all statistically significant[check - produce p-value
 
 In contrast to revenues, we do not consider ROI as suitable for further analysis as a dependent variable. Revenues as a financial metric has demonstrated the positive relationships we expected to see amongst social media (e.g. facebook looks and number of voted users), indicating that expressions of support tend to correspond with higher box office revenues (i.e. people go to the cinema). We do note the more weak positive correlation with IMDB scores (esp. relative to number of voting IMDB users), which we suspect is a function of the latter's negative skew, although given the strong correlation with budget, this partly offsets these concerns. The latter relationship would correspond well with blockbusters generating higher revenues, conditioned on budgets that can support the hiring of better actors, and increased marketing / promotional spend. 
 
-Equally, we observe a more positive correlation between number of voted users, against other metrics, relative to both IMDB scores and facebook likes. This warrants reappraising this variable, as it may represent a better proxy relative to IMDB scores themselves. From our descriptive analysis section above, we note a strong negative skew in IMDB scores, suggesting that those voting are likely to be fans conveying their support for a film, rather than providing a balanced critique. Therefore the number of IMDB votes may better represent the strength of popularity enjoyed by a particular movie, notwithstanding the possibility that not all these votes will be conveying the same numerical grade. 
+Equally, we observe a more positive correlation between number of voted users, against other metrics, relative to both IMDB scores and facebook likes. This warrants reappraising this variable, as it may represent a better proxy relative to IMDB scores themselves. From our descriptive analysis section above, we note a strong negative skew in IMDB scores, suggesting that those voting are likely to be fans conveying their support for a film, rather than providing a balanced critique. Therefore the number of IMDB votes may better represent the strength of popularity enjoyed by a particular movie. However, we are conscious of the possibility that not all these votes will be conveying the same numerical grade, nor the potential for duplicate votes to be included in any final score. 
 
-In sum, we believe examining both revenue and the number of 
+In sum, we believe examining both revenue and the number of IMDB votes separately, can help better inform our perspective on what constitutes a successful film. Yet both of these dependent variables demonstrate strong positive skew, which could bias any parameter estimate, and impact on variance calculations, affecting the accuracy of any t-statistic. Performing multiple regression analysis using OLS as it stands is unlikely to be appropriate. Remedies available are to perform regression using a GLS-based approach, or to transform our variables to resemble a normal distribution. Although extending beyond the scope of this assignment, we transform both our revenue and number of votes variables by natural logs raised to the power of 6 and 4 respectively (see below). As these transformations will generate beta estimates which are not intuitive, we conduct our regressions without these adjustment, altering our y-variable at the end to get a better understanding of our parameters and overall adjusted R-squared.
+
+```{r, echo = FALSE}
+
+numden <- ggplot(data=data11_15)+geom_density(aes(x=(num_voted_users)))
+revden <- ggplot(data=data11_15)+geom_density(aes(x=(gross)))
+
+numadj <- ggplot(data=data11_15)+geom_density(aes(x=log(num_voted_users)^4))
+revadj <- ggplot(data=data11_15)+geom_density(aes(x=log(gross)^6))
+
+grid.arrange(numden, revden, numadj, revadj, ncol=2)
+
+
+```
 
 
 
-[skewness]
-[p-value for correlations]
 
 
 [^3]: Wikipedia (2017)
@@ -325,11 +369,6 @@ In sum, we believe examining both revenue and the number of
 ##Appendix 2 - Boxplots and Density graphs
 
 ```{r, echo =FALSE}
-
-library(ggplot2)
-install.packages("gridExtra")
-library(gridExtra)
-
 #density plots
 
 imdbden <- ggplot(data=data11_15)+geom_density(aes(x=(imdb_score)))
