@@ -303,7 +303,7 @@ In contrast to revenues, we do not consider ROI as suitable for further analysis
 
 Equally, we observe a more positive correlation between number of voted users, against other metrics, relative to both IMDB scores and facebook likes. This warrants reappraising this variable, as it may represent a better proxy relative to IMDB scores themselves. From our descriptive analysis section above, we note a strong negative skew in IMDB scores, suggesting that those voting are likely to be fans conveying their support for a film, rather than providing a balanced critique. Therefore the number of IMDB votes may better represent the strength of popularity enjoyed by a particular movie, notwithstanding the possibility that not all these votes will be conveying the same numerical grade. 
 
-In sum, we believe examining
+In sum, we believe examining both revenue and the number of 
 
 
 
