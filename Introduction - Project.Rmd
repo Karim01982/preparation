@@ -288,10 +288,10 @@ We summarises some of the key descriptive findings of these graphs, along with i
 \usepackage{dcolumn}
 ``` {r results = "asis"}
 
-stargazer(data11_15, type="latex", title="Table with Stargazer")
+#stargazer(data11_15, type="latex", title="Table with Stargazer")
 
-temp_data <- data11_15 %>% select(gross, budget, num_voted_users, imdb_score, movie_facebook_likes, return)
-stargazer(temp_data, type="html", title="Summary of Dataset 2011 to 2015", median=TRUE, iqr=TRUE, nobs=FALSE, font.size="tiny", digits=2, align = TRUE, covariate.labels=c("Gross Revenue","Budget","No. of voted users","IMDB Score","Movie Facebook Likes","Movie ROI"))
+#temp_data <- data11_15 %>% select(gross, budget, num_voted_users, imdb_score, movie_facebook_likes, return)
+#stargazer(temp_data, type="html", title="Summary of Dataset 2011 to 2015", median=TRUE, iqr=TRUE, nobs=FALSE, font.size="tiny", digits=2, align = TRUE, covariate.labels=c("Gross Revenue","Budget","No. of voted users","IMDB Score","Movie Facebook Likes","Movie ROI"))
 
 
 #stargazer(summary(data11_15),type="latex", title="Table with Stargazer")
@@ -320,12 +320,14 @@ Our last observation is the comparative depth of number of IMDB votes relative t
 ###Correlation analysis
 
 ```{r, echo=FALSE}
+
+library(Hmisc)
+library(knitr)
+
 cordata <- select(data11_15, imdb_score, 
                   movie_facebook_likes, gross, return, 
                   budget, num_voted_users)
 cor_table <- round(cor(cordata),2)
-print(cor_table)
-library(knitr)
 kable(cor_table)
 
 matcordata <- as.matrix(cordata)
@@ -362,6 +364,70 @@ grid.arrange(numden, revden, numadj, revadj, ncol=2)
 
 ##Section 4: Regression Analysis
 
+###Social media: Number of IMDB votes
+
+```{r, results = "asis"}
+
+log4numvoted_users <- (log(data11_15$num_voted_users)^4)
+
+usereg1 <- lm(data = data11_15, num_voted_users~gross)
+
+usereg2 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence+ actor2_occurence+ actor3_occurence)
+
+usereg3 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence+ director_occurence)
+
+usereg4 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + movie_oscars + actor_oscars)
+
+usereg5 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + duration + actor_oscars)
+
+usereg6 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + duration + actor_oscars + actiondummy + adventuredummy + comedydummy + familydummy + fantasydummy+horrordummy+romancedummy + scifidummy+thrillerdummy)
+
+usereg7 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + duration + actor_oscars + actiondummy + familydummy +romancedummy + scifidummy + thrillerdummy)
+
+usereg8 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + duration + actor_oscars + familydummy + scifidummy )
+
+usereg9 <- lm(data = data11_15, num_voted_users ~ gross + duration + actor_oscars + familydummy + scifidummy)
+
+usereg10 <- lm(data = data11_15, log4numvoted_users ~ gross + duration + actor_oscars + familydummy + scifidummy)
+
+
+
+
+stargazer(usereg1, usereg2, usereg3, usereg4, usereg5, usereg6, usereg7, usereg8, usereg9, usereg10, type = "html", report = "vct*")
+
+```
+
+We start with a simple regression against box office revenues to gauge whether a film's cinema success (in purely absolute terms) corresponds with increased IMDB activity. We do not consider neither budget or ROI as an independent variable, given the former's high correlation (and thus introducing the risk of multi-collinearity), and the latter's minimal correlation coefficient. Our initial results indicate an additional IMDB vote is cast for every US$1,000 in ticket sales, that is statistically significant at a 5% confidence interval (we assume all t-tests are two-tailed). An adjusted R^2 of [0.435] is generated, providing a benchmark that can be refined further, given the size of our residual standard error ("RSE").
+
+We first examine the impact of particular actors and a director within our sample (equations 2 and 3), to address whether audiences respond to previous work produced. This is premised on counting the number of occurrences within our sample, and thus is limited in not consider other work undertaken within the period. Notwithstanding, this may help reduce any serial correlation within our error term. From our results, only the 1st actor appears statistically significant, with a negligible impact on increasing our adjusted R^2, or reducing the RSE term.
+
+As an alternative, we appraise the number of Oscars each actor and director has been awarded (equation 4), where these statistics reflect lifetime performance until film release. We find actor Oscars is stastically significant, contributing an extra 61,000 votes per Oscar, with movie Oscars insignificant. This is likely attributable to an extended lag between a film being released and the subsequent award ceremony being held; thus limiting its impact on box office sales. The adjusted R^2 increases to [0.476] with our RSE term falling, representing an improvement in fit.
+
+Our next step is to gain context into whether the duration of a film impacts popularity. This is premised on long films (i.e. > 150mins) generating mixed views depending on context. Although expecting this to be negligible, this proved materially significant, increasing our adjusted R^2 to [0.559], whilst rendering our Actor 1 variable insignificant. There is no apparent reason for this. An investigation of the scatterplot below would suggest outliers may be influencing these results. We remove this variable upon commencing our later refinement of our model within equations 8-10, as without any likely proxy, this appears to represent a spurious result.
+
+```{r}
+
+plot(data11_15$duration, data11_15$num_voted_users)
+
+```
+
+### Commercial: Box office ticket sales
+
+[Nirbhay Sharma]
+
+
+\pagebreak
+
+##Section 5: Hypothesis testing and robustness
+
+\pagebreak
+
+##Section 6: Limitations
+
+\pagebreak
+
+##Section 7: Conclusions and next steps
+
 
 
 
@@ -376,6 +442,7 @@ grid.arrange(numden, revden, numadj, revadj, ncol=2)
 
 ```{r, echo =FALSE}
 #density plots
+
 
 imdbden <- ggplot(data=data11_15)+geom_density(aes(x=(imdb_score)))
 

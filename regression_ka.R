@@ -26,13 +26,24 @@ summary(usereg7)
 usereg8 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + duration + actor_oscars + familydummy + scifidummy )
 summary(usereg8)
 
-usereg9 <- lm(data = data11_15, log4numvoted_users ~ gross + duration + actor_oscars + familydummy + scifidummy)
+usereg9 <- lm(data = data11_15, num_voted_users ~ gross + duration + actor_oscars + familydummy + scifidummy)
+
+usereg10 <- lm(data = data11_15, log4numvoted_users ~ gross + duration + actor_oscars + familydummy + scifidummy)
 summary(usereg9)
+
+
+summary(usereg9)
+summary(usereg10)
+
+
+stargazer(usereg1, usereg2, usereg3, usereg4, usereg5, usereg6, usereg7, usereg8, usereg9, usereg10, type = "latex")
 
 install.packages("car")
 
 library(car)
 residualPlot(usereg9)
+residualPlot(usereg10)
+
 
 ##Regression analysis - Facebook likes
 
