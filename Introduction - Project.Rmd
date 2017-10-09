@@ -6,7 +6,20 @@ output:
   html_document: default
   pdf_document: default
 ---
+<style>
 
+table, td, th {
+  border: 1pt;
+  padding-left: 1em;
+  padding-right: 1em;
+  min-width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+</style>
 ```{r setup, include=FALSE}
 library(stargazer)
 library(car)
@@ -16,6 +29,8 @@ library(tidyr)
 library(magrittr)
 library(stringr)
 library(ggplot2)
+library(knitr)
+library(gridExtra)
 ```
 
 
@@ -270,9 +285,17 @@ We produce boxplots and density graphs of the five variables above, along with b
 
 We summarises some of the key descriptive findings of these graphs, along with illustrating the results of our ROI boxplot and IMDB density graph:
 
+\usepackage{dcolumn}
 ``` {r results = "asis"}
-stargazer(data11_15, type="html", title="Table with Stargazer")
 
+temp_data <- data11_15 %>% select(gross, budget, num_voted_users, imdb_score, movie_facebook_likes, return)
+stargazer(temp_data, type="html", title="Summary of Dataset 2011 to 2015", median=TRUE, iqr=TRUE, nobs=FALSE, font.size="tiny", digits=2, align = TRUE, covariate.labels=c("Gross Revenue","Budget","No. of voted users","IMDB Score","Movie Facebook Likes","Movie ROI"))
+
+
+#stargazer(summary(data11_15),type="latex", title="Table with Stargazer")
+# iris_five %>% group_by(quintile) %>% # Group by quintile
+#   summarize(mean_sepal_length = mean(Sepal.Length), mean_sepal_width = mean(Sepal.Width), count = n()) %>%
+#   head()
 ```
 
 ```{r}
@@ -315,11 +338,6 @@ The most surprising result is the lack of correlation with the ROI variable.
 ##Appendix 2 - Boxplots and Density graphs
 
 ```{r, echo =FALSE}
-
-library(ggplot2)
-install.packages("gridExtra")
-library(gridExtra)
-
 #density plots
 
 imdbden <- ggplot(data=data11_15)+geom_density(aes(x=(imdb_score)))
