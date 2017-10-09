@@ -22,6 +22,8 @@ ggplot(data=data11_15)+geom_density(aes(x=num_voted_users))
 ggplot(data=data11_15)+geom_density(aes(x=log(num_voted_users)^4))
 
 
+ggplot(data=data11_15)+geom_density(aes(x=log(gross)^6))
+
 ggplot(data=data11_15)+geom_density(aes(x=(duration)))
 
 
