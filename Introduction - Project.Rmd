@@ -328,6 +328,10 @@ print(cor_table)
 library(knitr)
 kable(cor_table)
 
+matcordata <- as.matrix(cordata)
+pvalcor_table <- rcorr(matcordata, type="pearson")
+kable(pvalcor_table$P)
+
 ```
 
 The above correlations are all statistically significant[check - produce p-value table]. The most surprising result is the lack of correlation with the ROI variable. It is unclear why there is not a positive relationship relative to some of the social media metrics above. This may potentially suggest the impact of outliers in our sample, which may be reducing any underlying correlation [scope to include scatterplot conditioned on different return levels]. 
@@ -352,10 +356,12 @@ grid.arrange(numden, revden, numadj, revadj, ncol=2)
 ```
 
 
-
-
-
 [^3]: Wikipedia (2017)
+
+\pagebreak
+
+##Section 4: Regression Analysis
+
 
 
 
