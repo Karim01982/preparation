@@ -266,7 +266,7 @@ The remaining two metrics concern IMDB scores, and the number of votes received.
 
 ###Descriptive analysis
 
-We produce boxplots and density graphs of the five variables above, along with budget, to provide a sense-check. These can all separately be found in the appendices.
+We produce boxplots and density graphs of the five variables above, along with budget to provide a sense-check. These can all separately be found in the appendices.
 
 We summarises some of the key descriptive findings of these graphs, along with illustrating the results of our ROI boxplot and IMDB density graph:
 
@@ -297,9 +297,15 @@ kable(cor_table)
 
 ```
 
-The above correlations are all statistically significant[check - produce p-value table]. The most surprising result is the lack of correlation with the ROI variable. It is unclear why there is not a positive relationship relative to some of the social media metrics above. This may potentially suggest the impact of outliers in our sample, which may be reducing any underlying correlation [scope to include scatterplot conditioned on different return levels]. In contrast to revenues, which at least demonstrates positive correlation consistent with what is expected for movie facebook likes, and number of voted users, we do not consider ROI as suitable for further analysis. 
+The above correlations are all statistically significant[check - produce p-value table]. The most surprising result is the lack of correlation with the ROI variable. It is unclear why there is not a positive relationship relative to some of the social media metrics above. This may potentially suggest the impact of outliers in our sample, which may be reducing any underlying correlation [scope to include scatterplot conditioned on different return levels]. 
+
+In contrast to revenues, we do not consider ROI as suitable for further analysis as a dependent variable. Revenues as a financial metric has demonstrated the positive relationships we expected to see amongst social media (e.g. facebook looks and number of voted users), indicating that expressions of support tend to correspond with higher box office revenues (i.e. people go to the cinema). We do note the more weak positive correlation with IMDB scores (esp. relative to number of voting IMDB users), which we suspect is a function of the latter's negative skew, although given the strong correlation with budget, this partly offsets these concerns. The latter relationship would correspond well with blockbusters generating higher revenues, conditioned on budgets that can support the hiring of better actors, and increased marketing / promotional spend. 
 
 Equally, we observe a more positive correlation between number of voted users, against other metrics, relative to both IMDB scores and facebook likes. This warrants reappraising this variable, as it may represent a better proxy relative to IMDB scores themselves. From our descriptive analysis section above, we note a strong negative skew in IMDB scores, suggesting that those voting are likely to be fans conveying their support for a film, rather than providing a balanced critique. Therefore the number of IMDB votes may better represent the strength of popularity enjoyed by a particular movie, notwithstanding the possibility that not all these votes will be conveying the same numerical grade. 
+
+In sum, we believe examining
+
+
 
 [skewness]
 [p-value for correlations]
