@@ -1,0 +1,566 @@
+---
+title: "What makes a Hollywood film successful?"
+author: "Joanna Andari, Karim Awad, Jiye Ren, Nirbhay Sharma"
+date: "8 October 2017"
+output:
+  html_document: default
+  pdf_document: default
+---
+<style>
+
+table, td, th {
+  border: 1pt;
+  padding-left: 1em;
+  padding-right: 1em;
+  min-width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+</style>
+```{r setup, include=FALSE}
+library(stargazer)
+library(car)
+library(dplyr)
+library(readr)
+library(tidyr)
+library(magrittr)
+library(stringr)
+library(ggplot2)
+library(knitr)
+library(gridExtra)
+```
+
+
+```{r, echo=FALSE}
+##Initial cleaning
+old_data <- read.csv("./movie_metadata.csv", stringsAsFactors = FALSE)
+
+film_country <- old_data %>%
+  group_by(country) %>%
+  summarise(n=n())
+#print(film_country)
+
+filter_data <- filter(old_data, country=="USA", language=="English")
+select_data <- select(filter_data, movie_title, title_year, director_name, duration, gross, genres, num_voted_users, num_user_for_reviews, budget, imdb_score, movie_facebook_likes, actor_1_name, actor_2_name, actor_3_name)
+select_data_filter <- filter(select_data, title_year >= 2011, gross !=0, gross != "NA", gross != "", imdb_score != 0, imdb_score != "NA", imdb_score != "", budget != 0, budget != "NA", budget != "", movie_facebook_likes != 0, movie_facebook_likes != "NA", movie_facebook_likes != "")
+
+#head(select_data_filter)
+
+##Genre conversion
+#typeof(select_data_filter$genres)
+#toString(select_data_filter$genres)
+#str(select_data_filter)
+genre_names <- c("Action","Adventure", "Animation", "Biography", "Comedy", "Crime", "Documentary", "Drama", "Family", "Fantasy", "History", "Horror", "Musical", "Mystery", "News", "Romance", "Sci-Fi", "Sport", "Thriller", "War", "Western")
+genre_types <- c("genre1", "genre2","genre3", "genre4", "genre5", "genre6", "genre7")
+genre_filter <- select_data_filter %>% separate(genres, into=genre_types,sep = "\\|")
+
+##Establishing a Gross Revenue / Budget variable and cleaning up movie title names
+RB_data <- mutate(.data = genre_filter, return = gross / budget)
+RB_data$return <- round(RB_data$return, 2)
+#head(RB_data)
+
+##Clean RB_data of duplicates and the additional character in name
+RB_data$movie_title = substr(RB_data$movie_title,1,nchar(RB_data$movie_title)-1)
+RB_data <- RB_data[-c(as.vector(which(duplicated(RB_data) == TRUE))),]
+
+#head(RB_data)
+
+##Introducing flags for genres
+
+RB_data$actiondummy <- as.numeric( RB_data$genre1 == "Action" | RB_data$genre2 == "Action" | RB_data$genre3 == "Action" | RB_data$genre4 == "Action" | RB_data$genre5 == "Action" | RB_data$genre6 == "Action" | RB_data$genre7 == "Action")
+RB_data$actiondummy[is.na(RB_data$actiondummy)] <- 0
+
+RB_data$adventuredummy <- as.numeric( RB_data$genre1 == "Adventure" | RB_data$genre2 == "Adventure" | RB_data$genre3 == "Adventure" | RB_data$genre4 == "Adventure" | RB_data$genre5 == "Adventure" | RB_data$genre6 == "Adventure" | RB_data$genre7 == "Adventure")
+RB_data$adventuredummy[is.na(RB_data$adventuredummy)] <- 0
+
+RB_data$animationdummy <- as.numeric( RB_data$genre1 == "Animation" | RB_data$genre2 == "Animation" | RB_data$genre3 == "Animation" | RB_data$genre4 == "Animation" | RB_data$genre5 == "Animation" | RB_data$genre6 == "Animation" | RB_data$genre7 == "Animation")
+RB_data$animationdummy[is.na(RB_data$animationdummy)] <- 0
+
+RB_data$biographydummy <- as.numeric( RB_data$genre1 == "Biography" | RB_data$genre2 == "Biography" | RB_data$genre3 == "Biography" | RB_data$genre4 == "Biography" | RB_data$genre5 == "Biography" | RB_data$genre6 == "Biography" | RB_data$genre7 == "Biography")
+RB_data$biographydummy[is.na(RB_data$biographydummy)] <- 0
+
+RB_data$comedydummy <- as.numeric( RB_data$genre1 == "Comedy" | RB_data$genre2 == "Comedy" | RB_data$genre3 == "Comedy" | RB_data$genre4 == "Comedy" | RB_data$genre5 == "Comedy" | RB_data$genre6 == "Comedy" | RB_data$genre7 == "Comedy")
+RB_data$comedydummy[is.na(RB_data$comedydummy)] <- 0
+
+RB_data$crimedummy <- as.numeric( RB_data$genre1 == "Crime" | RB_data$genre2 == "Crime" | RB_data$genre3 == "Crime" | RB_data$genre4 == "Crime" | RB_data$genre5 == "Crime" | RB_data$genre6 == "Crime" | RB_data$genre7 == "Crime")
+RB_data$crimedummy[is.na(RB_data$crimedummy)] <- 0
+
+RB_data$documentarydummy <- as.numeric( RB_data$genre1 == "Documentary" | RB_data$genre2 == "Documentary" | RB_data$genre3 == "Documentary" | RB_data$genre4 == "Documentary" | RB_data$genre5 == "Documentary" | RB_data$genre6 == "Documentary" | RB_data$genre7 == "Documentary")
+RB_data$documentarydummy[is.na(RB_data$documentarydummy)] <- 0
+
+RB_data$dramadummy <- as.numeric( RB_data$genre1 == "Drama" | RB_data$genre2 == "Drama" | RB_data$genre3 == "Drama" | RB_data$genre4 == "Drama" | RB_data$genre5 == "Drama" | RB_data$genre6 == "Drama" | RB_data$genre7 == "Drama")
+RB_data$dramadummy[is.na(RB_data$dramadummy)] <- 0
+
+RB_data$familydummy <- as.numeric( RB_data$genre1 == "Family" | RB_data$genre2 == "Family" | RB_data$genre3 == "Family" | RB_data$genre4 == "Family" | RB_data$genre5 == "Family" | RB_data$genre6 == "Family" | RB_data$genre7 == "Family")
+RB_data$familydummy[is.na(RB_data$familydummy)] <- 0
+
+RB_data$fantasydummy <- as.numeric( RB_data$genre1 == "Fantasy" | RB_data$genre2 == "Fantasy" | RB_data$genre3 == "Fantasy" | RB_data$genre4 == "Fantasy" | RB_data$genre5 == "Fantasy" | RB_data$genre6 == "Fantasy" | RB_data$genre7 == "Fantasy")
+RB_data$fantasydummy[is.na(RB_data$fantasydummy)] <- 0
+
+RB_data$historydummy <- as.numeric( RB_data$genre1 == "History" | RB_data$genre2 == "History" | RB_data$genre3 == "History" | RB_data$genre4 == "History" | RB_data$genre5 == "History" | RB_data$genre6 == "History" | RB_data$genre7 == "History")
+RB_data$historydummy[is.na(RB_data$historydummy)] <- 0
+
+RB_data$horrordummy <- as.numeric( RB_data$genre1 == "Horror" | RB_data$genre2 == "Horror" | RB_data$genre3 == "Horror" | RB_data$genre4 == "Horror" | RB_data$genre5 == "Horror" | RB_data$genre6 == "Horror" | RB_data$genre7 == "Horror")
+RB_data$horrordummy[is.na(RB_data$horrordummy)] <- 0
+
+RB_data$musicaldummy <- as.numeric( RB_data$genre1 == "Musical" | RB_data$genre2 == "Musical" | RB_data$genre3 == "Musical" | RB_data$genre4 == "Musical" | RB_data$genre5 == "Musical" | RB_data$genre6 == "Musical" | RB_data$genre7 == "Musical")
+RB_data$musicaldummy[is.na(RB_data$musicaldummy)] <- 0
+
+RB_data$mysterydummy <- as.numeric( RB_data$genre1 == "Mystery" | RB_data$genre2 == "Mystery" | RB_data$genre3 == "Mystery" | RB_data$genre4 == "Mystery" | RB_data$genre5 == "Mystery" | RB_data$genre6 == "Mystery" | RB_data$genre7 == "Mystery")
+RB_data$mysterydummy[is.na(RB_data$mysterydummy)] <- 0
+
+RB_data$newsdummy <- as.numeric( RB_data$genre1 == "News" | RB_data$genre2 == "News" | RB_data$genre3 == "News" | RB_data$genre4 == "News" | RB_data$genre5 == "News" | RB_data$genre6 == "News" | RB_data$genre7 == "News")
+RB_data$newsdummy[is.na(RB_data$newsdummy)] <- 0
+
+RB_data$romancedummy <- as.numeric( RB_data$genre1 == "Romance" | RB_data$genre2 == "Romance" | RB_data$genre3 == "Romance" | RB_data$genre4 == "Romance" | RB_data$genre5 == "Romance" | RB_data$genre6 == "Romance" | RB_data$genre7 == "Romance")
+RB_data$romancedummy[is.na(RB_data$romancedummy)] <- 0
+
+RB_data$scifidummy <- as.numeric( RB_data$genre1 == "Sci-Fi" | RB_data$genre2 == "Sci-Fi" | RB_data$genre3 == "Sci-Fi" | RB_data$genre4 == "Sci-Fi" | RB_data$genre5 == "Sci-Fi" | RB_data$genre6 == "Sci-Fi" | RB_data$genre7 == "Sci-Fi")
+RB_data$scifidummy[is.na(RB_data$scifidummy)] <- 0
+
+RB_data$sportdummy <- as.numeric( RB_data$genre1 == "Sport" | RB_data$genre2 == "Sport" | RB_data$genre3 == "Sport" | RB_data$genre4 == "Sport" | RB_data$genre5 == "Sport" | RB_data$genre6 == "Sport" | RB_data$genre7 == "Sport")
+RB_data$sportdummy[is.na(RB_data$sportdummy)] <- 0
+
+RB_data$thrillerdummy <- as.numeric( RB_data$genre1 == "Thriller" | RB_data$genre2 == "Thriller" | RB_data$genre3 == "Thriller" | RB_data$genre4 == "Thriller" | RB_data$genre5 == "Thriller" | RB_data$genre6 == "Thriller" | RB_data$genre7 == "Thriller")
+RB_data$thrillerdummy[is.na(RB_data$thrillerdummy)] <- 0
+
+RB_data$wardummy <- as.numeric( RB_data$genre1 == "War" | RB_data$genre2 == "War" | RB_data$genre3 == "War" | RB_data$genre4 == "War" | RB_data$genre5 == "War" | RB_data$genre6 == "War" | RB_data$genre7 == "War")
+RB_data$wardummy[is.na(RB_data$wardummy)] <- 0
+
+RB_data$westerndummy <- as.numeric( RB_data$genre1 == "Western" | RB_data$genre2 == "Western" | RB_data$genre3 == "Western" | RB_data$genre4 == "Western" | RB_data$genre5 == "Western" | RB_data$genre6 == "Western" | RB_data$genre7 == "Western")
+RB_data$westerndummy[is.na(RB_data$westerndummy)] <- 0
+
+#sum(RB_data$actiondummy)
+
+##To search for items within the Movie Title column
+# row <- grep(RB_data$movie_title,"The Dark Knight")
+# as.character(RB_data$movie_title[1]) == as.character("The Dark Knight Rises")
+# head(RB_data)
+# typeof(RB_data$genre1)
+# typeof(RB_data$movie_title)
+# RB_data$movie_title[1] == as.character("The Dark Knight Rises")
+
+
+#to search for a string in any column
+#str_detect(RB_data$movie_title,"John Carter")
+
+##cleaning awards data 
+awards_data <- read.csv("./awards_metadata.csv", stringsAsFactors = FALSE, encoding = "UTF-8")
+awards_data <- filter(awards_data, Winner!="NA")
+awards_data <- select(awards_data, Year, Award, Name, Film)
+movie_wins <- filter(awards_data, Award=="Best Picture" | Award=="Best Motion Picture")
+movie_wins <- count(movie_wins, Name)
+actor_wins <- filter(awards_data, Award=="Actor" | Award=="Actress" | Award=="Actor in a Leading Role" | Award=="Actress in a Leading Role" | Award=="Actor in a Supporting Role" | Award=="Actress in a Supporting Role")
+actor_wins <- count(actor_wins, Name)
+director_wins <- filter(awards_data, Award=="Directing")
+director_wins$Name = director_wins$Film
+director_wins <- count(director_wins, Name)
+award_wins <- rbind(actor_wins,director_wins,movie_wins)
+
+
+
+##Getting the occurences of directors/actors in the database
+for (i in (1:length(RB_data))){
+  RB_data$director_occurence[i] = length(which((str_detect(RB_data$director_name, RB_data$director_name[i])) == TRUE))
+  RB_data$actor1_occurence[i] = length(which((str_detect(cbind(RB_data$actor_1_name, RB_data$actor_2_name, RB_data$actor_3_name), RB_data$actor_1_name[i])) == TRUE))
+  RB_data$actor2_occurence[i] = length(which((str_detect(cbind(RB_data$actor_1_name, RB_data$actor_2_name, RB_data$actor_3_name), RB_data$actor_2_name[i])) == TRUE))
+  RB_data$actor3_occurence[i] = length(which((str_detect(cbind(RB_data$actor_1_name, RB_data$actor_2_name, RB_data$actor_3_name), RB_data$actor_3_name[i])) == TRUE))
+}
+
+
+#FOR GETTING AWARDS DATA
+occurences = table(unlist(award_wins$Name))
+occurences = as.data.frame(occurences)
+RB_data = left_join(x=RB_data, y=occurences, by=c(director_name = "Var1"))
+colnames(RB_data)[47] <- "dir_oscars"
+RB_data = left_join(x=RB_data, y=occurences, by=c(actor_1_name = "Var1"))
+colnames(RB_data)[48] <- "act1_oscars"
+RB_data = left_join(x=RB_data, y=occurences, by=c(actor_2_name = "Var1"))
+colnames(RB_data)[49] <- "act2_oscars"
+RB_data = left_join(x=RB_data, y=occurences, by=c(actor_3_name = "Var1"))
+colnames(RB_data)[50] <- "act3_oscars"
+RB_data = left_join(x=RB_data, y=occurences, by=c(director_name = "Var1"))
+colnames(RB_data)[51] <- "movie_oscars"
+RB_data[c("dir_oscars","act1_oscars","act2_oscars","act3_oscars","movie_oscars")][is.na(RB_data[c("dir_oscars","act1_oscars","act2_oscars","act3_oscars","movie_oscars")])] <- 0
+RB_data$actor_oscars = RB_data$act1_oscars + RB_data$act2_oscars + RB_data$act3_oscars
+RB_data = RB_data[ , !(names(RB_data) %in% c("act1_oscars","act2_oscars","act3_oscars","genre1","genre2","genre3","genre4","genre5","genre6","genre7"))]
+
+
+##Establishing separate datasets for time periods
+data11_15 <- filter(.data = RB_data, title_year < 2016)
+#head(data11_15)
+data16 <- filter(.data = RB_data,title_year == 2016)
+#head(data16)
+#print(data11_15$movie_facebook_likes)
+#print(data11_15$movie_facebook_likes)
+```
+
+
+
+## Section 1: Introduction
+
+The film industry is expected to generate global box office revenues of almost $49.3bn by 2020, from a forecast of US$38.3bn in 2016[^1], representing a CAGR of over 32%. These substantial growth levels are likely to result in vast resources being poured into the industry, in search of the next "big hit". Countries, recognising the value of developing a film industry to support a variety of local and national initiatives, have supported these activities, providing tax breaks to investors, to mitigate the material upfront costs involved.
+
+Outside of India, the US continues to lead the way in producing a substantial volume of films, accounting for an estimated US$10.7bn in box office revenues in 2016[^2]. Yet in contrast to Indian films, which principally serve a domestic audience, Hollywood films benefit from a global distribution network. This results in films having to cater for different audiences in different countries, overcoming issues varying from political censorship through to cultural sensitivities, to maximise their appeal and potential commercial success.
+
+```{r, echo=FALSE}
+
+library("ggplot2")
+names <- c(2016, 2017, 2018, 2019, 2020)
+globalboxoffice16_20 <- c(38.3, 41.2, 44, 46.7, 49.3)
+USboxoffice16_20 <- c(10.7, 10.6, 10.9, 11.1, 11.3)
+boxoff <- data.frame(names, globalboxoffice16_20, USboxoffice16_20)
+
+year <- c(2016, 2017, 2018, 2019, 2020)
+type<- c('global','global','global','global','global')
+value <- c(38.3, 41.2, 44, 46.7, 49.3)
+global_df <- data.frame(year, type, value)
+
+year <- c(2016, 2017, 2018, 2019, 2020)
+type <- c('US','US','US','US','US')                      
+value <- c(10.7, 10.6, 10.9, 11.1, 11.3)
+US_df <- data.frame(year,type,value)
+
+boxoff <- rbind.data.frame(global_df,US_df)
+#####produce bar graph
+ggplot(boxoff, aes(x = year, y=value, fill= type))+ geom_bar(stat='identity', position='dodge')+ ggtitle ('Global versus US Box Office Revenues per Year') + theme(plot.title = element_text(hjust=0.5))+ labs(x='Year', y = ' Revenues (in bn$)') 
+
+```
+
+With global audiences in mind, are there factors that can help predict a Hollywood film's popularity, and with that, guide future decisions on the types of films produced? In turn, can this better inform investors on potential risks involved with backing particular projects?
+
+This report seeks to examine a random sample of movie data pulled from IMDB data between 2011-16, concentrating on the US given its role in influencing the wider film industry. This will seek to understand how we should measure popularity, focusing on 2011-15 data, before devising a regression model that can help predict popularity. We will then test its capacity to predict 2016 trends, before noting the limitations of our work, and areas for further development.
+
+As this report shall conclude, [...]
+
+
+[^1]: Statista (2016) 
+[^2]: Statista (2016) 
+
+\pagebreak
+
+##Section 2: Data sampling and cleaning
+
+The data compiled for this project/analysis is obtained from 2 different datasets:         
+* **IMDB Movie Dataset**           
+* **Oscar Awards Dataset**        
+
+We have performed data cleaning on both of these datasets and then compiled them to a single dataset in order to obtain the 'working data'. Below is a summary for the data cleaning operations performed on both of these datasets.                       
+                  
+1. **IMDB Movie Dataset:** The raw data consisted of 5044 observations, containing details of movies from the IMDb database over 28 variables. These variables included information about the movie performance on the box office, the actor(s) name, direcor(s) names, movie genre, movie facebook likes and more.     
+    * **Step 1 - Cleaning up inconsistent observations:** The raw dataset contained a lot of inconsistencies, namely 'NA' or Blank values for several observations. In order to get a consistent data to perform analysis on, we **_removed all the observations with any NA or blank values_**.                
+    * **Step 2 - Removing duplicate values:** We observed that the dataset contained duplicate observations, which were also removed.
+    * **Step 3 - Limiting our dataset:** In order to do a comprehensive analysis, having a dataset of movies belonging to a single country or industry will be a good place to start. Furthermore, ever since the the outset of facebook and other social media, the success of a movie is heavily reliant on its social presence and digital marketing. Therefore, to completely account for these factors, and also ensure that the data we analysed is consistent, we have limited our data to **_movies made in the USA after the year 2011_**.                           
+    * **Step 4 - Segregating the movie genres:** The dataset contained the movie genres in the form of a single string, with every genre of the movie, delimited by a '|' symbol. In order to get the actual genres separated and ready to use, we used created flags in order to check whether the movie is of a particular genre. For example: the 'action_genre' column will have a 1 value for an observation, if it is an action movie.
+    * **Step 5 - Calculating the number of occurences of each actor/director:** Another interesting variable that we expect to be of significance to our analysis was the number of times an actor/director has showed up in our dataset. That data would allow us to possibly find interesting points on how an actor/director can impact a movie's performance/success. Thus, we added variables/columns with the **_number of occurences for actors and directors_**.
+    * **Step 6 - Calculating the movie ROI:** We add another variable, 'movie_roi' which contains the **_return on investment for each movie_**. This will help us in our analysis.
+    * **Step 7 - Selecting only the required columns:** The raw dataset consisted of 28 variables, many of which are not required in our analyses. Thus, we remove the unwanted columns and keep only the data that is specific to our analysis. In the process we reduce the size of the dataset leading to better performance. (See data description for more detials).                                                                                                                                                                               
+  The cleaned movie dataset now has 535 obseravations over 39 variables. Please note that there are 21 variables which are genre indicators, and 4 are occuence variables.                          
+                                   
+                                                        
+2. **Oscar winners dataset:** The raw dataset of awards contained 2321 observations over 4 variables. This database consisted the nominees and winners of the Academy Awards (or Oscars) ever since its inception, i.e. from 1927 to 2015.     
+    * **Step 1 - Cleaning up inconsistent observations:** The raw dataset some inconsistent observations where the name of the winner and the film was placed in the incorrect column. Since this was the case for the initial few records only, we ignored this and copied the values in the 'film' column to the 'names' column.                
+    * **Step 2 - Limiting our dataset:** The dataset included both nominess and winner and from every category. We were interested in collecting data about the actors, directors, and the best picture winners only in order to see how that impacts the success of a movie. Therefore, we **_excluded the nomiees and only kept the winners for the awards_** related to Best Actor/Actress in a Lead/Supporting role, Best Director and Best Picutre.
+    * **Step 3 - Counting the awards:** In order to get the data of the number of wins for each individual, we introduced a new column 'num_wins' which counted the **_number of occurences of a name in the winners list_**. Using this data makes sense as in order to asses the impact of this on a movies popularity/success.
+    * **Step 4 - Selecting the required columns:** The raw dataset contains 4 variables, and a count column, out of which only the 'count' and 'name' column is required for our analysis. Thus we select only a small subset of the raw data for our analysis.                   
+  The cleaned awards data now has 434 observations over 2 variables. This data will come handy to check which movies/actors/directors have oscar(s) to their name(s) and how that impacts the success of a movie.
+
+
+3. **Final (Cumulative) Dataset:** In order to get the final working database, we combine the information from the two cleaned datasets.             
+    * **Step 1 - Summarizing the datasets:** We need to get the number of award wins for actors, directors, and movie for each observation in the into the IMDB movie dataset, from the 'Oscar winners dataset'. We do this by introducing new variables that captures **_the count of oscars for each actor, director, and movie for each observation_**.
+    * **Step 2 - Diving the final data into two datasets:** The entire basis of our analysis was to create a model that can predict the success of a hollywood movie. To achieve that, we will try to build a model (or hypothesis) using the data for movies from 2011 to 2015 and then test the model (or hypothesis) for the movies in 2016. This will give us a clear indication of how our model fits with current and future data. Thus we **_create two subsets of the final data, one for data of movies from 2011 to 2015 and the other with the data of movies for 2016_**.   
+
+
+##Section 3: How do we measure a film's popularity?
+
+###What metrics should we use to determine our dependent variable?
+
+Determining what variable should represent popularity, itself a subjective quality, gives rise to several potential proxy variables. These can be divided between those that are financially driven relative to social media metrics, of which we consider each in turn, arriving at five possible variables.
+
+An obvious proxy would be revenues, should we determine this a valid measure of commercial success. Contrary to the thoughts of those "voting with their wallets", this is not entirely a straightforward metric. A limitation of the data available is we are only able to track box-office ticket sales, rather than all associated revenues. This ignores digital sales from streaming, DVD sales, and any other merchandise or commercial agreements (e.g. in-film advertising). 
+
+An example of this shortcoming would be the motion picture, "The Interview". Although extreme given the political sensitivities with North Korea, which led to a limited global release, "The Interview grossed $40m in digital rentals...and earned an additional \$11.2m worldwide at the box office on a \$44m budget[^3]". By relying on box office revenues alone, we may not get a complete view on how commercially successful a film has been. This is something we discuss further as a limitation within our work, but which we do not explore further. 
+
+A second issue is whether a low grossing film is still a success, relative to its underlying budget? This may be more applicable to arthouse films, rather than a typical Hollywood blockbuster, but is something we are able to condition against by examining a film's return on investment; defined by its box office revenues divided by its total budget. 
+
+Social media provides us with three relevant metrics. The first surrounds the number of facebook likes a film has received. Although a singular expression of popularity, this provides some indication of fan reaction, premised on any "likes" resulting from watching the film, as opposed to being based on trailers or other promotional material. We are mindful this may not be entirely accurate, as we do not know at which point this data was collected (e.g. how many days / weeks after the film was released in the US, and how the latter is likely to vary by geography).
+
+The remaining two metrics concern IMDB scores, and the number of votes received. IMDB scores should provide a direct measure of popularity, with our initial assumption based on this most likely to be normally distributed (i.e. this theoretically should capture a broad range of views between a ranking of 0-10). The number of users may also help quantify the depth of support, and depending on the distribution of IMDB scores, represent a useful proxy for capturing popularity.
+
+###Descriptive analysis
+
+We produce boxplots and density graphs of the five variables above, along with budget to provide a sense-check. These can all separately be found in the appendices.
+
+We summarises some of the key descriptive findings of these graphs, along with illustrating the results of our ROI boxplot and IMDB density graph:
+
+\usepackage{dcolumn}
+``` {r results = "asis"}
+
+#stargazer(data11_15, type="latex", title="Table with Stargazer")
+
+#temp_data <- data11_15 %>% select(gross, budget, num_voted_users, imdb_score, movie_facebook_likes, return)
+#stargazer(temp_data, type="html", title="Summary of Dataset 2011 to 2015", median=TRUE, iqr=TRUE, nobs=FALSE, font.size="tiny", digits=2, align = TRUE, covariate.labels=c("Gross Revenue","Budget","No. of voted users","IMDB Score","Movie Facebook Likes","Movie ROI"))
+
+
+#stargazer(summary(data11_15),type="latex", title="Table with Stargazer")
+# iris_five %>% group_by(quintile) %>% # Group by quintile
+#   summarize(mean_sepal_length = mean(Sepal.Length), mean_sepal_width = mean(Sepal.Width), count = n()) %>%
+#   head()
+```
+
+```{r}
+# imdbden <- ggplot(data=data11_15)+geom_density(aes(x=(imdb_score)))
+# roibox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=return)) + ylim(0,5)
+# 
+# grid.arrange(imdbden, roibox,  ncol=2)
+
+```
+
+There are several intriguing observations. Firstly we observe that all our variables except IMDB scores are positively skewed, with the latter negatively skewed. This confounds our earlier thoughts on IMDB scores being normally distributed. With a median score of 6.7, this implies fans are likely to respond with favourable views, especially with our 1st and 3rd quartile scores between 6.1 and 7.2 respectively. Mopre generally, we will need to proceed with any regression analysis carefully (see further comments below).
+
+Examining our financial metrics, our ROI variable suggests a median film will make a return of 1.2x, although this engenders significant volatility, reflected on our very wide range, and a standard deviation that would imply a negative mean on the downside. This seems consistent with the level of risk associated with producing films, with properties mimicking a financial option (e.g. an upfront payment with no certainty of exercise), given the uncertainty in audience receptiveness.
+
+This uncertainty is reinforced in the range of revenue figures, and corresponding budget figures respectively. With revenue, this volatility is likely to be more pronounced in practice, as our metric only focuses on box office tickets. These figures imply a median film will have a budget of US$40m and be expected to generate box office revenues of US$52m, consistent with our ROI estimate above.
+
+Our last observation is the comparative depth of number of IMDB votes relative to facebook likes. As alluded towards earlier, it is unclear how such facebook data has been collected, nor the interval between the film's release and collection. The latter is equally applicable to IMDB scores; however, given the negative skew with this statistic, the higher number of votes may prove a more desirable proxy in gauging popularity. We shall seek to confirm this by testing how these variables correlate with each other, to guide our final choice on our dependent variables. 
+
+
+###Correlation analysis
+
+```{r, echo=FALSE}
+
+library(Hmisc)
+library(knitr)
+
+cordata <- select(data11_15, imdb_score, 
+                  movie_facebook_likes, gross, return, 
+                  budget, num_voted_users)
+cor_table <- round(cor(cordata),2)
+kable(cor_table)
+
+matcordata <- as.matrix(cordata)
+pvalcor_table <- rcorr(matcordata, type="pearson")
+kable(pvalcor_table$P)
+
+```
+
+The above correlations are all statistically significant, with the exception of our ROI variable. The most surprising result is the lack of correlation with the ROI variable. It is unclear why there is not a positive relationship relative to some of the social media metrics above. This may potentially suggest the impact of outliers in our sample, which may be reducing any underlying correlation 
+
+[Joanna Andari]
+[scope to include scatterplot conditioned on different return levels]
+[We need a ggplot with facet wrap on how ROI varies with number of users based on 0-1x return, 1-3x return, and 3+ return.] 
+
+```{r, echo=FALSE}
+library(dplyr)
+A<- filter(RB_data,return<1)
+B<- filter(RB_data, between(return,1,3))
+C<- filter(RB_data, return>3)
+
+A1<-select (A, 'num_voted_users','return' )
+A1[,"return"] <- "<1"
+A2<-select (B, 'num_voted_users', 'return')
+A2[,"return"] <- "1-3"
+A3<-select (C, 'num_voted_users', 'return')
+A3[,"return"] <- "3>"
+
+final_A <- rbind(A1,A2,A3)
+ggplot(data=final_A, aes(x=return, y=num_voted_users, color=return)) +
+  geom_point(position="jitter", alpha=0.5) + ggtitle('Number of Voted Users based on ROI')+ theme(plot.title = element_text(hjust=0.5))
+```
+
+In contrast to revenues, we do not consider ROI as suitable for further analysis as a dependent variable. Revenues as a financial metric has demonstrated the positive relationships we expected to see amongst social media (e.g. facebook looks and number of voted users), indicating that expressions of support tend to correspond with higher box office revenues (i.e. people go to the cinema). We do note the more weak positive correlation with IMDB scores (esp. relative to number of voting IMDB users), which we suspect is a function of the latter's negative skew, although given the strong correlation with budget, this partly offsets these concerns. The latter relationship would correspond well with blockbusters generating higher revenues, conditioned on budgets that can support the hiring of better actors, and increased marketing / promotional spend. 
+
+Equally, we observe a more positive correlation between number of voted users, against other metrics, relative to both IMDB scores and facebook likes. This warrants reappraising this variable, as it may represent a better proxy relative to IMDB scores themselves. From our descriptive analysis section above, we note a strong negative skew in IMDB scores, suggesting that those voting are likely to be fans conveying their support for a film, rather than providing a balanced critique. Therefore the number of IMDB votes may better represent the strength of popularity enjoyed by a particular movie. However, we are conscious of the possibility that not all these votes will be conveying the same numerical grade, nor the potential for duplicate votes to be included in any final score. 
+
+In sum, we believe examining both revenue and the number of IMDB votes separately, can help better inform our perspective on what constitutes a successful film. Yet both of these dependent variables demonstrate strong positive skew, which could bias any parameter estimate, and impact on variance calculations, affecting the accuracy of any t-statistic. Performing multiple regression analysis using OLS as it stands is unlikely to be appropriate. Remedies available are to perform regression using a GLS-based approach, or to transform our variables to resemble a normal distribution. Although extending beyond the scope of this assignment, we transform both our revenue and number of votes variables by natural logs raised to the power of 6 and 4 respectively (see below). As these transformations will generate beta estimates which are not intuitive, we conduct our regressions without these adjustment, altering our y-variable at the end to get a better understanding of our parameters and overall adjusted R-squared.
+
+```{r, echo = FALSE}
+
+numden <- ggplot(data=data11_15)+geom_density(aes(x=(num_voted_users)))
+revden <- ggplot(data=data11_15)+geom_density(aes(x=(gross)))
+
+numadj <- ggplot(data=data11_15)+geom_density(aes(x=log(num_voted_users)^4))
+revadj <- ggplot(data=data11_15)+geom_density(aes(x=log(gross)^6))
+
+grid.arrange(numden, revden, numadj, revadj, ncol=2)
+
+
+```
+
+
+[^3]: Wikipedia (2017)
+
+\pagebreak
+
+##Section 4: Regression Analysis
+
+###Social media: Number of IMDB votes
+
+```{r, results = "asis"}
+
+log4numvoted_users <- (log(data11_15$num_voted_users)^4)
+
+usereg1 <- lm(data = data11_15, num_voted_users~gross)
+
+usereg2 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence+ actor2_occurence+ actor3_occurence)
+
+usereg3 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence+ director_occurence)
+
+usereg4 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + movie_oscars + actor_oscars)
+
+usereg5 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + duration + actor_oscars)
+
+usereg6 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + duration + actor_oscars + actiondummy + adventuredummy + comedydummy + familydummy + fantasydummy+horrordummy+romancedummy + scifidummy+thrillerdummy)
+
+usereg7 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + duration + actor_oscars + actiondummy + familydummy +romancedummy + scifidummy + thrillerdummy)
+
+usereg8 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + duration + actor_oscars + familydummy + scifidummy )
+
+usereg9 <- lm(data = data11_15, num_voted_users ~ gross + duration + actor_oscars + familydummy + scifidummy)
+
+usereg10 <- lm(data = data11_15, log4numvoted_users ~ gross + duration + actor_oscars + familydummy + scifidummy)
+
+#stargazer(usereg1, usereg2, usereg3, usereg4, usereg5, usereg6, usereg7, usereg8, usereg9, usereg10, type = "html", report = "vct*")
+
+```
+
+
+We start with a simple regression against box office revenues to gauge whether a film's cinema success (in purely absolute terms) corresponds with increased IMDB activity. We do not consider neither budget or ROI as an independent variable, given the former's high correlation (and thus introducing the risk of multi-collinearity), and the latter's minimal correlation coefficient. Our initial results indicate an additional IMDB vote is cast for every US$1,000 in ticket sales, that is statistically significant at a 5% confidence interval (we assume all t-tests are two-tailed). An adjusted R^2 of [0.435] is generated, providing a benchmark that can be refined further, given the size of our residual standard error ("RSE").
+
+We first examine the impact of particular actors and a director within our sample (equations 2 and 3), to address whether audiences respond to previous work produced. This is premised on counting the number of occurrences within our sample, and thus is limited in not consider other work undertaken within the period. Notwithstanding, this may help reduce any serial correlation within our error term. From our results, only the 1st actor appears statistically significant, with a negligible impact on increasing our adjusted R^2, or reducing the RSE term.
+
+As an alternative, we appraise the number of Oscars each actor and director has been awarded (equation 4), where these statistics reflect lifetime performance until film release. We find actor Oscars is stastically significant, contributing an extra 61,000 votes per Oscar, with movie Oscars insignificant. This is likely attributable to an extended lag between a film being released and the subsequent award ceremony being held; thus limiting its impact on box office sales. The adjusted R^2 increases to [0.476] with our RSE term falling, representing an improvement in fit.
+
+Our next step is to gain context into whether the duration of a film impacts popularity. This is premised on long films (i.e. > 150mins) generating mixed views depending on context. Although expecting this to be negligible, this proved materially significant, increasing our adjusted R^2 to [0.559], whilst rendering our Actor 1 variable insignificant. There is no apparent reason for this. An investigation of the scatterplot below would suggest outliers may be influencing these results. We remove this variable upon commencing our later refinement of our model within equations 8-10, as without any likely proxy, this appears to represent a spurious result.
+
+```{r}
+
+plot(data11_15$duration, data11_15$num_voted_users)
+
+```
+
+The final criteria we consider is film genre. This is not straightforward, as a film can belong to more than one category (e.g. an action thriller)
+
+
+### Commercial: Box office ticket sales
+
+[Nirbhay Sharma]
+
+
+\pagebreak
+
+##Section 5: Hypothesis testing and robustness
+
+
+
+```{r, results = "asis"}
+log4numvoted_users <- (log(data11_15$num_voted_users)^4)
+Usereg11 <- lm(data = data11_15, log4numvoted_users ~ gross + actor_oscars + familydummy + scifidummy)
+log4numvoted_users <- (log(data16$num_voted_users)^4)
+Usereg12 <- lm(data = data16, log4numvoted_users ~ gross + actor_oscars + familydummy + scifidummy)
+
+stargazer(Usereg11, Usereg12, type = 'text')
+
+```
+```{r, results = "asis"}
+t.test(data11_15$familydummy, data16$familydummy, alternative='two.sided') 
+
+
+```
+```{r, results = "asis"}
+t.test(data11_15$gross, data16$gross, alternative='two.sided')  
+
+```
+
+```{r, results = "asis"}
+t.test(data11_15$gross, data16$gross, alternative='two.sided') 
+
+
+```
+
+```{r, results = "asis"}
+t.test(data11_15$scifidummy, data16$scifidummy, alternative='two.sided') 
+
+
+```
+
+
+\pagebreak
+
+##Section 6: Limitations
+
+\pagebreak
+
+##Section 7: Conclusions and next steps
+
+
+
+
+\pagebreak
+
+##Appendix 1 - Glossary of data definitions
+
+
+\pagebreak
+
+##Appendix 2 - Boxplots and Density graphs
+
+```{r, echo =FALSE}
+#density plots
+
+
+imdbden <- ggplot(data=data11_15)+geom_density(aes(x=(imdb_score)))
+
+fbden <- ggplot(data=data11_15)+geom_density(aes(x=movie_facebook_likes))
+
+revden <- ggplot(data=data11_15)+geom_density(aes(x=gross))
+
+roiden <- ggplot(data=data11_15)+geom_density(aes(x=return))
+
+budden <- ggplot(data=data11_15)+geom_density(aes(x=budget))
+
+numuserden <- ggplot(data=data11_15)+geom_density(aes(x=num_voted_users))
+
+grid.arrange(imdbden, fbden, revden, roiden, budden, numuserden, ncol=2)
+
+#boxplots
+
+imdbbox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=imdb_score))
+
+fbbox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=movie_facebook_likes)) + ylim(0,100000)
+
+revbox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=gross))
+
+roibox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=return)) + ylim(0,5)
+
+budbox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=budget))
+
+numuserbox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=num_voted_users)) + ylim(0,500000)
+
+grid.arrange(imdbbox, fbbox, revbox, roibox, budbox, numuserbox, ncol=2)
+
+
+```
+\pagebreak
+
+##Bibliography and references
+
+We have made reference to various forums on coding best-practices, notably including Stackoverflow.com, and other relevant sources of R studio information available online. These have been cited during the main document, where they have been specific to our study, or represent the application of coding practices not within the Maths and Statistics Foundations for Analytics module. We have not referenced general R studio packages applied within this module (e.g. dplyr; stargazer; etc). 
+
+We obtained the original dataset, in conjunction with information on Oscar academy awards, from the following websites: 
+<https://www.kaggle.com/tmdb/tmdb-movie-metadata/data>
+<https://www.kaggle.com/theacademy/academy-awards>
+
+In terms of documents we have referenced:
+
+[1-2] "Film industry in the US", Statista, Dossier (2016) <https://www.statista.com/study/11472/film-industry-in-the-united-states-statista-dossier/>
+[3] "The Interview", Wikipedia page (2017) <https://en.wikipedia.org/wiki/The_Interview#Pre-release_reaction>
+
+
+
+\pagebreak
+
+
