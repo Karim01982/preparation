@@ -451,10 +451,7 @@ Being unable to source separate details on financial characteristics on each fil
 
 We also recognise that our attempts to quantify film-specific estimators could be further improved. Qualifying the popularity of actors by virtue of their appearance within our random sample alone is insufficient (relative to their overall appearances as a lead or supporting actor). This was partly mitigated by number of Oscars, although left a sufficient gap between well known actors and those that have yet to receive an award. Accounting for this may have reduced the level of serial correlation evident within our residual plots, with film preferences unlikely to be independent between each year (e.g. a favoured actor in one year is likely to remain so in the following period).
 
-
-
-
-
+Another limitation was our inability to specify a single genre for each film. Our dataset classified each film across multiple genres, resulting in our dummy variables potentially lacking in sufficient power from diluting their relevance. It was thus a surprise to learn that family films were statistically more significant than action, comedy, romance, or thrillers, which were all well represented within our sample. We may thus have introduced error into our residual, which we would seek to correct in future from either a third party classification source, and / or from performing key-word count searches on film synopses. 
 
 
 \pagebreak
