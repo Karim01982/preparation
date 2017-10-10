@@ -471,7 +471,7 @@ rev_mod6 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + sum_
 rev_mod7 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + scifidummy + sum_actor_occurence + director_occurence))
 rev_mod8 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + scifidummy + sum_actor_occurence + director_occurence + num_voted_users))
 
-stargazer(rev_mod1, rev_mod2, rev_mod3, rev_mod4, rev_mod5, rev_mod6, rev_mod7, rev_mod8, rev_mod9, type = "html", report = "vct*")
+stargazer(rev_mod1, rev_mod2, rev_mod3, rev_mod4, rev_mod5, rev_mod6, rev_mod7, rev_mod8, type = "html", report = "vct*")
 
 ```
 
