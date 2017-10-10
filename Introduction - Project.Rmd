@@ -214,9 +214,18 @@ globalboxoffice16_20 <- c(38.3, 41.2, 44, 46.7, 49.3)
 USboxoffice16_20 <- c(10.7, 10.6, 10.9, 11.1, 11.3)
 boxoff <- data.frame(names, globalboxoffice16_20, USboxoffice16_20)
 
+year <- c(2016, 2017, 2018, 2019, 2020)
+type<- c('global','global','global','global','global')
+value <- c(38.3, 41.2, 44, 46.7, 49.3)
+global_df <- data.frame(year, type, value)
 
-#####produce bar graph
-#[Joanna Andari]
+year <- c(2016, 2017, 2018, 2019, 2020)
+type <- c('US','US','US','US','US')                      
+value <- c(10.7, 10.6, 10.9, 11.1, 11.3)
+US_df <- data.frame(year,type,value)
+
+boxoff <- rbind.data.frame(global_df,US_df)
+ggplot(boxoff, aes(x = year, y=value, fill= type))+ geom_bar(stat='identity', position='dodge')+ ggtitle ('Global versus US Box Office Revenues per Year') + theme(plot.title = element_text(hjust=0.5))+ labs(x='Year', y = ' Revenues (in bn$)') 
 
 ```
 
@@ -339,9 +348,23 @@ kable(pvalcor_table$P)
 
 The above correlations are all statistically significant, with the exception of our ROI variable. The most surprising result is the lack of correlation with the ROI variable. It is unclear why there is not a positive relationship relative to some of the social media metrics above. This may potentially suggest the impact of outliers in our sample, which may be reducing any underlying correlation 
 
-[Joanna Andari]
-[scope to include scatterplot conditioned on different return levels]
-[We need a ggplot with facet wrap on how ROI varies with number of users based on 0-1x return, 1-3x return, and 3+ return.] 
+```{r, echo=FALSE}
+library(dplyr)
+A<- filter(RB_data,return<1)
+B<- filter(RB_data, between(return,1,3))
+C<- filter(RB_data, return>3)
+
+A1<-select (A, 'num_voted_users','return' )
+A1[,"return"] <- "<1"
+A2<-select (B, 'num_voted_users', 'return')
+A2[,"return"] <- "1-3"
+A3<-select (C, 'num_voted_users', 'return')
+A3[,"return"] <- "3>"
+
+final_A <- rbind(A1,A2,A3)
+ggplot(data=final_A, aes(x=return, y=num_voted_users, color=return)) +
+  geom_point(position="jitter", alpha=0.5) + ggtitle('Number of Voted Users based on ROI')+ theme(plot.title = element_text(hjust=0.5))
+```
 
 In contrast to revenues, we do not consider ROI as suitable for further analysis as a dependent variable. Revenues as a financial metric has demonstrated the positive relationships we expected to see amongst social media (e.g. facebook looks and number of voted users), indicating that expressions of support tend to correspond with higher box office revenues (i.e. people go to the cinema). We do note the more weak positive correlation with IMDB scores (esp. relative to number of voting IMDB users), which we suspect is a function of the latter's negative skew, although given the strong correlation with budget, this partly offsets these concerns. The latter relationship would correspond well with blockbusters generating higher revenues, conditioned on budgets that can support the hiring of better actors, and increased marketing / promotional spend. 
 
@@ -434,6 +457,37 @@ Overall, this model should mitigate the effect of statistical bias affecting our
 \pagebreak
 
 ##Section 5: Hypothesis testing and robustness
+
+```{r, results = "asis"}
+log4numvoted_users <- (log(data11_15$num_voted_users)^4)
+Usereg11 <- lm(data = data11_15, log4numvoted_users ~ gross + actor_oscars + familydummy + scifidummy)
+log4numvoted_users <- (log(data16$num_voted_users)^4)
+Usereg12 <- lm(data = data16, log4numvoted_users ~ gross + actor_oscars + familydummy + scifidummy)
+
+stargazer(Usereg11, Usereg12, type = 'text')
+
+```
+```{r, results = "asis"}
+t.test(data11_15$familydummy, data16$familydummy, alternative='two.sided') 
+
+
+```
+```{r, results = "asis"}
+t.test(data11_15$gross, data16$gross, alternative='two.sided')  
+
+```
+
+```{r, results = "asis"}
+t.test(data11_15$gross, data16$gross, alternative='two.sided') 
+
+
+```
+
+```{r, results = "asis"}
+t.test(data11_15$scifidummy, data16$scifidummy, alternative='two.sided') 
+
+
+```
 
 \pagebreak
 
