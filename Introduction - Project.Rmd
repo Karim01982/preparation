@@ -439,11 +439,18 @@ Overall, this model should mitigate the effect of statistical bias affecting our
 
 ##Section 6: Limitations
 
-Besides the commentary above on robustness, we recognise there are several issues within our data. The original sample, though randomly generated, does not facilitate a more comprehensive assessment of Hollywood and non-Hollywood film statistics over the time horizon. Being unable to source separate details on financial characteristics on each film, has hindered this process, whilst limiting our ability to investigate the full value chain. Examples of other characteristics that we would like to have appraised includes:
+Besides the commentary above on robustness, we recognise there are several issues within our data. The original sample, though randomly generated, does not facilitate a more comprehensive assessment of Hollywood and non-Hollywood film statistics over the time horizon. It may also have resulted in the skewness observed within our datasets. 
 
-* A breakdown of budget expenses: understanding the level of marketing spend to promote films prior to release, along with the breakdown of total pre and post production costs, including actor salaries for the leading actor(s) / supporting actors
+Being unable to source separate details on financial characteristics on each film has further hindered this process, whilst limiting our ability to investigate the full value chain. Examples of other financial characteristics we wanted to appraise include:
 
-* 
+* A breakdown of budget expenses - marketing: understanding spend to promote films prior to release, and upon the immediate release of a film. This includes the amount spent on social media platforms, relative to conventional mediums (e.g. newspaper ads; TV commercials, etc), to better understand how this affects the perception of popularity and contributes to revenues
+
+* A breakdown of budget expenses - pre / post production costs: including salaries for the leading actor(s) / supporting actors. This would better approximate the value of an actor, including their perception of popularity, representing a more apt variable relative to counting the number of actor occurences between 2011-16 (see below).
+
+* DVD, in-film advertising, merchandise sales, and any cash subsidies: To gauge financial success, understanding the contribution of other revenue streams to determining overall pre-tax returns on investment. This also applies to any direct government incentives (e.g. subsidies) to support the production of films. This data is likely to boost the significance of our ROI estimator.
+
+
+
 
 
 \pagebreak
