@@ -20,7 +20,7 @@ table, td, th {
 }
 
 </style>
-```{r setup, include=FALSE}
+```{r, echo=FALSE}
 library(stargazer)
 library(car)
 library(dplyr)
@@ -460,7 +460,7 @@ Another limitation was our inability to specify a single genre for each film. Ou
 
 Our conclusion...
 
-
+In terms of developing our study, we would like to understand how these findings apply to arthouse films.
 
 
 
