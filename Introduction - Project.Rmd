@@ -216,7 +216,7 @@ boxoff <- data.frame(names, globalboxoffice16_20, USboxoffice16_20)
 
 
 #####produce bar graph
-[Joanna Andari]
+#[Joanna Andari]
 
 ```
 
@@ -391,14 +391,13 @@ usereg7 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + dura
 
 usereg8 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + duration + actor_oscars + familydummy + scifidummy )
 
-usereg9 <- lm(data = data11_15, num_voted_users ~ gross + duration + actor_oscars + familydummy + scifidummy)
+usereg9 <- lm(data = data11_15, num_voted_users ~ gross + actor_oscars + familydummy + scifidummy)
 
-usereg10 <- lm(data = data11_15, log4numvoted_users ~ gross + duration + actor_oscars + familydummy + scifidummy)
-
-
+usereg10 <- lm(data = data11_15, log4numvoted_users ~ gross + actor_oscars + familydummy + scifidummy)
 
 
-#stargazer(usereg1, usereg2, usereg3, usereg4, usereg5, usereg6, usereg7, usereg8, usereg9, usereg10, type = "html", report = "vct*")
+
+stargazer(usereg1, usereg2, usereg3, usereg4, usereg5, usereg6, usereg7, usereg8, usereg9, usereg10, type = "html", report = "vct*")
 
 ```
 
@@ -416,7 +415,15 @@ plot(data11_15$duration, data11_15$num_voted_users)
 
 ```
 
-The final criteria we consider is film genre. This is not straightforward, as a film can belong to more than one category (e.g. an action thriller)
+The final criteria we consider is film genre. This is not straightforward, as a film can belong to more than one category (e.g. a sci-fi, action thriller). We adopt a count-based approach, based on the number of times a description appears, although this may introduce an added source of multicollinearity. 
+
+We subsequently notice that both family and sci-fi dummy genres are statistically significant. Bizarrely, we generate a negative coefficient for family films, implying these are likely to receive 79,000 less votes. Given the selection bias likely apparent with IMDB data, this may reflect the characteristics of those voting. For instance, is an 18-30 year old as inclined to render judgement on a family film (e.g. Finding Nemo) relative to a sequel in the Terminator franchise? Equally, is it likely to find those with young families finding the time to vote for Finding Nemo on IMDB? Although a slight concern, the negative coefficient does appear logical.
+
+What is more intriguing is the remaining genres all appear statistically insignificant. This probably reflects multicollinearity, so we begin refining the model to eliminate categories where this overlap is likely (equation 7). This appears to work, with our R^2 marginally increasing, along with the t-values of those genre variables that were already significant. 
+
+We do note that the Action, Romance, and Thriller dummies remain insignificant; inconjunction with our lead actor variable, these are subsequently dropped. This also applies to our duration variable, for the reasons provided above, leading to equation 9. We recognise this is still conditioned on a skewed dependent variable, so equation 10 implements the log(x) ^ 4 transformation noted above. This results in an adjusted R^2 of [0.443], whilst applying a x^(1/4) adjustment to our parameter, before multiplying by 100, provides the percentage impact on y. We can see that a US$1 of revenue will raise IMDB votes by 8%, whilst there are > 500+% increases in votes should a participating actor hold an Oscar, or the film be sci-fi orietated. The negative coefficient for family movies, if considered in absolute terms, would entail a significant decrease in votes. 
+
+Overall, this model should mitigate the effect of statistical bias affecting our standard errors, and is intended to attain specification efficiency. However, it is likely our model violates our i.i.d. assumptions on our error terms, which is likely to be affected by an omitted variable(s). The high t-value attained on our intercept coefficient might be suggestive of this. We discuss overall model robustness further in the next section.
 
 
 ### Commercial: Box office ticket sales
@@ -432,6 +439,13 @@ The final criteria we consider is film genre. This is not straightforward, as a 
 
 ##Section 6: Limitations
 
+Besides the commentary above on robustness, we recognise there are several issues within our data. The original sample, though randomly generated, does not facilitate a more comprehensive assessment of Hollywood and non-Hollywood film statistics over the time horizon. Being unable to source separate details on financial characteristics on each film, has hindered this process, whilst limiting our ability to investigate the full value chain. Examples of other characteristics that we would like to have appraised includes:
+
+* A breakdown of budget expenses: understanding the level of marketing spend to promote films prior to release, along with the breakdown of total pre and post production costs, including actor salaries for the leading actor(s) / supporting actors
+
+* 
+
+
 \pagebreak
 
 ##Section 7: Conclusions and next steps
@@ -443,6 +457,7 @@ The final criteria we consider is film genre. This is not straightforward, as a 
 
 ##Appendix 1 - Glossary of data definitions
 
+"Qiuyue to add her table from initial draft"
 
 \pagebreak
 

@@ -385,7 +385,8 @@ The cleaned awards data now has 434 observations over 2 variables. This data wil
 </tr>
 </tbody>
 </table>
-<p>The above correlations are all statistically significant[check - produce p-value table]. The most surprising result is the lack of correlation with the ROI variable. It is unclear why there is not a positive relationship relative to some of the social media metrics above. This may potentially suggest the impact of outliers in our sample, which may be reducing any underlying correlation [scope to include scatterplot conditioned on different return levels].</p>
+<p>The above correlations are all statistically significant, with the exception of our ROI variable. The most surprising result is the lack of correlation with the ROI variable. It is unclear why there is not a positive relationship relative to some of the social media metrics above. This may potentially suggest the impact of outliers in our sample, which may be reducing any underlying correlation</p>
+<p>[Joanna Andari][scope to include scatterplot conditioned on different return levels] [We need a ggplot with facet wrap on how ROI varies with number of users based on 0-1x return, 1-3x return, and 3+ return.]</p>
 <p>In contrast to revenues, we do not consider ROI as suitable for further analysis as a dependent variable. Revenues as a financial metric has demonstrated the positive relationships we expected to see amongst social media (e.g. facebook looks and number of voted users), indicating that expressions of support tend to correspond with higher box office revenues (i.e. people go to the cinema). We do note the more weak positive correlation with IMDB scores (esp. relative to number of voting IMDB users), which we suspect is a function of the latter’s negative skew, although given the strong correlation with budget, this partly offsets these concerns. The latter relationship would correspond well with blockbusters generating higher revenues, conditioned on budgets that can support the hiring of better actors, and increased marketing / promotional spend.</p>
 <p>Equally, we observe a more positive correlation between number of voted users, against other metrics, relative to both IMDB scores and facebook likes. This warrants reappraising this variable, as it may represent a better proxy relative to IMDB scores themselves. From our descriptive analysis section above, we note a strong negative skew in IMDB scores, suggesting that those voting are likely to be fans conveying their support for a film, rather than providing a balanced critique. Therefore the number of IMDB votes may better represent the strength of popularity enjoyed by a particular movie. However, we are conscious of the possibility that not all these votes will be conveying the same numerical grade, nor the potential for duplicate votes to be included in any final score.</p>
 <p>In sum, we believe examining both revenue and the number of IMDB votes separately, can help better inform our perspective on what constitutes a successful film. Yet both of these dependent variables demonstrate strong positive skew, which could bias any parameter estimate, and impact on variance calculations, affecting the accuracy of any t-statistic. Performing multiple regression analysis using OLS as it stands is unlikely to be appropriate. Remedies available are to perform regression using a GLS-based approach, or to transform our variables to resemble a normal distribution. Although extending beyond the scope of this assignment, we transform both our revenue and number of votes variables by natural logs raised to the power of 6 and 4 respectively (see below). As these transformations will generate beta estimates which are not intuitive, we conduct our regressions without these adjustment, altering our y-variable at the end to get a better understanding of our parameters and overall adjusted R-squared.</p>
@@ -415,10 +416,9 @@ usereg7 &lt;- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + d
 
 usereg8 &lt;- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + duration + actor_oscars + familydummy + scifidummy )
 
-usereg9 &lt;- lm(data = data11_15, num_voted_users ~ gross + duration + actor_oscars + familydummy + scifidummy)
+usereg9 &lt;- lm(data = data11_15, num_voted_users ~ gross + actor_oscars + familydummy + scifidummy)
 
-usereg10 &lt;- lm(data = data11_15, log4numvoted_users ~ gross + duration + actor_oscars + familydummy + scifidummy)
-
+usereg10 &lt;- lm(data = data11_15, log4numvoted_users ~ gross + actor_oscars + familydummy + scifidummy)
 
 
 
@@ -521,7 +521,7 @@ gross
 0.001
 </td>
 <td>
-0.00004
+0.00005
 </td>
 </tr>
 <tr>
@@ -552,10 +552,10 @@ t = 15.233<sup>***</sup>
 t = 15.498<sup>***</sup>
 </td>
 <td>
-t = 15.622<sup>***</sup>
+t = 19.919<sup>***</sup>
 </td>
 <td>
-t = 12.426<sup>***</sup>
+t = 16.348<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -994,10 +994,8 @@ duration
 2,100.650
 </td>
 <td>
-2,104.689
 </td>
 <td>
-88.480
 </td>
 </tr>
 <tr>
@@ -1024,10 +1022,8 @@ t = 7.906<sup>***</sup>
 t = 7.898<sup>***</sup>
 </td>
 <td>
-t = 7.954<sup>***</sup>
 </td>
 <td>
-t = 6.955<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -1080,10 +1076,10 @@ actor_oscars
 39,749.860
 </td>
 <td>
-39,726.960
+54,371.880
 </td>
 <td>
-1,536.400
+2,152.065
 </td>
 </tr>
 <tr>
@@ -1111,10 +1107,10 @@ t = 4.212<sup>***</sup>
 t = 4.156<sup>***</sup>
 </td>
 <td>
-t = 4.158<sup>***</sup>
+t = 5.465<sup>***</sup>
 </td>
 <td>
-t = 3.344<sup>***</sup>
+t = 4.560<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -1392,10 +1388,10 @@ familydummy
 -73,194.760
 </td>
 <td>
--73,403.890
+-115,032.800
 </td>
 <td>
--2,098.193
+-3,848.250
 </td>
 </tr>
 <tr>
@@ -1421,10 +1417,10 @@ t = -4.408<sup>***</sup>
 t = -4.860<sup>***</sup>
 </td>
 <td>
-t = -4.896<sup>***</sup>
+t = -7.715<sup>***</sup>
 </td>
 <td>
-t = -2.911<sup>***</sup>
+t = -5.442<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -1702,10 +1698,10 @@ scifidummy
 41,433.760
 </td>
 <td>
-41,614.500
+39,309.540
 </td>
 <td>
-1,914.433
+1,817.534
 </td>
 </tr>
 <tr>
@@ -1731,10 +1727,10 @@ t = 3.006<sup>***</sup>
 t = 3.350<sup>***</sup>
 </td>
 <td>
-t = 3.381<sup>***</sup>
+t = 3.010<sup>***</sup>
 </td>
 <td>
-t = 3.235<sup>***</sup>
+t = 2.934<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -1867,10 +1863,10 @@ Constant
 -167,535.900
 </td>
 <td>
--164,742.600
+58,272.530
 </td>
 <td>
-4,791.019
+14,166.470
 </td>
 </tr>
 <tr>
@@ -1901,10 +1897,10 @@ t = -5.056<sup>***</sup>
 t = -5.031<sup>***</sup>
 </td>
 <td>
-t = -5.732<sup>***</sup>
+t = 8.677<sup>***</sup>
 </td>
 <td>
-t = 3.467<sup>***</sup>
+t = 44.474<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -1999,10 +1995,10 @@ R<sup>2</sup>
 0.594
 </td>
 <td>
-0.594
+0.542
 </td>
 <td>
-0.497
+0.447
 </td>
 </tr>
 <tr>
@@ -2034,10 +2030,10 @@ Adjusted R<sup>2</sup>
 0.589
 </td>
 <td>
-0.590
+0.538
 </td>
 <td>
-0.492
+0.443
 </td>
 </tr>
 <tr>
@@ -2069,10 +2065,10 @@ Residual Std. Error
 99,182.840 (df = 491)
 </td>
 <td>
-99,084.790 (df = 492)
+105,156.500 (df = 493)
 </td>
 <td>
-4,764.069 (df = 492)
+4,987.700 (df = 493)
 </td>
 </tr>
 <tr>
@@ -2104,10 +2100,10 @@ F Statistic
 119.796<sup>***</sup> (df = 6; 491)
 </td>
 <td>
-144.034<sup>***</sup> (df = 5; 492)
+145.808<sup>***</sup> (df = 4; 493)
 </td>
 <td>
-97.091<sup>***</sup> (df = 5; 492)
+99.692<sup>***</sup> (df = 4; 493)
 </td>
 </tr>
 <tr>
@@ -2123,6 +2119,21 @@ F Statistic
 </td>
 </tr>
 </table>
+<p>We start with a simple regression against box office revenues to gauge whether a film’s cinema success (in purely absolute terms) corresponds with increased IMDB activity. We do not consider neither budget or ROI as an independent variable, given the former’s high correlation (and thus introducing the risk of multi-collinearity), and the latter’s minimal correlation coefficient. Our initial results indicate an additional IMDB vote is cast for every US$1,000 in ticket sales, that is statistically significant at a 5% confidence interval (we assume all t-tests are two-tailed). An adjusted R^2 of [0.435] is generated, providing a benchmark that can be refined further, given the size of our residual standard error (“RSE”).</p>
+<p>We first examine the impact of particular actors and a director within our sample (equations 2 and 3), to address whether audiences respond to previous work produced. This is premised on counting the number of occurrences within our sample, and thus is limited in not consider other work undertaken within the period. Notwithstanding, this may help reduce any serial correlation within our error term. From our results, only the 1st actor appears statistically significant, with a negligible impact on increasing our adjusted R^2, or reducing the RSE term.</p>
+<p>As an alternative, we appraise the number of Oscars each actor and director has been awarded (equation 4), where these statistics reflect lifetime performance until film release. We find actor Oscars is stastically significant, contributing an extra 61,000 votes per Oscar, with movie Oscars insignificant. This is likely attributable to an extended lag between a film being released and the subsequent award ceremony being held; thus limiting its impact on box office sales. The adjusted R^2 increases to [0.476] with our RSE term falling, representing an improvement in fit.</p>
+<p>Our next step is to gain context into whether the duration of a film impacts popularity. This is premised on long films (i.e. &gt; 150mins) generating mixed views depending on context. Although expecting this to be negligible, this proved materially significant, increasing our adjusted R^2 to [0.559], whilst rendering our Actor 1 variable insignificant. There is no apparent reason for this. An investigation of the scatterplot below would suggest outliers may be influencing these results. We remove this variable upon commencing our later refinement of our model within equations 8-10, as without any likely proxy, this appears to represent a spurious result.</p>
+<pre class="r"><code>plot(data11_15$duration, data11_15$num_voted_users)</code></pre>
+<p><img src="data:image/png;base64,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" width="672" /></p>
+<p>The final criteria we consider is film genre. This is not straightforward, as a film can belong to more than one category (e.g. a sci-fi, action thriller). We adopt a count-based approach, based on the number of times a description appears, although this may introduce an added source of multicollinearity.</p>
+<p>We subsequently notice that both family and sci-fi dummy genres are statistically significant. Bizarrely, we generate a negative coefficient for family films, implying these are likely to receive 79,000 less votes. Given the selection bias likely apparent with IMDB data, this may reflect the characteristics of those voting. For instance, is an 18-30 year old as inclined to render judgement on a family film (e.g. Finding Nemo) relative to a sequel in the Terminator franchise? Equally, is it likely to find those with young families finding the time to vote for Finding Nemo on IMDB? Although a slight concern, the negative coefficient does appear logical.</p>
+<p>What is more intriguing is the remaining genres all appear statistically insignificant. This probably reflects multicollinearity, so we begin refining the model to eliminate categories where this overlap is likely (equation 7). This appears to work, with our R^2 marginally increasing, along with the t-values of those genre variables that were already significant.</p>
+<p>We do note that the Action, Romance, and Thriller dummies remain insignificant; inconjunction with our lead actor variable, these are subsequently dropped. This also applies to our duration variable, for the reasons provided above, leading to equation 9. We recognise this is still conditioned on a skewed dependent variable, so equation 10 implements the log(x) ^ 4 transformation noted above. This results in an adjusted R^2 of [0.443], whilst applying a x^(1/4) adjustment to our parameter, before multiplying by 100, provides the percentage impact on y. We can see that a US$1 of revenue will raise IMDB votes by 8%, whilst there are &gt; 500+% increases in votes should a participating actor hold an Oscar, or the film be sci-fi orietated. The negative coefficient for family movies, if considered in absolute terms, would entail a significant decrease in votes.</p>
+<p>Overall, this model should mitigate the effect of statistical bias affecting our standard errors, and is intended to attain specification efficiency. However, it is likely our model violates our i.i.d. assumptions on our error terms, which is likely to be affected by an omitted variable(s). The high t-value attained on our intercept coefficient might be suggestive of this. We discuss overall model robustness further in the next section.</p>
+</div>
+<div id="commercial-box-office-ticket-sales" class="section level3">
+<h3>Commercial: Box office ticket sales</h3>
+<p>[Nirbhay Sharma]</p>
 
 </div>
 </div>
@@ -2132,6 +2143,10 @@ F Statistic
 </div>
 <div id="section-6-limitations" class="section level2">
 <h2>Section 6: Limitations</h2>
+<p>Besides the commentary above on robustness, we recognise there are several issues within our data. The original sample, though randomly generated, does not facilitate a more comprehensive assessment of Hollywood and non-Hollywood film statistics over the time horizon. Being unable to source separate details on financial characteristics on each film, has hindered this process, whilst limiting our ability to investigate the full value chain. Examples of other characteristics that we would like to have appraised includes:</p>
+<ul>
+<li>A breakdown of budget expenses: understanding the level of marketing spend</li>
+</ul>
 
 </div>
 <div id="section-7-conclusions-and-next-steps" class="section level2">
@@ -2140,6 +2155,7 @@ F Statistic
 </div>
 <div id="appendix-1---glossary-of-data-definitions" class="section level2">
 <h2>Appendix 1 - Glossary of data definitions</h2>
+<p>“Qiuyue to add her table from initial draft”</p>
 
 </div>
 <div id="appendix-2---boxplots-and-density-graphs" class="section level2">
