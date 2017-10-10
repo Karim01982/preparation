@@ -165,9 +165,13 @@ award_wins <- rbind(actor_wins,director_wins,movie_wins)
 ##Getting the occurences of directors/actors in the database
 for (i in (1:length(RB_data))){
   RB_data$director_occurence[i] = length(which((str_detect(RB_data$director_name, RB_data$director_name[i])) == TRUE))
-  RB_data$actor1_occurence[i] = length(which((str_detect(cbind(RB_data$actor_1_name, RB_data$actor_2_name, RB_data$actor_3_name), RB_data$actor_1_name[i])) == TRUE))
-  RB_data$actor2_occurence[i] = length(which((str_detect(cbind(RB_data$actor_1_name, RB_data$actor_2_name, RB_data$actor_3_name), RB_data$actor_2_name[i])) == TRUE))
-  RB_data$actor3_occurence[i] = length(which((str_detect(cbind(RB_data$actor_1_name, RB_data$actor_2_name, RB_data$actor_3_name), RB_data$actor_3_name[i])) == TRUE))
+  RB_data$actor1_occurence[i] = length(which((str_detect(cbind(RB_data$actor_1_name, RB_data$actor_2_name, RB_data$actor_3_name),
+                                                         RB_data$actor_1_name[i])) == TRUE))
+  RB_data$actor2_occurence[i] = length(which((str_detect(cbind(RB_data$actor_1_name, RB_data$actor_2_name, RB_data$actor_3_name),
+                                                         RB_data$actor_2_name[i])) == TRUE))
+  RB_data$actor3_occurence[i] = length(which((str_detect(cbind(RB_data$actor_1_name, RB_data$actor_2_name, RB_data$actor_3_name),
+                                                         RB_data$actor_3_name[i])) == TRUE))
+  RB_data$sum_actor_occurence[i] = RB_data$actor1_occurence[i] + RB_data$actor2_occurence[i] + RB_data$actor3_occurence[i]
 }
 
 
@@ -175,19 +179,20 @@ for (i in (1:length(RB_data))){
 occurences = table(unlist(award_wins$Name))
 occurences = as.data.frame(occurences)
 RB_data = left_join(x=RB_data, y=occurences, by=c(director_name = "Var1"))
-colnames(RB_data)[47] <- "dir_oscars"
+colnames(RB_data)[48] <- "dir_oscars"
 RB_data = left_join(x=RB_data, y=occurences, by=c(actor_1_name = "Var1"))
-colnames(RB_data)[48] <- "act1_oscars"
+colnames(RB_data)[49] <- "act1_oscars"
 RB_data = left_join(x=RB_data, y=occurences, by=c(actor_2_name = "Var1"))
-colnames(RB_data)[49] <- "act2_oscars"
+colnames(RB_data)[50] <- "act2_oscars"
 RB_data = left_join(x=RB_data, y=occurences, by=c(actor_3_name = "Var1"))
-colnames(RB_data)[50] <- "act3_oscars"
+colnames(RB_data)[51] <- "act3_oscars"
 RB_data = left_join(x=RB_data, y=occurences, by=c(director_name = "Var1"))
-colnames(RB_data)[51] <- "movie_oscars"
+colnames(RB_data)[52] <- "movie_oscars"
 RB_data[c("dir_oscars","act1_oscars","act2_oscars","act3_oscars","movie_oscars")][is.na(RB_data[c("dir_oscars","act1_oscars","act2_oscars","act3_oscars","movie_oscars")])] <- 0
 RB_data$actor_oscars = RB_data$act1_oscars + RB_data$act2_oscars + RB_data$act3_oscars
 RB_data = RB_data[ , !(names(RB_data) %in% c("act1_oscars","act2_oscars","act3_oscars","genre1","genre2","genre3","genre4","genre5","genre6","genre7"))]
 
+RB_data$movie_title = substr(RB_data$movie_title,1,nchar(RB_data$movie_title)-1)
 
 ##Establishing separate datasets for time periods
 data11_15 <- filter(.data = RB_data, title_year < 2016)
@@ -197,8 +202,6 @@ data16 <- filter(.data = RB_data,title_year == 2016)
 #print(data11_15$movie_facebook_likes)
 #print(data11_15$movie_facebook_likes)
 ```
-
-
 
 ## Section 1: Introduction
 
@@ -408,9 +411,11 @@ usereg4 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + movi
 
 usereg5 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + duration + actor_oscars)
 
-usereg6 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + duration + actor_oscars + actiondummy + adventuredummy + comedydummy + familydummy + fantasydummy+horrordummy+romancedummy + scifidummy+thrillerdummy)
+usereg6 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + duration + actor_oscars + actiondummy + adventuredummy + comedydummy +
+                familydummy + fantasydummy+horrordummy+romancedummy + scifidummy+thrillerdummy)
 
-usereg7 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + duration + actor_oscars + actiondummy + familydummy +romancedummy + scifidummy + thrillerdummy)
+usereg7 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + duration + actor_oscars + actiondummy + familydummy + romancedummy +
+                scifidummy + thrillerdummy)
 
 usereg8 <- lm(data = data11_15, num_voted_users ~ gross +actor1_occurence + duration + actor_oscars + familydummy + scifidummy )
 
@@ -451,7 +456,32 @@ Overall, this model should mitigate the effect of statistical bias affecting our
 
 ### Commercial: Box office ticket sales
 
-[Nirbhay Sharma]
+```{r}
+log6_gross <- (log(data11_15$gross)^6)
+
+rev_mod1 <- lm(data=data11_15, gross ~ (budget))
+rev_mod2 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + thrillerdummy + romancedummy + comedydummy + familydummy))
+rev_mod3 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + duration))
+rev_mod4 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + actor_oscars + dir_oscars + movie_oscars + 
+                                          sum_actor_occurence + director_occurence))
+rev_mod5 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + sum_actor_occurence + director_occurence))
+rev_mod6 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + sum_actor_occurence + director_occurence + num_voted_users))
+rev_mod7 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + scifidummy + sum_actor_occurence + director_occurence))
+rev_mod8 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + scifidummy + sum_actor_occurence + director_occurence + num_voted_users))
+
+stargazer(rev_mod1, rev_mod2, rev_mod3, rev_mod4, rev_mod5, rev_mod6, rev_mod7, rev_mod8, type = "html", report = "vct*")
+
+```
+
+Coming to the finding the determinants of financial popularity or revenue of a movie, we begin with a simple quation trying to analyse the impact of the budget of the movie. This regression model, with an adjusted $R^2$ value is ~0.461 and a very low p-value, determines budget as a very significant factor affecting revenues.
+
+Moving ahead with this equation, in equation (2), we try to guage which genre movie impacts on the revenue or commercial success. In this model, we see that the adjusted $R^2$ increases to ~0.482 and there is a decrease in the RSE value. Furthermore, we observe that the genres Action genre is the most significant genre, closely followed by Sci-fi genre movies. Traditionally, these movies are known to cater to wide audience base. Furthermore, we see the intercept for the revenue and action genre movies is a negative one, which indicates that the data represents that action movies are often loss making ones. Taking only the significant variables forward, we asses the interaction of the duration of the movie with the revenue. Although we see a significance and a relation between them, we feel that duration of the movie is seldom a deciding factor for audience. Furthermore, as described by the plot above (insert table/plot number), the duration's fit can be impacted by residuals and thus we reject the significance of that variable in the model.
+
+Since the starcast of a movie is very significant crowd puller, in the regression equation (4), we take into account the impact of actor and diretor occurence variables and the number of oscar variables to the revenue. Contrary to the belief, the data doesnt represent any significant impact of the actor and director oscar wins to the  movie revenue with one oscar adding only $4million and \$1million repectively for actor and director respectively. That being said, the actor occurences and director occurences are significant variables and have p-values in the 95% confidence interval. The data also indicates that an oscar winning director adds \$20Million to the revenue of the movie. This being said, we have to realize that this data is a recent sample, which leads us to believe that the relation can be more stronger/weaker if we increase the sample size.
+
+Refining the equation (4) we derive regression equation (5) with adjusted $R^2$ value as ~0.491, meaning it fits for 49% of our data. Adding the variable for social success of the movie in equation (6), which is the number of voted users variable, we observe that the adjusted $R^2$ increases to ~0.605 and at the same time decreasing the RSE value significantly. We also observe that by adding the number of voted users variable, the scifi_genre variable and the sum_actor_occurence variable looses its significance to the revenue. Although it is not the optimal equation, we feel that within the data limitations, this fit gives us the most meaningful 'best-fit' equation.
+
+Taking into account the skew in the data, we further refine our model in equations (7) and (8) by replacing the gross variable with its log^6 equivalent in order to ensure that our regression is free from bias.
 
 
 \pagebreak
