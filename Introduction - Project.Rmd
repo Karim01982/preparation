@@ -203,8 +203,6 @@ data16 <- filter(.data = RB_data,title_year == 2016)
 #print(data11_15$movie_facebook_likes)
 ```
 
-
-
 ## Section 1: Introduction
 
 The film industry is expected to generate global box office revenues of almost $49.3bn by 2020, from a forecast of US$38.3bn in 2016[^1], representing a CAGR of over 32%. These substantial growth levels are likely to result in vast resources being poured into the industry, in search of the next "big hit". Countries, recognising the value of developing a film industry to support a variety of local and national initiatives, have supported these activities, providing tax breaks to investors, to mitigate the material upfront costs involved.
