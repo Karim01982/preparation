@@ -449,6 +449,10 @@ Being unable to source separate details on financial characteristics on each fil
 
 * DVD, in-film advertising, merchandise sales, and any cash subsidies: To gauge financial success, understanding the contribution of other revenue streams to determining overall pre-tax returns on investment. This also applies to any direct government incentives (e.g. subsidies) to support the production of films. This data is likely to boost the significance of our ROI estimator.
 
+We also recognise that our attempts to quantify film-specific estimators could be further improved. Qualifying the popularity of actors by virtue of their appearance within our random sample alone is insufficient (relative to their overall appearances as a lead or supporting actor). This was partly mitigated by number of Oscars, although left a sufficient gap between well known actors and those that have yet to receive an award. Accounting for this may have reduced the level of serial correlation evident within our residual plots, with film preferences unlikely to be independent between each year (e.g. a favoured actor in one year is likely to remain so in the following period).
+
+
+
 
 
 
@@ -456,6 +460,10 @@ Being unable to source separate details on financial characteristics on each fil
 \pagebreak
 
 ##Section 7: Conclusions and next steps
+
+Our conclusion...
+
+
 
 
 
