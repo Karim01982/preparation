@@ -216,6 +216,7 @@ boxoff <- data.frame(names, globalboxoffice16_20, USboxoffice16_20)
 
 
 #####produce bar graph
+[Joanna Andari]
 
 ```
 
@@ -336,7 +337,11 @@ kable(pvalcor_table$P)
 
 ```
 
-The above correlations are all statistically significant[check - produce p-value table]. The most surprising result is the lack of correlation with the ROI variable. It is unclear why there is not a positive relationship relative to some of the social media metrics above. This may potentially suggest the impact of outliers in our sample, which may be reducing any underlying correlation [scope to include scatterplot conditioned on different return levels]. 
+The above correlations are all statistically significant, with the exception of our ROI variable. The most surprising result is the lack of correlation with the ROI variable. It is unclear why there is not a positive relationship relative to some of the social media metrics above. This may potentially suggest the impact of outliers in our sample, which may be reducing any underlying correlation 
+
+[Joanna Andari]
+[scope to include scatterplot conditioned on different return levels]
+[We need a ggplot with facet wrap on how ROI varies with number of users based on 0-1x return, 1-3x return, and 3+ return.] 
 
 In contrast to revenues, we do not consider ROI as suitable for further analysis as a dependent variable. Revenues as a financial metric has demonstrated the positive relationships we expected to see amongst social media (e.g. facebook looks and number of voted users), indicating that expressions of support tend to correspond with higher box office revenues (i.e. people go to the cinema). We do note the more weak positive correlation with IMDB scores (esp. relative to number of voting IMDB users), which we suspect is a function of the latter's negative skew, although given the strong correlation with budget, this partly offsets these concerns. The latter relationship would correspond well with blockbusters generating higher revenues, conditioned on budgets that can support the hiring of better actors, and increased marketing / promotional spend. 
 
@@ -393,7 +398,7 @@ usereg10 <- lm(data = data11_15, log4numvoted_users ~ gross + duration + actor_o
 
 
 
-stargazer(usereg1, usereg2, usereg3, usereg4, usereg5, usereg6, usereg7, usereg8, usereg9, usereg10, type = "html", report = "vct*")
+#stargazer(usereg1, usereg2, usereg3, usereg4, usereg5, usereg6, usereg7, usereg8, usereg9, usereg10, type = "html", report = "vct*")
 
 ```
 
@@ -410,6 +415,9 @@ Our next step is to gain context into whether the duration of a film impacts pop
 plot(data11_15$duration, data11_15$num_voted_users)
 
 ```
+
+The final criteria we consider is film genre. This is not straightforward, as a film can belong to more than one category (e.g. an action thriller)
+
 
 ### Commercial: Box office ticket sales
 
