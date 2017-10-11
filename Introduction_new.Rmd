@@ -1,0 +1,30 @@
+---
+title: "Introduction"
+author: "xiaoyan zhou"
+date: "2017Äê10ÔÂ11ÈÕ"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Intrduction
+
+There are thousands of movies produced each year. In 2016, the number of films released in theater was 718, which was up 18 percent from ten years ago (MPAA, 2017).The revenue generated in this industry is tremendous. In 2016, the global box office for all films released in each country around the world reach 38.6 billion (MPAA, 2017)[^1]. The film industry is expected to generate global box office revenues of almost \$49.3bn by 2020, from a forecast of US \$38.3bn in 2016[^2], representing a CAGR of over 32%. These substantial growth levels are likely to result in vast resources being poured into the industry, in search of the next "big hit". Countries, recognising the value of developing a film industry to support a variety of local and national initiatives, have supported these activities, providing tax breaks to investors, to mitigate the material upfront costs involved.
+ 
+But the box office of different movies varies significantly. The top 1 box office created by *Finding Dory* is 4.9 billion, while the movie *Moonlight* only generated about 27 million box office[^3]. What makes the difference? How can we predict whether a movie is going to be popular or not? The answer to this problem can be fascinating and shed lights on the whole movie industry.
+
+To answer these question, our group analyses an IMDB dataset of over 5000 movies download from the Kaggle website. IMDB, The Internet Movie Database (IMDb; http://www.imdb.com), is one of the most frequently accessed website all around the world. It contains metadata on films, television programs, videos, and video games (Wasserman, 2014)[^4]. 
+
+This report seeks to examine the data between 2011-2016, concentrating on the US given its role in influencing the wider film industry.The US continues to lead the way in producing a substantial volume of films, accounting for an estimated US \$10.7bn in box office revenues in 2016[^5]. Benefited from a global distribution network, US films cater for different audiences in different countries, overcoming issues varying from political censorship through to cultural sensitivities, to maximise their appeal and potential commercial success. By working deep into this dataset, this report try to figure out the relationship between movie popularity and movie genre, the number of film Facebook likes, IMDB rating, the popularity of actors, the popularity of directors, movie budget, film duration, number of voters and number of critic reviews. This report will also seek to understand how we should measure popularity before devising a regression model that can help predict popularity, and test the model's capacity to predict 2016 trends, before noting the limitations of our work, and areas for further development.
+
+As this report shall conclude, [...]
+
+[^1]:MPAA-Theatrical-Market-Statistics-2016
+[^2]:1
+[^3]:"DOMESTIC GROSSES,Total Grosses of all Movies Released in 2016",Boxofficemojo (2017) http://www.boxofficemojo.com/yearly/chart/?page=1&view=releasedate&view2=domestic&yr=2016&p=.htm
+
+[^4]:Wasserman, M., Mukherjee, S., Scott, K., Zeng, X. H. T., & Radicchi, F. (2015). Correlations between user voting data, budget, and box office for films in the internet movie database. Journal of the Association for Information Science & Technology, 66(4), 858-868.
+[^5]:2
+
