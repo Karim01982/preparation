@@ -259,26 +259,19 @@ We produce boxplots and density graphs of the five variables above, along with b
 We summarises some of the key descriptive findings of these graphs, along with illustrating the results of our ROI boxplot and IMDB density graph:
 
 \usepackage{dcolumn}
-``` {r results = "asis"}
-
-#stargazer(data11_15, type="latex", title="Table with Stargazer")
-
-#temp_data <- data11_15 %>% select(gross, budget, num_voted_users, imdb_score, movie_facebook_likes, return)
-#stargazer(temp_data, type="html", title="Summary of Dataset 2011 to 2015", median=TRUE, iqr=TRUE, nobs=FALSE, font.size="tiny", digits=2, align = TRUE, covariate.labels=c("Gross Revenue","Budget","No. of voted users","IMDB Score","Movie Facebook Likes","Movie ROI"))
-
-
-#stargazer(summary(data11_15),type="latex", title="Table with Stargazer")
-# iris_five %>% group_by(quintile) %>% # Group by quintile
-#   summarize(mean_sepal_length = mean(Sepal.Length), mean_sepal_width = mean(Sepal.Width), count = n()) %>%
-#   head()
+``` {r, results = "asis", warning=FALSE}
+summary_data <- data11_15 %>% select(gross, budget, num_voted_users, imdb_score, movie_facebook_likes, return)
+summary_data = as.data.frame(describe(summary_data, quant = c(.25,.75)))
+summary_data = summary_data[ , !(names(summary_data) %in% c("vars","n","mad","range","kurtosis","se","trimmed"))]
+rownames(summary_data) <- c("Gross Revenue","Budget","Number of voted users","IMDB Score","Movie's Facebook Likes","ROI")
+colnames(summary_data) <- c("Mean","Stan. Dev.","Median","Min","Max","Skew","1st Quar","3rd Quar")
+kable(summary_data)
 ```
 
-```{r}
-# imdbden <- ggplot(data=data11_15)+geom_density(aes(x=(imdb_score)))
-# roibox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=return)) + ylim(0,5)
-# 
-# grid.arrange(imdbden, roibox,  ncol=2)
-
+```{r, results = "asis", warning=FALSE}
+imdbden <- ggplot(data=data11_15)+geom_density(aes(x=(imdb_score)))
+roibox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=return)) + ylim(0,5)
+grid.arrange(imdbden, roibox,  ncol=2)
 ```
 
 There are several intriguing observations. Firstly we observe that all our variables except IMDB scores are positively skewed, with the latter negatively skewed. This confounds our earlier thoughts on IMDB scores being normally distributed. With a median score of 6.7, this implies fans are likely to respond with favourable views, especially with our 1st and 3rd quartile scores between 6.1 and 7.2 respectively. MOre generally, we will need to proceed with any regression analysis carefully (see further comments below).
