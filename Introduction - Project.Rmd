@@ -804,7 +804,7 @@ Predictive analysis on 2016
 
 \pagebreak
 
-##Appendix 1 - Source of dataset and the limitation
+##Appendix 1 - Source of dataset 
 
 The raw dataset comes from Kaggle website[^1], the Dataset section. It includes:
 
