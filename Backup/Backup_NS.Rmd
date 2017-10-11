@@ -1,6 +1,6 @@
 ---
 title: "What makes a Hollywood film successful?"
-author: "Joanna Andari, Karim Awad, Jiye Ren, Nirbhay Sharma"
+author: "Joanna Andari, Karim Awad, Jiye Ren, Nirbhay Sharma, Qiuyue Zhang, Xiaoyan Zhou"
 date: "8 October 2017"
 output:
   html_document: default
@@ -31,8 +31,6 @@ library(stringr)
 library(ggplot2)
 library(knitr)
 library(gridExtra)
-library(Hmisc)
-library(psych)
 ```
 
 
@@ -42,19 +40,21 @@ old_data <- read.csv("./movie_metadata.csv", stringsAsFactors = FALSE)
 
 film_country <- old_data %>%
   group_by(country) %>%
-  summarise(n=n())
-#print(film_country)
+  summarise(mean_gross = mean(gross), n=n())
+head(film_country, 20,40)
+
 
 filter_data <- filter(old_data, country=="USA", language=="English")
 select_data <- select(filter_data, movie_title, title_year, director_name, duration, gross, genres, num_voted_users, num_user_for_reviews, budget, imdb_score, movie_facebook_likes, actor_1_name, actor_2_name, actor_3_name)
 select_data_filter <- filter(select_data, title_year >= 2011, gross !=0, gross != "NA", gross != "", imdb_score != 0, imdb_score != "NA", imdb_score != "", budget != 0, budget != "NA", budget != "", movie_facebook_likes != 0, movie_facebook_likes != "NA", movie_facebook_likes != "")
 
-#head(select_data_filter)
+#Looking at non-US data
+
+filter_data_nonUS <- filter(old_data, country!="USA", language=="English")
+summary(filter_data_nonUS[,"gross"])
+
 
 ##Genre conversion
-#typeof(select_data_filter$genres)
-#toString(select_data_filter$genres)
-#str(select_data_filter)
 genre_names <- c("Action","Adventure", "Animation", "Biography", "Comedy", "Crime", "Documentary", "Drama", "Family", "Fantasy", "History", "Horror", "Musical", "Mystery", "News", "Romance", "Sci-Fi", "Sport", "Thriller", "War", "Western")
 genre_types <- c("genre1", "genre2","genre3", "genre4", "genre5", "genre6", "genre7")
 genre_filter <- select_data_filter %>% separate(genres, into=genre_types,sep = "\\|")
@@ -62,13 +62,10 @@ genre_filter <- select_data_filter %>% separate(genres, into=genre_types,sep = "
 ##Establishing a Gross Revenue / Budget variable and cleaning up movie title names
 RB_data <- mutate(.data = genre_filter, return = gross / budget)
 RB_data$return <- round(RB_data$return, 2)
-#head(RB_data)
 
 ##Clean RB_data of duplicates and the additional character in name
 RB_data$movie_title = substr(RB_data$movie_title,1,nchar(RB_data$movie_title)-1)
 RB_data <- RB_data[-c(as.vector(which(duplicated(RB_data) == TRUE))),]
-
-#head(RB_data)
 
 ##Introducing flags for genres
 
@@ -135,20 +132,6 @@ RB_data$wardummy[is.na(RB_data$wardummy)] <- 0
 RB_data$westerndummy <- as.numeric( RB_data$genre1 == "Western" | RB_data$genre2 == "Western" | RB_data$genre3 == "Western" | RB_data$genre4 == "Western" | RB_data$genre5 == "Western" | RB_data$genre6 == "Western" | RB_data$genre7 == "Western")
 RB_data$westerndummy[is.na(RB_data$westerndummy)] <- 0
 
-#sum(RB_data$actiondummy)
-
-##To search for items within the Movie Title column
-# row <- grep(RB_data$movie_title,"The Dark Knight")
-# as.character(RB_data$movie_title[1]) == as.character("The Dark Knight Rises")
-# head(RB_data)
-# typeof(RB_data$genre1)
-# typeof(RB_data$movie_title)
-# RB_data$movie_title[1] == as.character("The Dark Knight Rises")
-
-
-#to search for a string in any column
-#str_detect(RB_data$movie_title,"John Carter")
-
 ##cleaning awards data 
 awards_data <- read.csv("./awards_metadata.csv", stringsAsFactors = FALSE, encoding = "UTF-8")
 awards_data <- filter(awards_data, Winner!="NA")
@@ -162,8 +145,6 @@ director_wins$Name = director_wins$Film
 director_wins <- count(director_wins, Name)
 award_wins <- rbind(actor_wins,director_wins,movie_wins)
 
-
-
 ##Getting the occurences of directors/actors in the database
 for (i in (1:length(RB_data))){
   RB_data$director_occurence[i] = length(which((str_detect(RB_data$director_name, RB_data$director_name[i])) == TRUE))
@@ -175,7 +156,6 @@ for (i in (1:length(RB_data))){
                                                          RB_data$actor_3_name[i])) == TRUE))
   RB_data$sum_actor_occurence[i] = RB_data$actor1_occurence[i] + RB_data$actor2_occurence[i] + RB_data$actor3_occurence[i]
 }
-
 
 #FOR GETTING AWARDS DATA
 occurences = table(unlist(award_wins$Name))
@@ -198,11 +178,7 @@ RB_data$movie_title = substr(RB_data$movie_title,1,nchar(RB_data$movie_title)-1)
 
 ##Establishing separate datasets for time periods
 data11_15 <- filter(.data = RB_data, title_year < 2016)
-#head(data11_15)
 data16 <- filter(.data = RB_data,title_year == 2016)
-#head(data16)
-#print(data11_15$movie_facebook_likes)
-#print(data11_15$movie_facebook_likes)
 ```
 
 ## Section 1: Introduction
@@ -283,7 +259,7 @@ We produce boxplots and density graphs of the five variables above, along with b
 We summarises some of the key descriptive findings of these graphs, along with illustrating the results of our ROI boxplot and IMDB density graph:
 
 \usepackage{dcolumn}
-``` {r results = "asis"}
+``` {r, results = "asis", warning=FALSE}
 summary_data <- data11_15 %>% select(gross, budget, num_voted_users, imdb_score, movie_facebook_likes, return)
 summary_data = as.data.frame(describe(summary_data, quant = c(.25,.75)))
 summary_data = summary_data[ , !(names(summary_data) %in% c("vars","n","mad","range","kurtosis","se","trimmed"))]
@@ -292,7 +268,7 @@ colnames(summary_data) <- c("Mean","Stan. Dev.","Median","Min","Max","Skew","1st
 kable(summary_data)
 ```
 
-```{r, results = "asis", warning=FALSE, echo=FALSE}
+```{r, results = "asis", warning=FALSE}
 imdbden <- ggplot(data=data11_15)+geom_density(aes(x=(imdb_score)))
 roibox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=return)) + ylim(0,5)
 grid.arrange(imdbden, roibox,  ncol=2)
@@ -310,6 +286,10 @@ Our last observation is the comparative depth of number of IMDB votes relative t
 ###Correlation analysis
 
 ```{r, echo=FALSE}
+
+library(Hmisc)
+library(knitr)
+
 cordata <- select(data11_15, imdb_score, 
                   movie_facebook_likes, gross, return, 
                   budget, num_voted_users)
@@ -325,6 +305,7 @@ kable(pvalcor_table$P)
 The above correlations are all statistically significant, with the exception of our ROI variable. The most surprising result is the lack of correlation with the ROI variable. It is unclear why there is not a positive relationship relative to some of the social media metrics above. This may potentially suggest the impact of outliers in our sample, which may be reducing any underlying correlation 
 
 ```{r, echo=FALSE}
+library(dplyr)
 A<- filter(RB_data,return<1)
 B<- filter(RB_data, between(return,1,3))
 C<- filter(RB_data, return>3)
@@ -537,24 +518,24 @@ We discuss the steps taken in cleaning our underlying datasets prior to analysis
 * **Compilation of both Datasets**
 
 1. **IMDB Movie Dataset:** The raw data consisted of 5044 observations, containing details of movies from the IMDb database over 28 variables. These variables included information about the movie performance on the box office, the actor(s) name, director(s) names, movie genre, movie facebook likes and more.     
-    * **Step 1 - Cleaning up inconsistent observations:** The raw dataset contained a lot of inconsistencies, namely 'NA' or Blank values for several observations. In order to get a consistent data to perform analysis on, we **_removed all the observations with any NA or blank values_**.                
-    * **Step 2 - Removing duplicate values:** We observed that the dataset contained duplicate observations, which were also removed.
-    * **Step 3 - Limiting our dataset:** In order to do a comprehensive analysis, having a dataset of movies belonging to a single country or industry will be a good place to start. Furthermore, ever since the the outset of facebook and other social media, the success of a movie is heavily reliant on its social presence and digital marketing. Therefore, to completely account for these factors, and also ensure that the data we analysed is consistent, we have limited our data to **_movies made in the USA after the year 2011_**.                           
-    * **Step 4 - Segregating the movie genres:** The dataset contained the movie genres in the form of a single string, with every genre of the movie, delimited by a '|' symbol. In order to get the actual genres separated and ready to use, we used created flags in order to check whether the movie is of a particular genre. For example: the 'action_genre' column will have a 1 value for an observation, if it is an action movie.
-    * **Step 5 - Calculating the number of occurences of each actor/director:** Another interesting variable that we expect to be of significance to our analysis was the number of times an actor/director has showed up in our dataset. That data would allow us to possibly find interesting points on how an actor/director can impact a movie's performance/success. Thus, we added variables/columns with the **_number of occurences for actors and directors_**.
-    * **Step 6 - Calculating the movie ROI:** We add another variable, 'movie_roi' which contains the **_return on investment for each movie_**. This will help us in our analysis.
-    * **Step 7 - Selecting only the required columns:** The raw dataset consisted of 28 variables, many of which are not required in our analyses. Thus, we remove the unwanted columns and keep only the data that is specific to our analysis. In the process we reduce the size of the dataset leading to better performance. (See data description for more detials).                                                                                                                                                                               
+  * **Step 1 - Cleaning up inconsistent observations:** The raw dataset contained a lot of inconsistencies, namely 'NA' or Blank values for several observations. In order to get a consistent data to perform analysis on, we **_removed all the observations with any NA or blank values_**.
+  * **Step 2 - Removing duplicate values:** We observed that the dataset contained duplicate observations, which were also removed.
+  * **Step 3 - Limiting our dataset:** In order to do a comprehensive analysis, having a dataset of movies belonging to a single country or industry will be a good place to start. Furthermore, ever since the the outset of facebook and other social media, the success of a movie is heavily reliant on its social presence and digital marketing. Therefore, to completely account for these factors, and also ensure that the data we analysed is consistent, we have limited our data to **_movies made in the USA after the year 2011_**.                           
+  * **Step 4 - Segregating the movie genres:** The dataset contained the movie genres in the form of a single string, with every genre of the movie, delimited by a '|' symbol. In order to get the actual genres separated and ready to use, we used created flags in order to check whether the movie is of a particular genre. For example: the 'action_genre' column will have a 1 value for an observation, if it is an action movie.
+  * **Step 5 - Calculating the number of occurences of each actor/director:** Another interesting variable that we expect to be of significance to our analysis was the number of times an actor/director has showed up in our dataset. That data would allow us to possibly find interesting points on how an actor/director can impact a movie's performance/success. Thus, we added variables/columns with the **_number of occurences for actors and directors_**.
+  * **Step 6 - Calculating the movie ROI:** We add another variable, 'movie_roi' which contains the **_return on investment for each movie_**. This will help us in our analysis.
+  * **Step 7 - Selecting only the required columns:** The raw dataset consisted of 28 variables, many of which are not required in our analyses. Thus, we remove the unwanted columns and keep only the data that is specific to our analysis. In the process we reduce the size of the dataset leading to better performance. (See data description for more detials).                                                                                                                                                                               
 2. **Oscar winners dataset:** The raw dataset of awards contained 2321 observations over 4 variables. This database consisted the nominees and winners of the Academy Awards (or Oscars) ever since its inception, i.e. from 1927 to 2015.     
-    * **Step 1 - Cleaning up inconsistent observations:** The raw dataset some inconsistent observations where the name of the winner and the film was placed in the incorrect column. Since this was the case for the initial few records only, we ignored this and copied the values in the 'film' column to the 'names' column.                
-    * **Step 2 - Limiting our dataset:** The dataset included both nominess and winner and from every category. We were interested in collecting data about the actors, directors, and the best picture winners only in order to see how that impacts the success of a movie. Therefore, we **_excluded the nomiees and only kept the winners for the awards_** related to Best Actor/Actress in a Lead/Supporting role, Best Director and Best Picutre.
-    * **Step 3 - Counting the awards:** In order to get the data of the number of wins for each individual, we introduced a new column 'num_wins' which counted the **_number of occurences of a name in the winners list_**. Using this data makes sense as in order to asses the impact of this on a movies popularity/success.
-    * **Step 4 - Selecting the required columns:** The raw dataset contains 4 variables, and a count column, out of which only the 'count' and 'name' column is required for our analysis. Thus we select only a small subset of the raw data for our analysis.                   
+  * **Step 1 - Cleaning up inconsistent observations:** The raw dataset some inconsistent observations where the name of the winner and the film was placed in the incorrect column. Since this was the case for the initial few records only, we ignored this and copied the values in the 'film' column to the 'names' column.                
+  * **Step 2 - Limiting our dataset:** The dataset included both nominess and winner and from every category. We were interested in collecting data about the actors, directors, and the best picture winners only in order to see how that impacts the success of a movie. Therefore, we **_excluded the nomiees and only kept the winners for the awards_** related to Best Actor/Actress in a Lead/Supporting role, Best Director and Best Picutre.
+  * **Step 3 - Counting the awards:** In order to get the data of the number of wins for each individual, we introduced a new column 'num_wins' which counted the **_number of occurences of a name in the winners list_**. Using this data makes sense as in order to asses the impact of this on a movies popularity/success.
+  * **Step 4 - Selecting the required columns:** The raw dataset contains 4 variables, and a count column, out of which only the 'count' and 'name' column is required for our analysis. Thus we select only a small subset of the raw data for our analysis.                   
   The cleaned awards data now has 434 observations over 2 variables. This data will come handy to check which movies/actors/directors have oscar(s) to their name(s) and how that impacts the success of a movie.
 
 
 3. **Final (Cumulative) Dataset:** In order to get the final working database, we combine the information from the two cleaned datasets.             
-    * **Step 1 - Summarizing the datasets:** We need to get the number of award wins for actors, directors, and movie for each observation in the into the IMDB movie dataset, from the 'Oscar winners dataset'. We do this by introducing new variables that captures **_the count of oscars for each actor, director, and movie for each observation_**.
-    * **Step 2 - Diving the final data into two datasets:** The entire basis of our analysis was to create a model that can predict the success of a hollywood movie. To achieve that, we will try to build a model (or hypothesis) using the data for movies from 2011 to 2015 and then test the model (or hypothesis) for the movies in 2016. This will give us a clear indication of how our model fits with current and future data. Thus we **_create two subsets of the final data, one for data of movies from 2011 to 2015 and the other with the data of movies for 2016_**.   
+  * **Step 1 - Summarizing the datasets:** We need to get the number of award wins for actors, directors, and movie for each observation in the into the IMDB movie dataset, from the 'Oscar winners dataset'. We do this by introducing new variables that captures **_the count of oscars for each actor, director, and movie for each observation_**.
+  * **Step 2 - Diving the final data into two datasets:** The entire basis of our analysis was to create a model that can predict the success of a hollywood movie. To achieve that, we will try to build a model (or hypothesis) using the data for movies from 2011 to 2015 and then test the model (or hypothesis) for the movies in 2016. This will give us a clear indication of how our model fits with current and future data. Thus we **_create two subsets of the final data, one for data of movies from 2011 to 2015 and the other with the data of movies for 2016_**.   
 
 
 \pagebreak
