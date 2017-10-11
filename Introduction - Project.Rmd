@@ -40,26 +40,24 @@ old_data <- read.csv("./movie_metadata.csv", stringsAsFactors = FALSE)
 
 film_country <- old_data %>%
   group_by(country) %>%
-<<<<<<< HEAD
+
   summarise(mean_gross = mean(gross), n=n())
 head(film_country, 20,40)
-=======
-  summarise(n=n())
->>>>>>> e63ba8d457207a1d51bb44b38d913f3f51af0772
+
+
 
 filter_data <- filter(old_data, country=="USA", language=="English")
 select_data <- select(filter_data, movie_title, title_year, director_name, duration, gross, genres, num_voted_users, num_user_for_reviews, budget, imdb_score, movie_facebook_likes, actor_1_name, actor_2_name, actor_3_name)
 select_data_filter <- filter(select_data, title_year >= 2011, gross !=0, gross != "NA", gross != "", imdb_score != 0, imdb_score != "NA", imdb_score != "", budget != 0, budget != "NA", budget != "", movie_facebook_likes != 0, movie_facebook_likes != "NA", movie_facebook_likes != "")
 
-<<<<<<< HEAD
+
 #Looking at non-US data
 
 filter_data_nonUS <- filter(old_data, country!="USA", language=="English")
 summary(filter_data_nonUS[,"gross"])
 
 
-=======
->>>>>>> e63ba8d457207a1d51bb44b38d913f3f51af0772
+
 ##Genre conversion
 genre_names <- c("Action","Adventure", "Animation", "Biography", "Comedy", "Crime", "Documentary", "Drama", "Family", "Fantasy", "History", "Horror", "Musical", "Mystery", "News", "Romance", "Sci-Fi", "Sport", "Thriller", "War", "Western")
 genre_types <- c("genre1", "genre2","genre3", "genre4", "genre5", "genre6", "genre7")
@@ -740,8 +738,9 @@ rev_mod6 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + sum_
 rev_mod7 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + scifidummy + sum_actor_occurence + director_occurence))
 rev_mod8 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + scifidummy + sum_actor_occurence + director_occurence + num_voted_users))
 
-stargazer(rev_mod1, rev_mod2, rev_mod3, rev_mod4, rev_mod5, rev_mod6, rev_mod7, rev_mod8, type = "html", report = "vct*")
+stargazer(rev_mod1, rev_mod2, rev_mod3, rev_mod4,  type = "text", report = "vct*")
 
+stargazer(rev_mod5,rev_mod6, rev_mod7, rev_mod8, type = "text", report = "vct*")
 ```
 
 Coming to the finding the determinants of financial popularity or revenue of a movie, we begin with a simple quation trying to analyse the impact of the budget of the movie. This regression model, with an adjusted ${R}^{2}$ value is ~0.461 and a very low p-value, determines budget as a very significant factor affecting revenues.
@@ -757,7 +756,7 @@ Taking into account the skew in the data, we further refine our model in equatio
 
 \pagebreak
 
-##Section 5: Robustness tests
+##Section 5: Hypothesis Testing & Robustness
 
 To test for robustness of our regression model, we have conducted a regression analysis and t-tests for each independent variables in our previous model as shown below:
 
@@ -817,11 +816,11 @@ kable(t_test_table, caption = 'Variables', align = c('l', 'l', 'l'), digits = 4)
 log6_gross <- (log(data11_15$gross)^6)
 
 
-rev_mod9 <- lm(data=data11_15, log6_gross ~ budget + actiondummy + scifidummy + sum_actor_occurence + director_occurence + num_voted_users)
+rev_mod9 <- lm(data=data11_15, log6_gross ~ budget + actiondummy + scifidummy +  director_occurence + num_voted_users)
 
 log6_gross <- (log(data16$gross)^6)
 
-rev_mod10 <- lm(data=data16, log6_gross ~ budget + actiondummy + scifidummy + sum_actor_occurence + director_occurence + num_voted_users)
+rev_mod10 <- lm(data=data16, log6_gross ~ budget + actiondummy + scifidummy + director_occurence + num_voted_users)
 
 stargazer(rev_mod9, rev_mod10, type = "text")
 ```
