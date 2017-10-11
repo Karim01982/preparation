@@ -232,7 +232,7 @@ ggplot(boxoff, aes(x = year, y=value, fill= type))+ geom_bar(stat='identity', po
 
 ```
 
-With global audiences in mind, are there factors that can help predict a Hollywood film's popularity, and with that, guide future decisions on the types of films produced? In turn, can this better inform investors on potential risks involved with backing particular projects?
+Although continued growth in Chinese and Indian box office revenues is likely to dominate the period to 2020, Hollywood is likely to remain a bellweather of judging a film's global success, given its wide audience base. With that in mind, are there factors that can help predict a Hollywood film's popularity, and with that, guide future decisions on the types of films produced? In turn, can this better inform investors on potential risks involved with backing particular projects?
 
 This report seeks to examine a random sample of movie data pulled from IMDB data between 2011-16, concentrating on the US given its role in influencing the wider film industry. This will seek to understand how we should measure popularity, focusing on 2011-15 data, before devising a regression model that can help predict popularity. We will then test its capacity to predict 2016 trends, before noting the limitations of our work, and areas for further development.
 
