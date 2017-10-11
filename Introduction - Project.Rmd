@@ -252,7 +252,7 @@ The data compiled for this project/analysis is obtained from 2 different dataset
 
 We have performed data cleaning on both of these datasets and then compiled them to a single dataset in order to obtain the 'working data'. Below is a summary for the data cleaning operations performed on both of these datasets.                       
                   
-1. **IMDB Movie Dataset:** The raw data consisted of 5044 observations, containing details of movies from the IMDb database over 28 variables. These variables included information about the movie performance on the box office, the actor(s) name, direcor(s) names, movie genre, movie facebook likes and more.     
+1. **IMDB Movie Dataset:** The raw data consisted of 5044 observations, containing details of movies from the IMDb database over 28 variables. These variables included information about the movie performance on the box office, the actor(s) name, director(s) names, movie genre, movie facebook likes and more.     
     * **Step 1 - Cleaning up inconsistent observations:** The raw dataset contained a lot of inconsistencies, namely 'NA' or Blank values for several observations. In order to get a consistent data to perform analysis on, we **_removed all the observations with any NA or blank values_**.                
     * **Step 2 - Removing duplicate values:** We observed that the dataset contained duplicate observations, which were also removed.
     * **Step 3 - Limiting our dataset:** In order to do a comprehensive analysis, having a dataset of movies belonging to a single country or industry will be a good place to start. Furthermore, ever since the the outset of facebook and other social media, the success of a movie is heavily reliant on its social presence and digital marketing. Therefore, to completely account for these factors, and also ensure that the data we analysed is consistent, we have limited our data to **_movies made in the USA after the year 2011_**.                           
@@ -278,7 +278,7 @@ We have performed data cleaning on both of these datasets and then compiled them
 
 ##Section 3: How do we measure a film's popularity?
 
-###What metrics should we use to determine our dependent variable?
+###What metric(s) should we use to determine our dependent variable?
 
 Determining what variable should represent popularity, itself a subjective quality, gives rise to several potential proxy variables. These can be divided between those that are financially driven relative to social media metrics, of which we consider each in turn, arriving at five possible variables.
 
