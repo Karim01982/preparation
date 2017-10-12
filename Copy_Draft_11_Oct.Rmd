@@ -495,118 +495,20 @@ We first perform an F-test to contrast the variance between our 2011-15 and 2016
 #Include the results of our F-test here
 ```
 
-[Comment on results]
+We can apparently reject our null hypothesis for both regressions at a 5% confidence interval. Given the potential issues we have identified above, this does not seem unreasonable as an assumption, although we note for our social media regression that we could reject our alternate hypothesis at a 1% interval. It may therefore not be entirely clear, with this highlighting the prospect of a Type I error.
 
-
-
-The t-test results for the two datasets (data for 2011-15 and 2016) are shown below:
-
-```{r, results = "asis"}
-t1 <- t.test(data11_15$gross, data16$gross, alternative='two.sided') 
-t2 <- t.test(data11_15$actor_oscars, data16$actor_oscars, alternative='two.sided')  
-t3 <- t.test(data11_15$familydummy, data16$familydummy, alternative='two.sided') 
-t4 <- t.test(data11_15$scifidummy, data16$scifidummy, alternative='two.sided') 
-t_test_variable <- c('gross', 'actor_oscars', 'familydummy', 'scifidummy')
-t_test_p_value <- c(t1$p.value, t2$p.value, t3$p.value, t4$p.value)
-t_test_sig_level <- c('> 0.05','> 0.05','> 0.05','< 0.05')
-t_test_table <- data.frame(t_test_variable, t_test_p_value, t_test_sig_level)
-
-kable(t_test_table, caption = 'Variables', align = c('l', 'l', 'l'), digits = 4)
-```
-
-The p-value for the first three variables are high enough (greater than 0.05) and hence we could accept the null hypothesis and conclude that there are no significant differences in those data of 2011 to 2015 and those data of 2016. The p-value for scifidummy variable is slightly less than 0.05, however, the confidence interval is [-0.3352, -0.0060] which is very close to 0. Thus our group will ignore the minor difference and use the whole dataset for the future analysis.
-
-```{r, echo=FALSE, results = "asis"}
-log4numvoted_users1 <- (log(data11_15$num_voted_users)^4)
-Usereg11 <- lm(data = data11_15, log4numvoted_users1 ~ gross + actor_oscars + familydummy + scifidummy)
-log4numvoted_users2 <- (log(data16$num_voted_users)^4)
-Usereg12 <- lm(data = data16, log4numvoted_users2 ~ gross + actor_oscars + familydummy + scifidummy)
-
-stargazer(Usereg11, Usereg12, type = 'text')
-```
-
-The left column in the table stands for the social popularity model we established in the previous sections (2011 - 2015), and the right one for year 2016. The gross and constant terms are highly significant, however, the actor_oscars, familydummy and scifidummy are not as significant.The adjusted ${r}^{2}$ is satisfyingly high and F-test is significant. One reason why the dummy variables are not significant here while R square and F value are both high is we do not have sufficient data for year 2016 -- only 37 observations while there are 4 independent variables. However, the signs of all coefficients in the 2016 model are the same as 2011-2015 model, which could prove the general correctness of our model.
-
-#Additionally, the model is strong and valid, no significant multicollinearity, heteroskedasticity and aotucorrelation occured. Stepwise regression was adopted when building the model which reduced the multicollinearity. We noticed that the raw data was not all showing normal distribution, so we took the logarithm of those data and found the processed data normal distributed, which helped to reduce the skedasticity as the test
-
-
-
-B. Commercial Popularity
-
-In order to validate the robustness of our model of commercial popularity, we have used residual plots in order to determine the fitness of our regression model. 
+We separately examine what our parameter coefficients return across both models. We formulate our hypothesis as follows:
 
 ```{r}
 
-#residualPlot(rev_mod6)
-#residualPlot(rev_mod6_log)
+#Include formula of H0: Beta (subscript i, 11-15) = Beta (subscript i, 16) (i.e. Beta (subscript i, 11-15) - Beta (subscript i, 16) = 0 )
+#Include formula of H1: Beta (subscript i, 11-15) [not equal to] Beta (subscript i, 16)
 
-#residualPlot(rev_mod6)
-#residualPlot(rev_mod6_log)
-
+#Include results here
 
 ```
 
-In the first residual plot, most data points concerntrated in the left half plot around the zero line. It seems that the residuals are dependent on the observe values (especially when the values are small). After the logarithm transformation, the second residual plot shows a much more spreaded scene which demonstrate the transformed model is more persuasive. However, the red fitted curves above shows that there still exists ommitted independent variables, which is restricted by the limited dataset we currently have.
-
-In addition to the residual plots, we also conducted t-tests on the independant variables of our commercial sucess model for the dataset of 2011-2015 and dataset of 2016.
-
-The null hypothesis for the t-tests is that there is no significant differences between the variable of the dataset of 2011-2015 and dataset of 2016. If the p-value is greater than 0.05, the null hypothesis will be accepted.
-
-The t-test results for the two datasets (data for 2011-15 and 2016) are shown below:
-
-```{r, results = "asis"}
-t1 <- t.test(data11_15$budget, data16$budget, alternative='two.sided') 
-t2 <- t.test(data11_15$actiondummy, data16$actiondummy, alternative='two.sided')  
-t3 <- t.test(data11_15$scifidummy, data16$scifidummy, alternative='two.sided') 
-t4 <- t.test(data11_15$actor1_occurence, data16$actor1_occurence, alternative='two.sided') 
-t5 <- t.test(data11_15$actor2_occurence, data16$actor2_occurence, alternative='two.sided') 
-t6 <- t.test(data11_15$num_voted_users, data16$num_voted_users, alternative='two.sided') 
-t_test_variable <- c('budget', 'action-dummy', 'scifidummy', 'actor1_occurence','actor2_occurence', 'num_voted_users')
-t_test_p_value <- c(t1$p.value, t2$p.value, t3$p.value, t4$p.value, t5$p.value, t6$p.value)
-t_test_sig_level <- c('< 0.05','< 0.05','< 0.05','> 0.05', '> 0.05', '< 0.05')
-
-t_test_table <- data.frame(t_test_variable, t_test_p_value, t_test_sig_level)
-
-kable(t_test_table, caption = 'Variables', align = c('l', 'l', 'l'), digits = 4)
-
-```
-
-The p-value for the actor/actress occurence variables are high enough (greater than 0.05) and hence we could accept the null hypothesis and conclude that there are no significant differences in those data of 2011 to 2015 and those data of 2016. The p-value for scifidummy variable, as explained in part A, is slightly less than 0.05, however, the confidence interval is [-0.3352, -0.0060] which is very close to 0. The p-values for action dummy variable, budget and number of voted users are less than 0.05, and 0 is far outside the confidence interval, therefore they are not suitable for the model application on year 2016 movies. This report believes that the reason of this inconsistent could be the limitation of the raw data. Below is the summary statistics of these variables in dataset 2011-15 and dataset 2016:
-
-```{r}
-Statistics <- c('Min.', '1st Qu.', 'Median', 'Mean', '3rd Qu.', 'Max.')
-budget_11_15 <- as.vector(summary(data11_15$budget))
-budget_16 <- as.vector(summary(data16$budget))
-action_11_15<- as.vector(summary(data11_15$actiondummy))
-action_16<- as.vector(summary(data16$actiondummy))
-num_voted_users_11_15<- as.vector(summary(data11_15$num_voted_users))
-num_voted_users_16<- as.vector(summary(data16$num_voted_users))
-
-insig_variable_table <- data.frame(Statistics, budget_11_15, budget_16, action_11_15, action_16, num_voted_users_11_15, num_voted_users_16)
-
-kable(insig_variable_table, digits = 2, caption = 'Variables')
-
-```
-
-As the summary statistics shown in the above table, it is very obvious that the available data of those three variables for 2016 is very different from the ones for 2011-15. It is due to the size of the dataset for 2016 as it only contains the data up to August 2016. The number of voted users variable is especially inconsistent as it is an accumulated data on the Internet and it was not as fully collected by August 2016 as the previous movies (2011-15). Therefore, the report does not recommend to use the current data of these three variables to conduct future analysis.
-
-
-```{r}
-##As the table shown above, our available data is not consistent at all, so it would be meaningless to apply our model to data16.
-
-#log6_gross <- (log(data11_15$gross)^6)
-
-
-#new_rev_mod6_log <- lm(data=data11_15, log6_gross ~ budget + actiondummy + actor1_occurence+ actor2_occurence + num_voted_users)
-
-#log6_gross <- (log(data16$gross)^6)
-
-#rev_mod10 <- lm(data=data16, log6_gross ~ budget + actiondummy +actor1_occurence +actor2_occurence+ num_voted_users)
-
-#stargazer(new_rev_mod6_log, rev_mod10, type = "text")
-```
-
-
+[comments]
 
 
 
