@@ -541,6 +541,8 @@ t_test_table <- data.frame(t_test_variable, t_test_p_value, t_test_sig_level)
 
 kable(t_test_table, caption = 'Variables', align = c('l', 'l', 'l'), digits = 4)
 
+t1
+
 ```
 
 The p-value for the actor/actress occurence variables are high enough (greater than 0.05) and hence we could accept the null hypothesis and conclude that there are no significant differences in those data of 2011 to 2015 and those data of 2016. The p-value for scifidummy variable, as explained in part A, is slightly less than 0.05, however, the confidence interval is [-0.3352, -0.0060] which is very close to 0. The p-values for action dummy variable, budget and number of voted users are less than 0.05, and 0 is far outside the confidence interval, therefore they are not suitable for the model application on year 2016 movies. This report believes that the reason of this inconsistent could be the limitation of the raw data. Below is the summary statistics of these variables in dataset 2011-15 and dataset 2016:
