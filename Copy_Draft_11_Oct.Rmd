@@ -306,19 +306,24 @@ A<- filter(RB_data,return<1)
 B<- filter(RB_data, between(return,1,3))
 C<- filter(RB_data, return>3)
 
-A1<-select (A, 'num_voted_users','return' )
+A1<-select (A, 'num_voted_users','return','gross' )
 A1[,"return"] <- "<1"
-A2<-select (B, 'num_voted_users', 'return')
+A2<-select (B, 'num_voted_users', 'return', 'gross')
 A2[,"return"] <- "1-3"
-A3<-select (C, 'num_voted_users', 'return')
+A3<-select (C, 'num_voted_users', 'return', 'gross')
 A3[,"return"] <- "3>"
 
 final_A <- rbind(A1,A2,A3)
-ggplot(data=final_A, aes(x=return, y=num_voted_users, color=return)) +
-  geom_point(position="jitter", alpha=0.5) + ggtitle('Number of Voted Users based on ROI')+ theme(plot.title = element_text(hjust=0.5))
+ggplot(data=final_A, aes(x=gross, y=num_voted_users)) +
+  geom_point(position="jitter", alpha=0.5) + facet_wrap(~return) + ggtitle('Number of Voted Users based on ROI')+ theme(plot.title = element_text(hjust=0.5))
+
+ggplot(data=final_A, aes(x=RB_data$return, y=gross)) +
+  geom_point(position="jitter", alpha=0.5) + xlim(0,5)+ xlab("ROI < 5.0x") + ggtitle('Box office sales vs ROI')+ theme(plot.title = element_text(hjust=0.5))
 ```
 
-In contrast to revenues, we do not consider ROI as suitable for further analysis as a dependent variable. Revenues as a financial metric has demonstrated the positive relationships we expected to see amongst social media (e.g. facebook looks and number of voted users), indicating that expressions of support tend to correspond with higher box office revenues (i.e. people go to the cinema). We do note the more weak positive correlation with IMDB scores (esp. relative to number of voting IMDB users), which we suspect is a function of the latter's negative skew, although given the strong correlation with budget, this partly offsets these concerns. The latter relationship would correspond well with blockbusters generating higher revenues, conditioned on budgets that can support the hiring of better actors, and increased marketing / promotional spend. 
+In contrast to revenues, we do not consider ROI as suitable for further analysis as a dependent variable. We produce two scatter plots to confirm this finding. The first, which segregates returns, shows no underlying change on the positive relationship between box office sales and IMDB votes. In other words, each type of return appears just as likely as we vary IMDB votes and sales achieved. This is more apparent when we produce a scatterplot of revenues over returns, where no relationship appears apparent between high-grossing and small box office sales. These results are surprising, as we expected some pattern to emerge, be it positive or negative correlation (e.g. either films grossing higher box office sales generate larger returns, or small films performing far better compared to large films that lose money due to higher costs). Neither is evident, of which we comment further in section 6, as we'd expect ROI to be a significant factor in measuring success.   
+
+Revenues as a financial metric has demonstrated the positive relationships we expected to see amongst social media (e.g. facebook likes and number of voted users), indicating that expressions of support tend to correspond with higher box office revenues (i.e. people go to the cinema). We do note the more weak positive correlation with IMDB scores (esp. relative to number of voting IMDB users), which we suspect is a function of the latter's negative skew, although given the strong correlation with budget, this partly offsets these concerns. The latter relationship would correspond well with blockbusters generating higher revenues, conditioned on budgets that can support the hiring of better actors, and increased marketing / promotional spend. 
 
 Equally, we observe a more positive correlation between number of voted users, against other metrics, relative to both IMDB scores and facebook likes. This warrants reappraising this variable, as it may represent a better proxy relative to IMDB scores themselves. From our descriptive analysis section above, we note a strong negative skew in IMDB scores, suggesting that those voting are likely to be fans conveying their support for a film, rather than providing a balanced critique. Therefore the number of IMDB votes may better represent the strength of popularity enjoyed by a particular movie. However, we are conscious of the possibility that not all these votes will be conveying the same numerical grade, nor the potential for duplicate votes to be included in any final score. 
 
