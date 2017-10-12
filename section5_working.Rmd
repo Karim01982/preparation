@@ -466,7 +466,6 @@ As the first step of validating the robustness of the social popularity and comm
 residualPlot(usereg10) # residual plot for our social media model (with the log)
 residualPlot(rev_mod7) # residual plot for our commercial model (without the log)
 
-
 ```
 
 In addition, when taking into account the 'log' dependent variable in both social popularity and comercial sucess regression models, we have noted serial correlation in residual plots for them. This can be explained by ommitted variables in our model. This means that R-Standard Error might not be accurate and thus the fit or any test results on the models might be innacurate. 
@@ -491,7 +490,6 @@ t6 <- t.test(data11_15$gross, data16$gross, alternative='two.sided')
 t7 <- t.test(data11_15$actor_oscars, data16$actor_oscars, alternative='two.sided') 
 t8 <- t.test(data11_15$familydummy, data16$familydummy, alternative='two.sided') 
 t9 <- t.test(data11_15$scifidummy, data16$scifidummy, alternative='two.sided') 
-
 
 t_test_variable <- c('budget','director_occurence','actor2_occurence','actiondummy','comedydummy','gross','actor_oscars','familydummy','scifidummy')
 t_test_p_value <- c(t1$p.value, t2$p.value, t3$p.value, t4$p.value, t5$p.value, t6$p.value, t7$p.value, t8$p.value, t9$p.value)
