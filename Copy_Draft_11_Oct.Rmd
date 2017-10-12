@@ -252,7 +252,7 @@ We recognise that social media metrics will be lagged indicators of a film's suc
 
 We produce boxplots and density graphs of the five variables above, along with budget to provide a sense-check. These can all separately be found in the appendices.
 
-We summarises some of the key descriptive findings of these graphs, along with illustrating the results of our ROI boxplot and IMDB density graph:
+We summarises some of the key descriptive findings of these graphs, along with illustrating the results of our ROI boxplot (limited to returns up to 5.0x) and IMDB density graph:
 
 \usepackage{dcolumn}
 ``` {r, results = "asis", warning=FALSE}
@@ -270,11 +270,11 @@ roibox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=return)) + ylim(0,5)
 grid.arrange(imdbden, roibox,  ncol=2)
 ```
 
-There are several intriguing observations. Firstly we observe that all our variables except IMDB scores are positively skewed, with the latter negatively skewed. This confounds our earlier thoughts on IMDB scores being normally distributed. With a median score of 6.7, this implies fans are likely to respond with favourable views, especially with our 1st and 3rd quartile scores between 6.1 and 7.2 respectively. MOre generally, we will need to proceed with any regression analysis carefully (see further comments below).
+There are several intriguing observations. Firstly we observe that all our variables except IMDB scores are positively skewed, with the latter negatively skewed. This confounds our earlier thoughts on IMDB scores being normally distributed. With a median score of 6.7, this implies fans are likely to respond with favourable views, especially with our 1st and 3rd quartile scores between 6.1 and 7.2 respectively. More generally, we will need to proceed with any regression analysis carefully (see further comments below).
 
 Examining our financial metrics, our ROI variable suggests a median film will make a return of 1.2x, although this engenders significant volatility, reflected within our wide range, and a standard deviation that would imply a negative mean on the downside. Ignoring the latter, this volatility seems consistent with the level of risk associated with producing films, with properties mimicking a financial option (e.g. an upfront payment with no assurance of exercise), given the uncertainty in audience receptiveness.
 
-This uncertainty is reinforced in the range of revenue figures, and corresponding budget figures respectively. With revenue, this volatility is likely to be more pronounced in practice, as our metric only focuses on box office tickets. These figures imply a median film will have a budget of US\$40m and be expected to generate box office revenues of US\$52m, consistent with our ROI estimate above.
+This uncertainty is reinforced in the range of revenue figures, and corresponding budget figures respectively. With revenue, this volatility is likely to be more pronounced in practice, as our metric only focuses on box office tickets. These figures imply a median film will have a budget of US\$40m and be expected to generate box office revenues of US\$52m, broadly consistent with our ROI estimate above.
 
 Our last observation is the comparative depth of number of IMDB votes relative to facebook likes. As alluded towards earlier, it is unclear how such facebook data has been collected, nor the interval between the film's release and data collection. The latter is equally applicable to IMDB scores; however, given the negative skew with this statistic, the higher number of votes may prove a more desirable proxy in gauging popularity. We shall seek to confirm this by testing how these variables correlate with each other, to guide our final choice on our dependent variables. 
 
@@ -410,7 +410,7 @@ Overall, this model should mitigate the effect of statistical bias affecting our
 ### Commercial: Box office ticket sales
 
 ```{r}
-log6_gross <- (log(final_data_11to15$gross)^6)
+log6_gross <- (log(data11_15$gross)^6)
 
 rev_mod1 <- lm(data=data11_15, gross ~ (budget))
 rev_mod2 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + thrillerdummy + romancedummy + comedydummy + familydummy))
@@ -525,8 +525,8 @@ B. Commercial Popularity
 In order to validate the robustness of our model of commercial popularity, we have used residual plots in order to determine the fitness of our regression model. 
 
 ```{r}
-residualPlot(new_rev_mod6)
-residualPlot(new_rev_mod6_log)
+residualPlot(rev_mod6)
+residualPlot(rev_mod6_log)
 
 ```
 
