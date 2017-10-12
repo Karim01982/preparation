@@ -1,6 +1,7 @@
 ---
 title: "What makes a Hollywood film successful?"
-author: "Joanna Andari, Karim Awad, Jiye Ren, Nirbhay Sharma, Qiuyue Zhang, Xiaoyan Zhou"
+author: Joanna Andari, Karim Awad, Jiye Ren, Nirbhay Sharma, Qiuyue Zhang, Xiaoyan
+  Zhou
 date: "8 October 2017"
 output:
   html_document: default
@@ -419,21 +420,21 @@ Overall, this model should mitigate the effect of statistical bias affecting our
 ### Commercial: Box office ticket sales
 
 ```{r, results = "asis", echo = FALSE}
+
 log6_gross <- (log(data11_15$gross)^6)
 
 rev_mod1 <- lm(data=data11_15, gross ~ (budget))
-rev_mod2 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + comedydummy))
-rev_mod3 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + duration))
-rev_mod4 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + actor_oscars + dir_oscars + movie_oscars))
-rev_mod5 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + actor1_occurence))
-rev_mod6 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + actor2_occurence))
-rev_mod7 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + actor3_occurence))
-rev_mod8 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + director_occurence))
-rev_mod9 <- lm(data=data11_15, gross ~ (budget + actiondummy + director_occurence + actor1_occurence + actor2_occurence + actor3_occurence))
-rev_mod10 <- lm(data=data11_15, gross ~ (budget + actiondummy + actor1_occurence + actor2_occurence + num_voted_users))
-rev_mod11 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + actor1_occurence + actor2_occurence + num_voted_users))
+rev_mod2 <- lm(data=data11_15, gross ~ (budget + actiondummy + adventuredummy + comedydummy +
+                familydummy + fantasydummy+horrordummy+romancedummy + scifidummy+thrillerdummy))
+rev_mod3 <- lm(data=data11_15, gross ~ budget + actiondummy + scifidummy + comedydummy + actor_oscars + dir_oscars + movie_oscars)
+rev_mod4 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + comedydummy + director_occurence + actor1_occurence + actor2_occurence + actor3_occurence))
+rev_mod5 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + comedydummy + director_occurence + actor2_occurence + actor3_occurence))
 
-stargazer(rev_mod1, rev_mod2, rev_mod3, rev_mod4, rev_mod5, rev_mod6, rev_mod7, rev_mod8, rev_mod9, rev_mod10, rev_mod11, type = "html", report = "vct*")
+rev_mod6 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + scifidummy + comedydummy + director_occurence + actor2_occurence + actor3_occurence))
+rev_mod7 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + comedydummy  + director_occurence + actor2_occurence))
+
+
+stargazer(rev_mod1, rev_mod2, rev_mod3, rev_mod4, rev_mod5, rev_mod6, rev_mod7, type = "html", report = "vct*")
 
 ```
 
