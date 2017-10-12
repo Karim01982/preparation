@@ -418,7 +418,7 @@ Overall, this model should mitigate the effect of statistical bias affecting our
 
 ### Commercial: Box office ticket sales
 
-<<<<<<< HEAD
+
 ```{r, results = "asis", echo = FALSE}
 
 log6_gross <- (log(data11_15$gross)^6)
