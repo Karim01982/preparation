@@ -31,6 +31,7 @@ library(stringr)
 library(ggplot2)
 library(knitr)
 library(gridExtra)
+library(psych)
 ```
 
 
@@ -215,14 +216,15 @@ As this report shall conclude, [...]
 
 ##Section 2: Data sampling and cleaning
 
-The data compiled for this project/analysis is obtained from 2 different datasets:         
+The data compiled for this project/analysis is obtained from 2 different datasets:   
+
 * **IMDB Movie Dataset**           
 * **Oscar Awards Dataset**        
 
 We have performed data cleaning on both of these datasets and then compiled them into a single dataset, to obtain the 'working data'. The object names and cleaning methodology applied is discussed further within Appendix 1 & 2.   
-Overall, from an initial sample of 5,044 observations taken between Jan 2011 to Aug 2016, the cleaned movie dataset now has 535 obseravations over 39 variables. Please note that there are 21 variables which are genre indicators, and 4 are occuence variables (see comment below). We have split our datasets to between 2011-15 for our core analysis, with Jan-Aug 16 data kept to undertake backtesting.   
+Overall, from an initial sample of 5,044 observations taken between Jan 2011 to Aug 2016, the cleaned movie dataset has 535 obseravations over 39 variables. Please note that there are 21 variables which are genre indicators, and 4 are occurrence variables (see comment below). We have split our datasets to between 2011-15 for our core analysis, with Jan-Aug 16 data kept to undertake backtesting.   
 
-Given the lack of data on several variables, we have been creative with identifying particular financial and film-related characteristics. For instance, we have derived an ROI variable based on ticket sales divided by a film's budget, to gauge the box office success of films. We have also derive genre dummies, based on the number of times a particular genre is mentioned for each film, to determine whether specific types of films are more popular than others. Finally, in an effort to gauge actor and director popularity, we have derived actor dummies for the lead and two foremost supporting actors, and a director dummy, both based on the number of times they appear within our sample. We have complemented this with separately pulling up Oscar data on both areas, as we recognise audience preferences are likely to change rather slowly over time (e.g. favourite actor, etc).
+Given the lack of data on several variables, we have been creative with identifying particular financial and film-related characteristics. For instance, we have derived an ROI variable based on ticket sales divided by a film's budget, to gauge the box office success of films. We have also derived genre dummies, based on the number of times a particular genre is mentioned for each film, to determine whether specific types of films are more popular than others. Finally, in an effort to gauge actor and director popularity, we have derived actor dummies for the lead and two supporting actors, and a director dummy, both based on the number of times they appear within our sample. We have complemented this with separately pulling up Oscar data on both areas, as we recognise audience preferences are likely to change rather slowly over time (e.g. favourite actor, etc).
 
 We discuss the merits of this approach throughout the report, along with commenting about potential limitations and improvements within Section 6.                     
          
@@ -232,11 +234,11 @@ We discuss the merits of this approach throughout the report, along with comment
 
 ###What metrics should we use to determine our dependent variable?
 
-Determining what variable(s) should represent popularity, itself a subjective quality, gives rise to several potential proxy variables. These can be divided between those that are financially driven relative to social media metrics, of which we consider each in turn, arriving at five possible variables.
+Determining what variable should represent popularity, itself a subjective quality, gives rise to several potential proxy variables. These can be divided between those that are financially driven relative to social media metrics, of which we consider each in turn, arriving at five possible variables.
 
 An obvious proxy would be revenues, should we determine this a valid measure of commercial success. Contrary to the thoughts of those "voting with their wallets", this is not entirely a straightforward metric. A limitation of the data available is we are only able to track global box-office ticket sales, rather than all associated revenues. This ignores digital sales from streaming, DVD sales, and any other merchandise or commercial agreements (e.g. in-film advertising).
 
-An example of this shortcoming would be the motion picture, "The Interview". Although extreme given the political sensitivities with North Korea, which led to a limited global release, "The Interview grossed \$40m in digital rentals...and earned an additional \$11.2m worldwide at the box office on a \$44m budget[^3]". By relying on box office revenues alone, we may not get a complete view on how commercially successful a film has been. This is something we discuss further as a limitation within our work, but which we do not explore further. 
+An example of this shortcoming would be the motion picture, "The Interview". Although extreme given the political sensitivities with North Korea, which led to a limited global release, "The Interview grossed US\$40m in digital rentals...and earned an additional US\$11.2m worldwide at the box office on a US\$44m budget[^3]". By relying on box office revenues alone, we may not get a complete view on how commercially successful a film has been. This is something we discuss further as a limitation within our work, but which we do not explore further. 
 
 A second issue is whether a low grossing film is still a success, relative to its underlying budget? This may be more applicable to arthouse films, rather than a typical Hollywood blockbuster, but is something we are able to condition against by examining a film's return on investment; defined by its box office revenues divided by its total budget. 
 
@@ -244,11 +246,13 @@ Social media provides us with three relevant metrics. The first surrounds the nu
 
 The remaining two metrics concern IMDB scores, and the number of votes received. IMDB scores should provide a direct measure of popularity, with our initial assumption based on this most likely to be normally distributed (i.e. this theoretically should capture a broad range of views between a ranking of 0-10). The number of users may also help quantify the depth of support, and depending on the distribution of IMDB scores, represent a useful proxy for capturing popularity.
 
+We recognise that social media metrics will be lagged indicators of a film's success. Hence, we are likely to depend upon a commercial variable to project future success, although social media can help by identifying film types that are likely to prove popular, which may form the basis of choosing future films to invest within. 
+
 ###Descriptive analysis
 
 We produce boxplots and density graphs of the five variables above, along with budget to provide a sense-check. These can all separately be found in the appendices.
 
-We summarises some of the key descriptive findings of these graphs, along with illustrating the results of our ROI boxplot and IMDB density graph:
+We summarises some of the key descriptive findings of these graphs, along with illustrating the results of our ROI boxplot (limited to returns up to 5.0x) and IMDB density graph:
 
 \usepackage{dcolumn}
 ``` {r, results = "asis", warning=FALSE}
@@ -266,13 +270,13 @@ roibox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=return)) + ylim(0,5)+yl
 grid.arrange(imdbden, roibox,  ncol=2)
 ```
 
-There are several intriguing observations. Firstly we observe that all our variables except IMDB scores are positively skewed, with the latter negatively skewed. This confounds our earlier thoughts on IMDB scores being normally distributed. With a median score of 6.7, this implies fans are likely to respond with favourable views, especially with our 1st and 3rd quartile scores between 6.1 and 7.2 respectively. MOre generally, we will need to proceed with any regression analysis carefully (see further comments below).
+There are several intriguing observations. Firstly we observe that all our variables except IMDB scores are positively skewed, with the latter negatively skewed. This confounds our earlier thoughts on IMDB scores being normally distributed. With a median score of 6.7, this implies fans are likely to respond with favourable views, especially with our 1st and 3rd quartile scores between 6.1 and 7.2 respectively. More generally, we will need to proceed with any regression analysis carefully (see further comments below).
 
-Examining our financial metrics, our ROI variable suggests a median film will make a return of 1.2x, although this engenders significant volatility, reflected on our very wide range, and a standard deviation that would imply a negative mean on the downside. This seems consistent with the level of risk associated with producing films, with properties mimicking a financial option (e.g. an upfront payment with no certainty of exercise), given the uncertainty in audience receptiveness.
+Examining our financial metrics, our ROI variable suggests a median film will make a return of 1.2x, although this engenders significant volatility, reflected within our wide range, and a standard deviation that would imply a negative mean on the downside. Ignoring the latter, this volatility seems consistent with the level of risk associated with producing films, with properties mimicking a financial option (e.g. an upfront payment with no assurance of exercise), given the uncertainty in audience receptiveness.
 
-This uncertainty is reinforced in the range of revenue figures, and corresponding budget figures respectively. With revenue, this volatility is likely to be more pronounced in practice, as our metric only focuses on box office tickets. These figures imply a median film will have a budget of US\$40m and be expected to generate box office revenues of US\$52m, consistent with our ROI estimate above.
+This uncertainty is reinforced in the range of revenue figures, and corresponding budget figures respectively. With revenue, this volatility is likely to be more pronounced in practice, as our metric only focuses on box office tickets. These figures imply a median film will have a budget of US\$40m and be expected to generate box office revenues of US\$52m, broadly consistent with our ROI estimate above.
 
-Our last observation is the comparative depth of number of IMDB votes relative to facebook likes. As alluded towards earlier, it is unclear how such facebook data has been collected, nor the interval between the film's release and collection. The latter is equally applicable to IMDB scores; however, given the negative skew with this statistic, the higher number of votes may prove a more desirable proxy in gauging popularity. We shall seek to confirm this by testing how these variables correlate with each other, to guide our final choice on our dependent variables. 
+Our last observation is the comparative depth of number of IMDB votes relative to facebook likes. As alluded towards earlier, it is unclear how such facebook data has been collected, nor the interval between the film's release and data collection. The latter is equally applicable to IMDB scores; however, given the negative skew with this statistic, the higher number of votes may prove a more desirable proxy in gauging popularity. We shall seek to confirm this by testing how these variables correlate with each other, to guide our final choice on our dependent variables. 
 
 
 ###Correlation analysis
@@ -294,7 +298,7 @@ kable(pvalcor_table$P)
 
 ```
 
-The above correlations are all statistically significant, with the exception of our ROI variable. The most surprising result is the lack of correlation with the ROI variable. It is unclear why there is not a positive relationship relative to some of the social media metrics above. This may potentially suggest the impact of outliers in our sample, which may be reducing any underlying correlation. 
+The above correlations are all statistically significant, with the exception of our ROI variable, which comes as quite a surprise. It is unclear why there is not a positive relationship relative to some of the social media metrics above. This may potentially suggest the impact of outliers in our sample, which may be reducing any underlying correlation. 
 
 ```{r, echo=FALSE}
 library(dplyr)
@@ -302,19 +306,24 @@ A<- filter(RB_data,return<1)
 B<- filter(RB_data, between(return,1,3))
 C<- filter(RB_data, return>3)
 
-A1<-select (A, 'num_voted_users','return' )
+A1<-select (A, 'num_voted_users','return','gross' )
 A1[,"return"] <- "<1"
-A2<-select (B, 'num_voted_users', 'return')
+A2<-select (B, 'num_voted_users', 'return', 'gross')
 A2[,"return"] <- "1-3"
-A3<-select (C, 'num_voted_users', 'return')
+A3<-select (C, 'num_voted_users', 'return', 'gross')
 A3[,"return"] <- "3>"
 
 final_A <- rbind(A1,A2,A3)
-ggplot(data=final_A, aes(x=return, y=num_voted_users, color=return)) +
-  geom_point(position="jitter", alpha=0.5) + ggtitle('Number of Voted Users based on ROI')+ theme(plot.title = element_text(hjust=0.5))
+ggplot(data=final_A, aes(x=gross, y=num_voted_users)) +
+  geom_point(position="jitter", alpha=0.5) + facet_wrap(~return) + ggtitle('Number of Voted Users based on ROI')+ theme(plot.title = element_text(hjust=0.5))
+
+ggplot(data=final_A, aes(x=RB_data$return, y=gross)) +
+  geom_point(position="jitter", alpha=0.5) + xlim(0,5)+ xlab("ROI < 5.0x") + ggtitle('Box office sales vs ROI')+ theme(plot.title = element_text(hjust=0.5))
 ```
 
-In contrast to revenues, we do not consider ROI as suitable for further analysis as a dependent variable. Revenues as a financial metric has demonstrated the positive relationships we expected to see amongst social media (e.g. facebook looks and number of voted users), indicating that expressions of support tend to correspond with higher box office revenues (i.e. people go to the cinema). We do note the more weak positive correlation with IMDB scores (esp. relative to number of voting IMDB users), which we suspect is a function of the latter's negative skew, although given the strong correlation with budget, this partly offsets these concerns. The latter relationship would correspond well with blockbusters generating higher revenues, conditioned on budgets that can support the hiring of better actors, and increased marketing / promotional spend. 
+In contrast to revenues, we do not consider ROI as suitable for further analysis as a dependent variable. We produce two scatter plots to confirm this finding. The first, which segregates returns, shows no underlying change on the positive relationship between box office sales and IMDB votes. In other words, each type of return appears just as likely as we vary IMDB votes and sales achieved. This is more apparent when we produce a scatterplot of revenues over returns, where no relationship appears apparent between high-grossing and small box office sales. These results are surprising, as we expected some pattern to emerge, be it positive or negative correlation (e.g. either films grossing higher box office sales generate larger returns, or small films performing far better compared to large films that lose money due to higher costs). Neither is evident, of which we comment further in section 6, as we'd expect ROI to be a significant factor in measuring success.   
+
+Revenues as a financial metric has demonstrated the positive relationships we expected to see amongst social media (e.g. facebook likes and number of voted users), indicating that expressions of support tend to correspond with higher box office revenues (i.e. people go to the cinema). We do note the more weak positive correlation with IMDB scores (esp. relative to number of voting IMDB users), which we suspect is a function of the latter's negative skew, although given the strong correlation with budget, this partly offsets these concerns. The latter relationship would correspond well with blockbusters generating higher revenues, conditioned on budgets that can support the hiring of better actors, and increased marketing / promotional spend. 
 
 Equally, we observe a more positive correlation between number of voted users, against other metrics, relative to both IMDB scores and facebook likes. This warrants reappraising this variable, as it may represent a better proxy relative to IMDB scores themselves. From our descriptive analysis section above, we note a strong negative skew in IMDB scores, suggesting that those voting are likely to be fans conveying their support for a film, rather than providing a balanced critique. Therefore the number of IMDB votes may better represent the strength of popularity enjoyed by a particular movie. However, we are conscious of the possibility that not all these votes will be conveying the same numerical grade, nor the potential for duplicate votes to be included in any final score. 
 
@@ -373,16 +382,20 @@ usereg10 <- lm(data = data11_15, log4numvoted_users ~ gross + actor_oscars + fam
 stargazer(usereg1, usereg2, usereg3, usereg4, usereg5, usereg6, usereg7, usereg8, usereg9, usereg10, type = "html", report = "vct*")
 
 library(car)
-residualPlot(usereg9)
-residualPlot(usereg10)
+#residualPlot(usereg9)
+#residualPlot(usereg10)
 
 ```
 
-We start with a simple regression against box office revenues to gauge whether a film's cinema success (in purely absolute terms) corresponds with increased IMDB activity. We do not consider neither budget or ROI as an independent variable, given the former's high correlation (and thus introducing the risk of multi-collinearity), and the latter's minimal correlation coefficient. Our initial results indicate an additional IMDB vote is cast for every US\$1,000 in ticket sales, that is statistically significant at a 5% confidence interval (we assume all t-tests are two-tailed). An adjusted ${R}^{2}$ of [0.435] is generated, providing a benchmark that can be refined further, given the size of our residual standard error ("RSE").
+We start with a simple regression against box office revenues to gauge whether a film's cinema success (in purely absolute terms) corresponds with increased IMDB activity. This regression is aimed at determining the types of films that may facilitate a positive investment decision in future.
 
-We first examine the impact of particular actors and a director within our sample (equations 2 and 3), to address whether audiences respond to previous work produced. This is premised on counting the number of occurrences within our sample, and thus is limited in not consider other work undertaken within the period. Notwithstanding, this may help reduce any serial correlation within our error term. From our results, only the 1st actor appears statistically significant, with a negligible impact on increasing our adjusted ${R}^{2}$, or reducing the RSE term.
+We do not consider budget or ROI as an independent variable, given the former's high correlation (and thus introducing the risk of multi-collinearity), and the latter's minimal correlation coefficient. Our initial results (equation 1) indicate an additional IMDB vote is cast for every US\$1,000 in ticket sales, that is statistically significant at a 5% confidence interval (we assume all t-tests are two-tailed). An adjusted ${R}^{2}$ of 0.435 is generated, providing a benchmark that can be refined further, given the size of our residual standard error ("RSE").
 
-As an alternative, we appraise the number of Oscars each actor and director has been awarded (equation 4), where these statistics reflect lifetime performance until film release. We find actor Oscars is stastically significant, contributing an extra 61,000 votes per Oscar, with movie Oscars insignificant. This is likely attributable to an extended lag between a film being released and the subsequent award ceremony being held; thus limiting its impact on box office sales. The adjusted ${R}^{2}$ increases to [0.476] with our RSE term falling, representing an improvement in fit.
+We first examine the impact of particular actors and a director within our sample (equations 2 and 3), to address whether audiences respond to previous work produced. This is premised on counting the number of occurrences within our sample, and thus is limited in not consider other work undertaken within the period. Notwithstanding, this may help reduce any serial correlation within our error term (i.e. an actor favoured in the past is likely to remain favoured at present). From our results, only the 1st actor appears statistically significant, with a negligible impact on increasing our adjusted ${R}^{2}$, or reducing the RSE term.
+
+As an alternative, we appraise the number of Oscars each actor and director has been awarded (equation 4), where these statistics reflect lifetime performance. This does introduce error, as we aggregate Oscars across the period, and apply this figure restrospectively (eg. an Oscar won in 2016 would be reflected in a 2012 sample point starring the actor), however we don't feel it detracts from measuring the popularity of an Oscar, which is what the variable is intended to achieve (i.e. it does not seem unreasonable to assume an Oscar is won by an actor who has featured in films over many years, building up a following and wider respect for their work). 
+
+We find actor Oscars is stastically significant, contributing an extra 61,000 votes per Oscar, with movie Oscars insignificant. The latter is likely attributable to an extended lag between a film being released and the subsequent award ceremony being held; thus limiting its impact on box office sales. The adjusted ${R}^{2}$ increases to 0.476 with our RSE term falling, representing an improvement in fit.
 
 Our next step is to gain context into whether the duration of a film impacts popularity. This is premised on long films (i.e. > 150mins) generating mixed views depending on context. Although expecting this to be negligible, this proved materially significant, increasing our adjusted ${R}^{2}$ to [0.559], whilst rendering our Actor 1 variable insignificant. There is no apparent reason for this. An investigation of the scatterplot below would suggest outliers may be influencing these results. We remove this variable upon commencing our later refinement of our model within equations 8-10, as without any likely proxy, this appears to represent a spurious result.
 
@@ -392,63 +405,42 @@ plot(data11_15$duration, data11_15$num_voted_users)
 
 ```
 
-The final criteria we consider is film genre. This is not straightforward, as a film can belong to more than one category (e.g. a sci-fi, action thriller). We adopt a count-based approach, based on the number of times a description appears, although this may introduce an added source of multicollinearity. 
+The final criteria we consider is film genre. This is not straightforward, as a film can belong to more than one category (e.g. a sci-fi, action thriller). We adopt a count-based approach, based on the number of times a description appears, although this may introduce an added source of multicollinearity, which we attempt to limit by being selective over the categories included. 
 
-We subsequently notice that both family and sci-fi dummy genres are statistically significant. Bizarrely, we generate a negative coefficient for family films, implying these are likely to receive 79,000 less votes. Given the selection bias likely apparent with IMDB data, this may reflect the characteristics of those voting. For instance, is an 18-30 year old as inclined to render judgement on a family film (e.g. Finding Nemo) relative to a sequel in the Terminator franchise? Equally, is it likely to find those with young families finding the time to vote for Finding Nemo on IMDB? Although a slight concern, the negative coefficient does appear logical.
+We subsequently notice that both family and sci-fi dummy genres are statistically significant. Bizarrely, we generate a negative coefficient for family films, implying these are likely to receive 79,000 less votes. Given the selection bias likely apparent with IMDB data, this may reflect the characteristics of those voting. For instance, is a 18-30 year old as inclined to render judgement on a family film (e.g. Finding Nemo) relative to a sequel in the Terminator franchise? Equally, is IMDB likely to find those with young families finding the time to vote for Finding Nemo on IMDB? Although a slight concern, the negative coefficient does appear logical.
 
 What is more intriguing is the remaining genres all appear statistically insignificant. This probably reflects multicollinearity, so we begin refining the model to eliminate categories where this overlap is likely (equation 7). This appears to work, with our ${R}^{2}$ marginally increasing, along with the t-values of those genre variables that were already significant. 
 
-We do note that the Action, Romance, and Thriller dummies remain insignificant; inconjunction with our lead actor variable, these are subsequently dropped. This also applies to our duration variable, for the reasons provided above, leading to equation 9. We recognise this is still conditioned on a skewed dependent variable, so equation 10 implements the ${\log {x}}^{4}$ transformation noted above. This results in an adjusted ${R}^{2}$ of [0.443], whilst applying a ${x}^{\frac{1}{4}}$ adjustment to our parameter, before multiplying by 100, provides the percentage impact on y. We can see that a US$1 of revenue will raise IMDB votes by 8%, whilst there are > 500+% increases in votes should a participating actor hold an Oscar, or the film be sci-fi orietated. The negative coefficient for family movies, if considered in absolute terms, would entail a significant decrease in votes. 
+We do note that the Action, Romance, and Thriller dummies remain insignificant; inconjunction with our lead actor variable, these are subsequently dropped. This also applies to our duration variable, for the reasons provided above, leading to equation 9. We recognise this is still conditioned on a skewed dependent variable, so equation 10 implements the ${\log {x}}^{4}$ transformation noted above. This results in an adjusted ${R}^{2}$ of 0.443, whilst applying a ${x}^{\frac{1}{4}}$ adjustment to our parameter, before multiplying by 100, provides the percentage impact on y. We can see that a US$1 of revenue will raise IMDB votes by 8%, whilst there are > 500+% increases in votes should a participating actor hold an Oscar, or the film be sci-fi orietated. The negative coefficient for family movies, if considered in absolute terms, would entail a significant decrease in votes. 
 
-Overall, this model should mitigate the effect of statistical bias affecting our standard errors, and is intended to attain specification efficiency. However, it is likely our model violates our i.i.d. assumptions on our error terms, which is likely to be affected by an omitted variable(s). The high t-value attained on our intercept coefficient might be suggestive of this. We discuss overall model robustness further in the next section.
+Overall, this model should mitigate the effect of statistical bias affecting our standard errors, and is intended to attain specification efficiency. However, it is likely our model violates our i.i.d. assumptions on our error terms, which is likely to be affected by an omitted variable(s). The high t-value attained on our intercept coefficient might be suggestive of this. We discuss overall model robustness further in section 5.
 
 
 ### Commercial: Box office ticket sales
 
 ```{r}
-log6_gross <- (log(final_data_11to15$gross)^6)
+log6_gross <- (log(data11_15$gross)^6)
 
 rev_mod1 <- lm(data=data11_15, gross ~ (budget))
-rev_mod2 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + thrillerdummy + romancedummy + comedydummy + familydummy))
+rev_mod2 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + comedydummy))
 rev_mod3 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + duration))
-rev_mod4 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + actor_oscars + dir_oscars + movie_oscars + sum_actor_occurence + director_occurence))
-rev_mod5 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + sum_actor_occurence + director_occurence))
-rev_mod6 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + sum_actor_occurence + director_occurence + num_voted_users))
-rev_mod7 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + scifidummy + sum_actor_occurence + director_occurence))
-rev_mod8 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + scifidummy + sum_actor_occurence + director_occurence + num_voted_users))
+rev_mod4 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + actor_oscars + dir_oscars + movie_oscars))
+rev_mod5 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + actor1_occurence))
+rev_mod6 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + actor2_occurence))
+rev_mod7 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + actor3_occurence))
+rev_mod8 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + director_occurence))
+rev_mod9 <- lm(data=data11_15, gross ~ (budget + actiondummy + director_occurence + actor1_occurence + actor2_occurence + actor3_occurence))
+rev_mod10 <- lm(data=data11_15, gross ~ (budget + actiondummy + director_occurence))
+rev_mod11 <- lm(data=data11_15, gross ~ (budget + actiondummy + actor1_occurence + actor2_occurence + num_voted_users))
+rev_mod12 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + actor1_occurence + actor2_occurence + num_voted_users))
 
-#Ren's modification
-new_rev_mod1 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + scifidummy + actor1_occurence + num_voted_users))
+stargazer(rev_mod1, rev_mod2, rev_mod3, rev_mod4, rev_mod5, rev_mod6, rev_mod7, rev_mod8, type = "html", report = "vct*")
 
-new_rev_mod2 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + scifidummy + actor2_occurence + num_voted_users))
-
-new_rev_mod3 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + scifidummy + actor3_occurence + director_occurence + num_voted_users))
-
-new_rev_mod4 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + scifidummy + +actor1_occurence+ actor2_occurence+ actor3_occurence + director_occurence + num_voted_users))
-
-#When puting actor1,2&3 together, actor 3 loses significance in t-test, though subsituting them individualy they all showes high significance.
-
-
-stargazer(rev_mod1, rev_mod2, rev_mod3, rev_mod4, type = "text", report = "vct*")
-
-stargazer(rev_mod5, rev_mod6, rev_mod7, rev_mod8, type = "text", report = "vct*")
-stargazer(new_rev_mod1,new_rev_mod2,new_rev_mod3, type = "text", report = "vct*")
-stargazer(new_rev_mod4, type = "text", report = "vct*")
-
-#Final model, removed all insignificance
-rev_mod6_log <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + actor1_occurence + actor2_occurence + num_voted_users))#final model
-
-
-rev_mod6 <- lm(data=data11_15, gross ~ (budget + actiondummy + actor1_occurence + actor2_occurence + num_voted_users))
-
-stargazer(rev_mod6, rev_mod6_log, type = "text", report = "vct*")
-
-stargazer(new_rev_mod1, new_rev_mod2, new_rev_mod3, new_rev_mod4, rev_mod6_log, rev_mod6, type="text",  report="vct*" )
 ```
 
 Coming to the finding the determinants of financial popularity or revenue of a movie, we begin with a simple quation trying to analyse the impact of the budget of the movie. This regression model, with an adjusted ${R}^{2}$ value is ~0.461 and a very low p-value, determines budget as a very significant factor affecting revenues.
 
-Moving ahead with this equation, in equation (2), we try to guage which genre movie impacts on the revenue or commercial success. In this model, we see that the adjusted ${R}^{2}$ increases to ~0.482 and there is a decrease in the RSE value. Furthermore, we observe that the genres Action genre is the most significant genre, closely followed by Sci-fi genre movies. Traditionally, these movies are known to cater to wide audience base. Furthermore, we see the intercept for the revenue and action genre movies is a negative one, which indicates that the data represents that action movies are often loss making ones. Taking only the significant variables forward, we asses the interaction of the duration of the movie with the revenue. Although we see a significance and a relation between them, we feel that duration of the movie is seldom a deciding factor for audience. Furthermore, as described by the plot above (insert table/plot number), the duration's fit can be impacted by residuals and thus we reject the significance of that variable in the model.
+Moving ahead with this equation, in equation (2), we try to guage which genre movie impacts on the revenue or commercial success. In this model, we see that the adjusted ${R}^{2}$ increases to ~0.480 and there is a decrease in the RSE value. Furthermore, we observe that the genres Action genre is the most significant genre, closely followed by Sci-fi genre movies. Traditionally, these movies are known to cater to wide audience base, and also have higher budgets. Furthermore, we see the intercept for the revenue and action genre movies is a negative one, which indicates that the data represents that action movies are often loss making ones. Taking only the significant variables forward, we asses the interaction of the duration of the movie with the revenue. Although we see a significance and a relation between them, we feel that duration of the movie is seldom a deciding factor for audience. Furthermore, as described by the plot above (insert table/plot number), the duration's fit can be impacted by residuals and thus we reject the significance of that variable in the model.
 
 Since the starcast of a movie is very significant crowd puller, in the regression equation (4), we take into account the impact of actor and diretor occurence variables and the number of oscar variables to the revenue. Contrary to the belief, the data doesnt represent any significant impact of the actor and director oscar wins to the  movie revenue with one oscar adding only \$4million and \$1million repectively for actor and director respectively. That being said, the actor occurences and director occurences are significant variables and have p-values in the 95% confidence interval. The data also indicates that an oscar winning director adds \$20Million to the revenue of the movie. This being said, we have to realize that this data is a recent sample, which leads us to believe that the relation can be more stronger/weaker if we increase the sample size.
 
@@ -521,8 +513,13 @@ B. Commercial Popularity
 In order to validate the robustness of our model of commercial popularity, we have used residual plots in order to determine the fitness of our regression model. 
 
 ```{r}
+<<<<<<< HEAD
 residualPlot(rev_mod6)
 residualPlot(rev_mod6_log)
+=======
+#residualPlot(rev_mod6)
+#residualPlot(rev_mod6_log)
+>>>>>>> db756c2053ba305872d78953b3933728b8a75cdf
 
 ```
 
