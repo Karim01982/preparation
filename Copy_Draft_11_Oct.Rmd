@@ -513,8 +513,8 @@ B. Commercial Popularity
 In order to validate the robustness of our model of commercial popularity, we have used residual plots in order to determine the fitness of our regression model. 
 
 ```{r}
-residualPlot(rev_mod6)
-residualPlot(rev_mod6_log)
+#residualPlot(rev_mod6)
+#residualPlot(rev_mod6_log)
 
 ```
 
