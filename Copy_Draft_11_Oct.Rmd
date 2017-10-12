@@ -261,8 +261,8 @@ kable(summary_data)
 ```
 
 ```{r, results = "asis", warning=FALSE}
-imdbden <- ggplot(data=data11_15)+geom_density(aes(x=(imdb_score)))
-roibox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=return)) + ylim(0,5)
+imdbden <- ggplot(data=data11_15)+geom_density(aes(x=(imdb_score)))+xlab("Imdb score")+ylab("Density")
+roibox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=return)) + ylim(0,5)+ylab("Return/100%")
 grid.arrange(imdbden, roibox,  ncol=2)
 ```
 
@@ -521,8 +521,8 @@ B. Commercial Popularity
 In order to validate the robustness of our model of commercial popularity, we have used residual plots in order to determine the fitness of our regression model. 
 
 ```{r}
-residualPlot(new_rev_mod6)
-residualPlot(new_rev_mod6_log)
+residualPlot(rev_mod6)
+residualPlot(rev_mod6_log)
 
 ```
 
