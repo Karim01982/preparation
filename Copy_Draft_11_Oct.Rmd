@@ -330,12 +330,11 @@ Equally, we observe a more positive correlation between number of voted users, a
 In sum, we believe examining both revenue and the number of IMDB votes separately, can help better inform our perspective on what constitutes a successful film. Yet both of these dependent variables demonstrate strong positive skew, which could bias any parameter estimate, and impact on variance calculations, affecting the accuracy of any t-statistic. Performing multiple regression analysis using OLS as it stands is unlikely to be appropriate. Remedies available are to perform regression using a GLS-based approach, or to transform our variables to resemble a normal distribution. Although extending beyond the scope of this assignment, we transform both our revenue and number of votes variables by natural logs raised to the power of 6 and 4 respectively (see below). As these transformations will generate beta estimates which are not intuitive, we conduct our regressions without these adjustment, altering our y-variable at the end to get a better understanding of our parameters and overall adjusted R-squared.
 
 ```{r, echo = FALSE}
+numden <- ggplot(data=data11_15)+geom_density(aes(x=(num_voted_users)))+xlab("Number of voted users")+ylab("Density")+ggtitle("Density Plots")
+revden <- ggplot(data=data11_15)+geom_density(aes(x=(gross)))+xlab("Revenue/$")+ylab("Density")+ggtitle("Density Plots")
 
-numden <- ggplot(data=data11_15)+geom_density(aes(x=(num_voted_users)))
-revden <- ggplot(data=data11_15)+geom_density(aes(x=(gross)))
-
-numadj <- ggplot(data=data11_15)+geom_density(aes(x=log(num_voted_users)^4))
-revadj <- ggplot(data=data11_15)+geom_density(aes(x=log(gross)^6))
+numadj <- ggplot(data=data11_15)+geom_density(aes(x=log(num_voted_users)^4))+xlab("Number of voted users/log^4")+ylab("Density")
+revadj <- ggplot(data=data11_15)+geom_density(aes(x=log(gross)^6))+xlab("Revenue/log^6")+ylab("Density")
 
 grid.arrange(numden, revden, numadj, revadj, ncol=2)
 
@@ -351,7 +350,7 @@ grid.arrange(numden, revden, numadj, revadj, ncol=2)
 
 ###Social media: Number of IMDB votes
 
-```{r, results = "asis"}
+```{r, echo=FALSE, results = "asis"}
 
 log4numvoted_users <- (log(data11_15$num_voted_users)^4)
 
@@ -418,7 +417,7 @@ Overall, this model should mitigate the effect of statistical bias affecting our
 
 ### Commercial: Box office ticket sales
 
-```{r}
+```{r, echo=FALSE, results = "asis"}
 log6_gross <- (log(data11_15$gross)^6)
 
 rev_mod1 <- lm(data=data11_15, gross ~ (budget))
@@ -493,7 +492,7 @@ kable(t_test_table, caption = 'Variables', align = c('l', 'l', 'l'), digits = 4)
 
 The p-value for the first three variables are high enough (greater than 0.05) and hence we could accept the null hypothesis and conclude that there are no significant differences in those data of 2011 to 2015 and those data of 2016. The p-value for scifidummy variable is slightly less than 0.05, however, the confidence interval is [-0.3352, -0.0060] which is very close to 0. Thus our group will ignore the minor difference and use the whole dataset for the future analysis.
 
-```{r, results = "asis"}
+```{r, echo=FALSE, results = "asis"}
 log4numvoted_users1 <- (log(data11_15$num_voted_users)^4)
 Usereg11 <- lm(data = data11_15, log4numvoted_users1 ~ gross + actor_oscars + familydummy + scifidummy)
 log4numvoted_users2 <- (log(data16$num_voted_users)^4)
@@ -513,13 +512,13 @@ B. Commercial Popularity
 In order to validate the robustness of our model of commercial popularity, we have used residual plots in order to determine the fitness of our regression model. 
 
 ```{r}
-<<<<<<< HEAD
+
 residualPlot(rev_mod6)
 residualPlot(rev_mod6_log)
-=======
+
 #residualPlot(rev_mod6)
 #residualPlot(rev_mod6_log)
->>>>>>> db756c2053ba305872d78953b3933728b8a75cdf
+
 
 ```
 
