@@ -413,7 +413,7 @@ What is more intriguing is the remaining genres all appear statistically insigni
 
 We do note that the Action, Romance, and Thriller dummies remain insignificant; inconjunction with our lead actor variable, these are subsequently dropped. This also applies to our duration variable, for the reasons provided above, leading to equation 9. We recognise this is still conditioned on a skewed dependent variable, so equation 10 implements the ${\log {x}}^{4}$ transformation noted above. This results in an adjusted ${R}^{2}$ of 0.443, whilst applying a ${x}^{\frac{1}{4}}$ adjustment to our parameter, before multiplying by 100, provides the percentage impact on y. We can see that a US$1 of revenue will raise IMDB votes by 8%, whilst there are > 500+% increases in votes should a participating actor hold an Oscar, or the film be sci-fi orietated. The negative coefficient for family movies, if considered in absolute terms, would entail a significant decrease in votes. 
 
-Overall, this model should mitigate the effect of statistical bias affecting our standard errors, and is intended to attain specification efficiency. However, it is likely our model violates our i.i.d. assumptions on our error terms, which is likely to be affected by an omitted variable(s). The high t-value attained on our intercept coefficient might be suggestive of this. We discuss overall model robustness further in section 5.
+Overall, this model should mitigate the effect of statistical bias affecting our standard errors, and is intended to attain specification efficiency. However, it is likely our model violates our independently and identically distribution ("iid") assumptions on our error terms, which is likely to be affected by an omitted variable(s). The high t-value attained on our intercept coefficient might be suggestive of this. We discuss overall model robustness further in section 5.
 
 
 ### Commercial: Box office ticket sales
@@ -438,7 +438,7 @@ stargazer(rev_mod1, rev_mod2, rev_mod3, rev_mod4, rev_mod5, rev_mod6, rev_mod7, 
 
 ```
 
-We follow a similar methodology above to translate social popularity into revenue generation by examining the impact of genres, actors, and budget.
+We follow a similar methodology above to translate social popularity into revenue generation by examining the impact of genres, actors, and budget. Contrary to the above, which reflects popularity on lagged variables, this model is intended to help hypothesise on future revenue performance.
 
 We notice a discrepancy in film genres, with action and comedy films having a significant impact on revenues, the former having a negative effect. This may reflect the extra costs associated with stunts and special FX, which may not entirely be recouped from box office sales alone.
 
@@ -452,22 +452,52 @@ We note a slight improvement in adjusted ${R}^{2}$ of 0.482 relative to equation
 
 \pagebreak
 
-##Section 5: Hypothesis Testing & Robustness
+##Section 5: Robustness and Hypothesis Tests
 
+###Robustness
 
-A. Social Popularity
+Prior to backtesting our models, we want to get a sense of overall model robustness. We examine residual plots of our final models to help determine whether our iid assumptions on our error term are valid:
 
-In order to validate the robustness of our model of social popularity, we have used residual plots in order to determine the fitness of our regression model. 
 
 ```{r}
 residualPlot(usereg9)
 residualPlot(usereg10)
+#Residual plots of both social media and financial performance equations
+#Nirbhay to update
+
 ```
-In the first residual plot, most data points concerntrated in the left half plot around the zero line. It seems that the residuals are dependent on the observe values (especially when the values are small). After the logarithm transformation, the second residual plot shows a much more spreaded scene which demonstrate the transformed model is more persuasive. However, the red fitted curves above shows that there still exists ommitted independent variables, which is restricted by the limited dataset we currently have.
 
-In addition to the residual plots, we also conducted t-tests on the independant variables of our commercial sucess model for the dataset of 2011-2015 and dataset of 2016.
+The trend line on both graphs indicates our iid assumptions are violated, with serial correlation present. This is likely attributable to other variables being omitted, along with potential error within some of our variable estimates. We would validate this with a Durbin-Watson test, although the residual plot is relatively self-evident.
 
-The null hypothesis for the t-tests is that there is no significant differences between the variable of the dataset of 2011-2015 and dataset of 2016. If the p-value is greater than 0.05, the null hypothesis will be accepted.
+We expect this to affect the accuracy of our standard error (and thus our t-values), increasing the likelihood of Type I and II errors. For the hypothesis tests that follow, we therefore must apply caution to any final result.
+
+###Hypothesis tests
+
+We start by regressing our 2011-15 model on our Jan-Aug 2016 dataset. This includes [37] data-points. With our log-transformed equations consistent with a normal distribution, we assume that a sample of this size should satisfy the central-limit theorem (ie. a sample > 30-35), enabling meaningful analysis; although we recognise further data-points would provide further comfort.
+
+We obtain the following results for our IMDB votes and Revenue regressions:
+
+```{r}
+
+#Stargazer with side by side comparison of these two equations between 2011-15 and 2016
+
+```
+
+Nominally, our models would suggest a good fit with 2016 data, based on high ${R}^{2}$ being attained. However, combined with low t-values generally being observed (with the exception of revenue and budget variables in our social media and revenue regressions respectively), this would normally be a symptom of multi-collinearity, notwithstanding our efforts to achieve the contrary. We give our models the benefit of the doubt, however we must recognise the potential for this to seriously undermine any resulting conclusion. [The material significance of our constants (i.e p values < 0.001)) may also reinforce our suspicion of an omitted variable bias - we discuss this within Section 6].
+
+We first perform an F-test to contrast the variance between our 2011-15 and 2016 models. Should these variances be similar, enabling the rejection of H[subscript 0] this would indicate our 2011-15 model may represent a reasonable fit on 2016 data. Formalising our hypothesis:
+
+```{r}
+#Include subscript above
+#Include formula of H0: Sigma^2 (subscript 16) / Sigma ^2 (subscript 11-15) = 1
+#Include formula of H1: Sigma^2 (subscript 16) / Sigma ^2 (subscript 11-15) [not equal sign] 1
+
+#Include the results of our F-test here
+```
+
+[Comment on results]
+
+
 
 The t-test results for the two datasets (data for 2011-15 and 2016) are shown below:
 
