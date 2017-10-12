@@ -406,49 +406,28 @@ Overall, this model should mitigate the effect of statistical bias affecting our
 ### Commercial: Box office ticket sales
 
 ```{r}
-log6_gross <- (log(final_data_11to15$gross)^6)
+log6_gross <- (log(data11_15$gross)^6)
 
 rev_mod1 <- lm(data=data11_15, gross ~ (budget))
-rev_mod2 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + thrillerdummy + romancedummy + comedydummy + familydummy))
+rev_mod2 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + comedydummy))
 rev_mod3 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + duration))
-rev_mod4 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + actor_oscars + dir_oscars + movie_oscars + sum_actor_occurence + director_occurence))
-rev_mod5 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + sum_actor_occurence + director_occurence))
-rev_mod6 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + sum_actor_occurence + director_occurence + num_voted_users))
-rev_mod7 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + scifidummy + sum_actor_occurence + director_occurence))
-rev_mod8 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + scifidummy + sum_actor_occurence + director_occurence + num_voted_users))
+rev_mod4 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + actor_oscars + dir_oscars + movie_oscars))
+rev_mod5 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + actor1_occurence))
+rev_mod6 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + actor2_occurence))
+rev_mod7 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + actor3_occurence))
+rev_mod8 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + director_occurence))
+rev_mod9 <- lm(data=data11_15, gross ~ (budget + actiondummy + director_occurence + actor1_occurence + actor2_occurence + actor3_occurence))
+rev_mod10 <- lm(data=data11_15, gross ~ (budget + actiondummy + director_occurence))
+rev_mod11 <- lm(data=data11_15, gross ~ (budget + actiondummy + actor1_occurence + actor2_occurence + num_voted_users))
+rev_mod12 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + actor1_occurence + actor2_occurence + num_voted_users))
 
-#Ren's modification
-new_rev_mod1 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + scifidummy + actor1_occurence + num_voted_users))
+stargazer(rev_mod1, rev_mod2, rev_mod3, rev_mod4, rev_mod5, rev_mod6, rev_mod7, rev_mod8, type = "html", report = "vct*")
 
-new_rev_mod2 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + scifidummy + actor2_occurence + num_voted_users))
-
-new_rev_mod3 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + scifidummy + actor3_occurence + director_occurence + num_voted_users))
-
-new_rev_mod4 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + scifidummy + +actor1_occurence+ actor2_occurence+ actor3_occurence + director_occurence + num_voted_users))
-
-#When puting actor1,2&3 together, actor 3 loses significance in t-test, though subsituting them individualy they all showes high significance.
-
-
-stargazer(rev_mod1, rev_mod2, rev_mod3, rev_mod4, type = "text", report = "vct*")
-
-stargazer(rev_mod5, rev_mod6, rev_mod7, rev_mod8, type = "text", report = "vct*")
-stargazer(new_rev_mod1,new_rev_mod2,new_rev_mod3, type = "text", report = "vct*")
-stargazer(new_rev_mod4, type = "text", report = "vct*")
-
-#Final model, removed all insignificance
-rev_mod6_log <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + actor1_occurence + actor2_occurence + num_voted_users))#final model
-
-
-rev_mod6 <- lm(data=data11_15, gross ~ (budget + actiondummy + actor1_occurence + actor2_occurence + num_voted_users))
-
-stargazer(rev_mod6, rev_mod6_log, type = "text", report = "vct*")
-
-stargazer(new_rev_mod1, new_rev_mod2, new_rev_mod3, new_rev_mod4, rev_mod6_log, rev_mod6, type="text",  report="vct*" )
 ```
 
 Coming to the finding the determinants of financial popularity or revenue of a movie, we begin with a simple quation trying to analyse the impact of the budget of the movie. This regression model, with an adjusted ${R}^{2}$ value is ~0.461 and a very low p-value, determines budget as a very significant factor affecting revenues.
 
-Moving ahead with this equation, in equation (2), we try to guage which genre movie impacts on the revenue or commercial success. In this model, we see that the adjusted ${R}^{2}$ increases to ~0.482 and there is a decrease in the RSE value. Furthermore, we observe that the genres Action genre is the most significant genre, closely followed by Sci-fi genre movies. Traditionally, these movies are known to cater to wide audience base. Furthermore, we see the intercept for the revenue and action genre movies is a negative one, which indicates that the data represents that action movies are often loss making ones. Taking only the significant variables forward, we asses the interaction of the duration of the movie with the revenue. Although we see a significance and a relation between them, we feel that duration of the movie is seldom a deciding factor for audience. Furthermore, as described by the plot above (insert table/plot number), the duration's fit can be impacted by residuals and thus we reject the significance of that variable in the model.
+Moving ahead with this equation, in equation (2), we try to guage which genre movie impacts on the revenue or commercial success. In this model, we see that the adjusted ${R}^{2}$ increases to ~0.480 and there is a decrease in the RSE value. Furthermore, we observe that the genres Action genre is the most significant genre, closely followed by Sci-fi genre movies. Traditionally, these movies are known to cater to wide audience base, and also have higher budgets. Furthermore, we see the intercept for the revenue and action genre movies is a negative one, which indicates that the data represents that action movies are often loss making ones. Taking only the significant variables forward, we asses the interaction of the duration of the movie with the revenue. Although we see a significance and a relation between them, we feel that duration of the movie is seldom a deciding factor for audience. Furthermore, as described by the plot above (insert table/plot number), the duration's fit can be impacted by residuals and thus we reject the significance of that variable in the model.
 
 Since the starcast of a movie is very significant crowd puller, in the regression equation (4), we take into account the impact of actor and diretor occurence variables and the number of oscar variables to the revenue. Contrary to the belief, the data doesnt represent any significant impact of the actor and director oscar wins to the  movie revenue with one oscar adding only \$4million and \$1million repectively for actor and director respectively. That being said, the actor occurences and director occurences are significant variables and have p-values in the 95% confidence interval. The data also indicates that an oscar winning director adds \$20Million to the revenue of the movie. This being said, we have to realize that this data is a recent sample, which leads us to believe that the relation can be more stronger/weaker if we increase the sample size.
 
