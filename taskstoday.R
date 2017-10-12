@@ -12,6 +12,15 @@ US vs Non-US -
 Between genres
 Backtesting
 
+Things outstanding
+
+1) write-up of introduction
+2) write up of conclusion
+3) Completion of section 5
+4) Scrub-down of dataset 
+
+
+
 
 --------------
 
