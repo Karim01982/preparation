@@ -508,8 +508,8 @@ B. Commercial Popularity
 In order to validate the robustness of our model of commercial popularity, we have used residual plots in order to determine the fitness of our regression model. 
 
 ```{r}
-residualPlot(rev_mod6)
-residualPlot(rev_mod6_log)
+#residualPlot(rev_mod6)
+#residualPlot(rev_mod6_log)
 
 ```
 
@@ -535,6 +535,8 @@ t_test_sig_level <- c('< 0.05','< 0.05','< 0.05','> 0.05', '> 0.05', '< 0.05')
 t_test_table <- data.frame(t_test_variable, t_test_p_value, t_test_sig_level)
 
 kable(t_test_table, caption = 'Variables', align = c('l', 'l', 'l'), digits = 4)
+
+t1
 
 ```
 
