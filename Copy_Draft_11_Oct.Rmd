@@ -483,6 +483,11 @@ We obtain the following results for our IMDB votes and Revenue regressions:
 
 ```
 
+Nominally, our models would suggest a good fit with 2016 data, based on high ${R}^{2}$ being attained. However, combined with low t-values generally being observed (with the exception of revenue and budget variables in our social media and revenue regressions respectively), this would normally be a symptom of multi-collinearity, notwithstanding our efforts to achieve the contrary. We give our models the benefit of the doubt, however we must recognise the potential for this to seriously undermine any resulting conclusion. [The material significance of our constants (i.e p values < 0.001)) may also reinforce our suspicion of an omitted variable bias - we discuss this within Section 6].
+
+We first perform an F-test to contrast the variance between our 2011-15 and 2016 models. Should these variances be similar, enabling the rejection of H this would indicate our 2011-15 model may represent a reasonable fit on 2016 data. Formalising our hypothesis
+
+
 
 
 The t-test results for the two datasets (data for 2011-15 and 2016) are shown below:
