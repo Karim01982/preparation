@@ -266,8 +266,8 @@ kable(summary_data)
 ```
 
 ```{r, results = "asis", warning=FALSE}
-imdbden <- ggplot(data=data11_15)+geom_density(aes(x=(imdb_score)))
-roibox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=return)) + ylim(0,5)
+imdbden <- ggplot(data=data11_15)+geom_density(aes(x=(imdb_score)))+xlab("Imdb score")+ylab("Density")
+roibox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=return)) + ylim(0,5)+ylab("Return/100%")
 grid.arrange(imdbden, roibox,  ncol=2)
 ```
 
@@ -322,7 +322,7 @@ ggplot(data=final_A, aes(x=RB_data$return, y=gross)) +
   geom_point(position="jitter", alpha=0.5) + xlim(0,5)+ xlab("ROI < 5.0x") + ggtitle('Box office sales vs ROI')+ theme(plot.title = element_text(hjust=0.5))
 ```
 
-In contrast to revenues, we do not consider ROI as suitable for further analysis as a dependent variable. We produce two scatter plots to confirm this finding. The first, which segregates returns, shows no underlying change on the positive relationship between box office sales and IMDB votes. In other words, each type of return appears just as likely as we vary IMDB votes and sales achieved. This is more apparent when we produce a scatterplot of revenues over returns, where no relationship appears apparent between high-grossing and small box office sales. These results are surprising, as we expected some pattern to emerge, be it positive or negative correlation (e.g. either films grossing higher box office sales generate larger returns, or small films performing far better compared to large films that lose money due to higher costs). Neither is evident, of which we comment further in section 6, as we'd expect ROI to be a significant factor in measuring success.   
+In contrast to revenues, we do not consider ROI as suitable for further analysis as a dependent variable. We produced two scatter plots to confirm this finding. The first, which segregates returns, shows no underlying change on the positive relationship between box office revenue and IMDB votes. In other words, each type of return appears just as likely as we vary IMDB votes and sales achieved. This is more apparent when we produce a scatterplot of revenues over returns, where no relationship appears apparent between high-grossing and small box office sales. These results are surprising, as we expected some pattern to emerge, be it positive or negative correlation (e.g. either films grossing higher box office sales generate larger returns, or small films performing far better compared to large films that lose money due to higher costs). Neither is evident, of which we comment further in section 6, as we'd expect ROI to be a significant factor in measuring success.   
 
 Revenues as a financial metric has demonstrated the positive relationships we expected to see amongst social media (e.g. facebook likes and number of voted users), indicating that expressions of support tend to correspond with higher box office revenues (i.e. people go to the cinema). We do note the more weak positive correlation with IMDB scores (esp. relative to number of voting IMDB users), which we suspect is a function of the latter's negative skew, although given the strong correlation with budget, this partly offsets these concerns. The latter relationship would correspond well with blockbusters generating higher revenues, conditioned on budgets that can support the hiring of better actors, and increased marketing / promotional spend. 
 
@@ -331,12 +331,11 @@ Equally, we observe a more positive correlation between number of voted users, a
 In sum, we believe examining both revenue and the number of IMDB votes separately, can help better inform our perspective on what constitutes a successful film. Yet both of these dependent variables demonstrate strong positive skew, which could bias any parameter estimate, and impact on variance calculations, affecting the accuracy of any t-statistic. Performing multiple regression analysis using OLS as it stands is unlikely to be appropriate. Remedies available are to perform regression using a GLS-based approach, or to transform our variables to resemble a normal distribution. Although extending beyond the scope of this assignment, we transform both our revenue and number of votes variables by natural logs raised to the power of 6 and 4 respectively (see below). As these transformations will generate beta estimates which are not intuitive, we conduct our regressions without these adjustment, altering our y-variable at the end to get a better understanding of our parameters and overall adjusted R-squared.
 
 ```{r, echo = FALSE}
+numden <- ggplot(data=data11_15)+geom_density(aes(x=(num_voted_users)))+xlab("Number of voted users")+ylab("Density")+ggtitle("Density Plots")
+revden <- ggplot(data=data11_15)+geom_density(aes(x=(gross)))+xlab("Revenue/$")+ylab("Density")+ggtitle("Density Plots")
 
-numden <- ggplot(data=data11_15)+geom_density(aes(x=(num_voted_users)))
-revden <- ggplot(data=data11_15)+geom_density(aes(x=(gross)))
-
-numadj <- ggplot(data=data11_15)+geom_density(aes(x=log(num_voted_users)^4))
-revadj <- ggplot(data=data11_15)+geom_density(aes(x=log(gross)^6))
+numadj <- ggplot(data=data11_15)+geom_density(aes(x=log(num_voted_users)^4))+xlab("Number of voted users/log^4")+ylab("Density")
+revadj <- ggplot(data=data11_15)+geom_density(aes(x=log(gross)^6))+xlab("Revenue/log^6")+ylab("Density")
 
 grid.arrange(numden, revden, numadj, revadj, ncol=2)
 
@@ -352,7 +351,7 @@ grid.arrange(numden, revden, numadj, revadj, ncol=2)
 
 ###Social media: Number of IMDB votes
 
-```{r, results = "asis"}
+```{r, echo=FALSE, results = "asis"}
 
 log4numvoted_users <- (log(data11_15$num_voted_users)^4)
 
@@ -419,6 +418,7 @@ Overall, this model should mitigate the effect of statistical bias affecting our
 
 ### Commercial: Box office ticket sales
 
+<<<<<<< HEAD
 ```{r, results = "asis", echo = FALSE}
 
 log6_gross <- (log(data11_15$gross)^6)
@@ -489,7 +489,7 @@ kable(t_test_table, caption = 'Variables', align = c('l', 'l', 'l'), digits = 4)
 
 The p-value for the first three variables are high enough (greater than 0.05) and hence we could accept the null hypothesis and conclude that there are no significant differences in those data of 2011 to 2015 and those data of 2016. The p-value for scifidummy variable is slightly less than 0.05, however, the confidence interval is [-0.3352, -0.0060] which is very close to 0. Thus our group will ignore the minor difference and use the whole dataset for the future analysis.
 
-```{r, results = "asis"}
+```{r, echo=FALSE, results = "asis"}
 log4numvoted_users1 <- (log(data11_15$num_voted_users)^4)
 Usereg11 <- lm(data = data11_15, log4numvoted_users1 ~ gross + actor_oscars + familydummy + scifidummy)
 log4numvoted_users2 <- (log(data16$num_voted_users)^4)
@@ -509,8 +509,13 @@ B. Commercial Popularity
 In order to validate the robustness of our model of commercial popularity, we have used residual plots in order to determine the fitness of our regression model. 
 
 ```{r}
+
+residualPlot(rev_mod6)
+residualPlot(rev_mod6_log)
+
 #residualPlot(rev_mod6)
 #residualPlot(rev_mod6_log)
+
 
 ```
 
