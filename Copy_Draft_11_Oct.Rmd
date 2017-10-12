@@ -31,6 +31,7 @@ library(stringr)
 library(ggplot2)
 library(knitr)
 library(gridExtra)
+library(psych)
 ```
 
 
@@ -215,14 +216,15 @@ As this report shall conclude, [...]
 
 ##Section 2: Data sampling and cleaning
 
-The data compiled for this project/analysis is obtained from 2 different datasets:         
+The data compiled for this project/analysis is obtained from 2 different datasets:   
+
 * **IMDB Movie Dataset**           
 * **Oscar Awards Dataset**        
 
 We have performed data cleaning on both of these datasets and then compiled them into a single dataset, to obtain the 'working data'. The object names and cleaning methodology applied is discussed further within Appendix 1 & 2.   
-Overall, from an initial sample of 5,044 observations taken between Jan 2011 to Aug 2016, the cleaned movie dataset now has 535 obseravations over 39 variables. Please note that there are 21 variables which are genre indicators, and 4 are occuence variables (see comment below). We have split our datasets to between 2011-15 for our core analysis, with Jan-Aug 16 data kept to undertake backtesting.   
+Overall, from an initial sample of 5,044 observations taken between Jan 2011 to Aug 2016, the cleaned movie dataset has 535 obseravations over 39 variables. Please note that there are 21 variables which are genre indicators, and 4 are occurrence variables (see comment below). We have split our datasets to between 2011-15 for our core analysis, with Jan-Aug 16 data kept to undertake backtesting.   
 
-Given the lack of data on several variables, we have been creative with identifying particular financial and film-related characteristics. For instance, we have derived an ROI variable based on ticket sales divided by a film's budget, to gauge the box office success of films. We have also derive genre dummies, based on the number of times a particular genre is mentioned for each film, to determine whether specific types of films are more popular than others. Finally, in an effort to gauge actor and director popularity, we have derived actor dummies for the lead and two foremost supporting actors, and a director dummy, both based on the number of times they appear within our sample. We have complemented this with separately pulling up Oscar data on both areas, as we recognise audience preferences are likely to change rather slowly over time (e.g. favourite actor, etc).
+Given the lack of data on several variables, we have been creative with identifying particular financial and film-related characteristics. For instance, we have derived an ROI variable based on ticket sales divided by a film's budget, to gauge the box office success of films. We have also derived genre dummies, based on the number of times a particular genre is mentioned for each film, to determine whether specific types of films are more popular than others. Finally, in an effort to gauge actor and director popularity, we have derived actor dummies for the lead and two supporting actors, and a director dummy, both based on the number of times they appear within our sample. We have complemented this with separately pulling up Oscar data on both areas, as we recognise audience preferences are likely to change rather slowly over time (e.g. favourite actor, etc).
 
 We discuss the merits of this approach throughout the report, along with commenting about potential limitations and improvements within Section 6.                     
          
@@ -232,17 +234,19 @@ We discuss the merits of this approach throughout the report, along with comment
 
 ###What metrics should we use to determine our dependent variable?
 
-Determining what variable(s) should represent popularity, itself a subjective quality, gives rise to several potential proxy variables. These can be divided between those that are financially driven relative to social media metrics, of which we consider each in turn, arriving at five possible variables.
+Determining what variable should represent popularity, itself a subjective quality, gives rise to several potential proxy variables. These can be divided between those that are financially driven relative to social media metrics, of which we consider each in turn, arriving at five possible variables.
 
 An obvious proxy would be revenues, should we determine this a valid measure of commercial success. Contrary to the thoughts of those "voting with their wallets", this is not entirely a straightforward metric. A limitation of the data available is we are only able to track global box-office ticket sales, rather than all associated revenues. This ignores digital sales from streaming, DVD sales, and any other merchandise or commercial agreements (e.g. in-film advertising).
 
-An example of this shortcoming would be the motion picture, "The Interview". Although extreme given the political sensitivities with North Korea, which led to a limited global release, "The Interview grossed \$40m in digital rentals...and earned an additional \$11.2m worldwide at the box office on a \$44m budget[^3]". By relying on box office revenues alone, we may not get a complete view on how commercially successful a film has been. This is something we discuss further as a limitation within our work, but which we do not explore further. 
+An example of this shortcoming would be the motion picture, "The Interview". Although extreme given the political sensitivities with North Korea, which led to a limited global release, "The Interview grossed US\$40m in digital rentals...and earned an additional US\$11.2m worldwide at the box office on a US\$44m budget[^3]". By relying on box office revenues alone, we may not get a complete view on how commercially successful a film has been. This is something we discuss further as a limitation within our work, but which we do not explore further. 
 
 A second issue is whether a low grossing film is still a success, relative to its underlying budget? This may be more applicable to arthouse films, rather than a typical Hollywood blockbuster, but is something we are able to condition against by examining a film's return on investment; defined by its box office revenues divided by its total budget. 
 
 Social media provides us with three relevant metrics. The first surrounds the number of facebook likes a film has received. Although a singular expression of popularity, this provides some indication of fan reaction, premised on any "likes" resulting from watching the film, as opposed to being based on trailers or other promotional material. We are mindful this may not be entirely accurate, as we do not know at which point this data was collected (e.g. how many days / weeks after the film was released in the US, and how the latter is likely to vary by geography).
 
 The remaining two metrics concern IMDB scores, and the number of votes received. IMDB scores should provide a direct measure of popularity, with our initial assumption based on this most likely to be normally distributed (i.e. this theoretically should capture a broad range of views between a ranking of 0-10). The number of users may also help quantify the depth of support, and depending on the distribution of IMDB scores, represent a useful proxy for capturing popularity.
+
+We recognise that social media metrics will be lagged indicators of a film's success. Hence, we are likely to depend upon a commercial variable to project future success, although social media can help by identifying film types that are likely to prove popular, which may form the basis of choosing future films to invest within. 
 
 ###Descriptive analysis
 
@@ -268,11 +272,11 @@ grid.arrange(imdbden, roibox,  ncol=2)
 
 There are several intriguing observations. Firstly we observe that all our variables except IMDB scores are positively skewed, with the latter negatively skewed. This confounds our earlier thoughts on IMDB scores being normally distributed. With a median score of 6.7, this implies fans are likely to respond with favourable views, especially with our 1st and 3rd quartile scores between 6.1 and 7.2 respectively. MOre generally, we will need to proceed with any regression analysis carefully (see further comments below).
 
-Examining our financial metrics, our ROI variable suggests a median film will make a return of 1.2x, although this engenders significant volatility, reflected on our very wide range, and a standard deviation that would imply a negative mean on the downside. This seems consistent with the level of risk associated with producing films, with properties mimicking a financial option (e.g. an upfront payment with no certainty of exercise), given the uncertainty in audience receptiveness.
+Examining our financial metrics, our ROI variable suggests a median film will make a return of 1.2x, although this engenders significant volatility, reflected within our wide range, and a standard deviation that would imply a negative mean on the downside. Ignoring the latter, this volatility seems consistent with the level of risk associated with producing films, with properties mimicking a financial option (e.g. an upfront payment with no assurance of exercise), given the uncertainty in audience receptiveness.
 
 This uncertainty is reinforced in the range of revenue figures, and corresponding budget figures respectively. With revenue, this volatility is likely to be more pronounced in practice, as our metric only focuses on box office tickets. These figures imply a median film will have a budget of US\$40m and be expected to generate box office revenues of US\$52m, consistent with our ROI estimate above.
 
-Our last observation is the comparative depth of number of IMDB votes relative to facebook likes. As alluded towards earlier, it is unclear how such facebook data has been collected, nor the interval between the film's release and collection. The latter is equally applicable to IMDB scores; however, given the negative skew with this statistic, the higher number of votes may prove a more desirable proxy in gauging popularity. We shall seek to confirm this by testing how these variables correlate with each other, to guide our final choice on our dependent variables. 
+Our last observation is the comparative depth of number of IMDB votes relative to facebook likes. As alluded towards earlier, it is unclear how such facebook data has been collected, nor the interval between the film's release and data collection. The latter is equally applicable to IMDB scores; however, given the negative skew with this statistic, the higher number of votes may prove a more desirable proxy in gauging popularity. We shall seek to confirm this by testing how these variables correlate with each other, to guide our final choice on our dependent variables. 
 
 
 ###Correlation analysis
@@ -294,7 +298,7 @@ kable(pvalcor_table$P)
 
 ```
 
-The above correlations are all statistically significant, with the exception of our ROI variable. The most surprising result is the lack of correlation with the ROI variable. It is unclear why there is not a positive relationship relative to some of the social media metrics above. This may potentially suggest the impact of outliers in our sample, which may be reducing any underlying correlation. 
+The above correlations are all statistically significant, with the exception of our ROI variable, which comes as quite a surprise. It is unclear why there is not a positive relationship relative to some of the social media metrics above. This may potentially suggest the impact of outliers in our sample, which may be reducing any underlying correlation. 
 
 ```{r, echo=FALSE}
 library(dplyr)
