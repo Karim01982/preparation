@@ -410,6 +410,8 @@ Overall, this model should mitigate the effect of statistical bias affecting our
 ### Commercial: Box office ticket sales
 
 ```{r}
+log6_gross <- (log(final_data_11to15$gross)^6)
+
 rev_mod1 <- lm(data=data11_15, gross ~ (budget))
 rev_mod2 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + thrillerdummy + romancedummy + comedydummy + familydummy))
 rev_mod3 <- lm(data=data11_15, gross ~ (budget + actiondummy + scifidummy + duration))
