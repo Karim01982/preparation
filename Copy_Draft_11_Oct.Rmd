@@ -805,6 +805,39 @@ grid.arrange(imdbbox, fbbox, revbox, roibox, budbox, numuserbox, ncol=2)
 
 We have made reference to various forums on coding best-practices, notably including Stackoverflow.com, and other relevant sources of R studio information available online. These have been cited during the main document, where they have been specific to our study, or represent the application of coding practices not within the Maths and Statistics Foundations for Analytics module. We have not referenced general R studio packages applied within this module (e.g. dplyr; stargazer; etc). 
 
+  Hlavac, Marek (2015). stargazer: Well-Formatted Regression and Summary Statistics Tables. R package version
+  5.2. http://CRAN.R-project.org/package=stargazer
+  
+  John Fox and Sanford Weisberg (2011). An {R} Companion to Applied Regression, Second Edition. Thousand Oaks
+  CA: Sage. URL: http://socserv.socsci.mcmaster.ca/jfox/Books/Companion
+  
+  Hadley Wickham, Romain Francois, Lionel Henry and Kirill Müller (2017). dplyr: A Grammar of Data
+  Manipulation. R package version 0.7.4. https://CRAN.R-project.org/package=dplyr
+  
+  Hadley Wickham, Jim Hester and Romain Francois (2017). readr: Read Rectangular Text Data. R package version
+  1.1.1. https://CRAN.R-project.org/package=readr
+  
+  Hadley Wickham and Lionel Henry (2017). tidyr: Easily Tidy Data with 'spread()' and 'gather()' Functions. R
+  package version 0.7.1. https://CRAN.R-project.org/package=tidyr
+  
+  Stefan Milton Bache and Hadley Wickham (2014). magrittr: A Forward-Pipe Operator for R. R package version
+  1.5. https://CRAN.R-project.org/package=magrittr
+  
+  Hadley Wickham (2017). stringr: Simple, Consistent Wrappers for Common String Operations. R package version
+  1.2.0. https://CRAN.R-project.org/package=stringr
+  
+  H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York, 2009.
+  
+  Yihui Xie (2017). knitr: A General-Purpose Package for Dynamic Report Generation in R. R package version
+  1.17.
+  
+  Baptiste Auguie (2017). gridExtra: Miscellaneous Functions for "Grid" Graphics. R package version 2.3.
+  https://CRAN.R-project.org/package=gridExtra
+  
+  Revelle, W. (2017) psych: Procedures for Personality and Psychological Research, Northwestern University,
+  Evanston, Illinois, USA, https://CRAN.R-project.org/package=psych Version = 1.7.8.
+
+
 We obtained the original dataset, in conjunction with information on Oscar academy awards, from the following websites: 
 <https://www.kaggle.com/tmdb/tmdb-movie-metadata/data>
 <https://www.kaggle.com/theacademy/academy-awards>
