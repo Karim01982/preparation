@@ -2,7 +2,7 @@
 title: "What makes a Hollywood film successful?"
 author: Joanna Andari, Karim Awad, Jiye Ren, Nirbhay Sharma, Qiuyue Zhang, Xiaoyan
   Zhou
-date: "8 October 2017"
+date: "13 October 2017"
 output:
   html_document: default
   pdf_document: default
@@ -389,13 +389,11 @@ We start with a simple regression against box office revenues to gauge whether a
 
 Our initial results (equation 1) indicate an additional IMDB vote is cast for every US\$1,000 in ticket sales, that is statistically significant at a 5% confidence interval (we assume all t-tests are two-tailed). An adjusted ${R}^{2}$ of 0.435 is generated, providing a benchmark that can be refined further, given the size of our residual standard error ("RSE").
 
-We first examine the impact of particular actors and director (equations 2 and 3). This counts the number of occurrences within our sample, and is limited in not consider other films within the period. Notwithstanding, this may help reduce any serial correlation within our error term (i.e. an actor favoured in the past is likely to remain favoured at present). From our results, only the 1st actor appears statistically significant, with a negligible impact on increasing our adjusted ${R}^{2}$. 
+We first examine the impact of featured actors and director (equations 2-4). This counts the number of occurrences within our sample only, and does not consider other films within the period. Notwithstanding, this may help reduce any serial correlation within our error term (i.e. an actor favoured in the past is likely to remain favoured at present). We also appraise the number of Oscars each actor and director has been awarded, to further reduce serial correlation. This also introduces error, as it counts any award and applies it retrospectively across our sample, although we believe this is acceptable, with actor reputations forged over many years prior to an award.
 
-As an alternative, we appraise the number of Oscars each actor and director has been awarded (equation 4), where these statistics reflect lifetime performance. This does introduce error, as we aggregate Oscars across the period, and apply this figure restrospectively (eg. an Oscar won in 2016 would be reflected in a 2012 sample point starring the actor), however we don't feel it detracts from measuring the popularity of an Oscar, which is what the variable is intended to achieve (i.e. it does not seem unreasonable to assume an Oscar is won by an actor who has featured in films over many years, building up a following and wider respect for their work). 
+From our results, only the 1st actor appears statistically significant, with a negligible impact on increasing our adjusted ${R}^{2}$. We find actor Oscars is stastically significant, contributing an extra 61,000 votes per Oscar, with movie Oscars insignificant. The latter is likely attributable to an extended lag between a film being released and the subsequent award ceremony held.
 
-We find actor Oscars is stastically significant, contributing an extra 61,000 votes per Oscar, with movie Oscars insignificant. The latter is likely attributable to an extended lag between a film being released and the subsequent award ceremony being held; thus limiting its impact on box office sales. The adjusted ${R}^{2}$ increases to 0.476 with our RSE term falling, representing an improvement in fit.
-
-Our next step is to gain context into whether the duration of a film impacts popularity. This is premised on long films (i.e. > 150mins) generating mixed views depending on context. Although expecting this to be negligible, this proved materially significant, increasing our adjusted ${R}^{2}$ to [0.559], whilst rendering our Actor 1 variable insignificant. There is no apparent reason for this. An investigation of the scatterplot below would suggest outliers may be influencing these results. We remove this variable upon commencing our later refinement of our model within equations 8-10, as without any likely proxy, this appears to represent a spurious result.
+Our next step examines if long films (i.e. > 150mins) affect audience sentiment. Although expecting this to be negligible, this proved materially significant, increasing our adjusted ${R}^{2}$ to 0.559, whilst rendering our Actor 1 variable insignificant. There is no apparent reason for this. An investigation of the scatterplot below would suggest outliers may be influencing these results. We remove this variable upon commencing our later refinement of our model within equations 8-10, as without any likely proxy, this appears to represent a spurious result.
 
 ```{r}
 ggplot(data11_15, aes(x = duration, y = num_voted_users)) + geom_point() + ggtitle("Duration vs Number of Voted Users") + ylab("Number of Voted Users")
@@ -403,13 +401,11 @@ ggplot(data11_15, aes(x = duration, y = num_voted_users)) + geom_point() + ggtit
 
 The final criteria we consider is film genre. This is not straightforward, as a film can belong to more than one category (e.g. a sci-fi, action thriller). We adopt a count-based approach, based on the number of times a description appears, although this may introduce an added source of multicollinearity, which we attempt to limit by being selective over the categories included. 
 
-We subsequently notice that both family and sci-fi dummy genres are statistically significant. Bizarrely, we generate a negative coefficient for family films, implying these are likely to receive 79,000 less votes. Given the selection bias likely apparent with IMDB data, this may reflect the characteristics of those voting. For instance, is a 18-30 year old as inclined to render judgement on a family film (e.g. Finding Nemo) relative to a sequel in the Terminator franchise? Equally, is IMDB likely to find those with young families finding the time to vote for Finding Nemo on IMDB? Although a slight concern, the negative coefficient does appear logical.
+We subsequently notice that both family and sci-fi dummy genres are statistically significant. Bizarrely, we generate a negative coefficient for family films, implying these are likely to receive 79,000 less votes. Given the selection bias likely apparent with IMDB data, this may reflect the age characteristics of those voting. 
 
-What is more intriguing is the remaining genres all appear statistically insignificant. This probably reflects multicollinearity, so we begin refining the model to eliminate categories where this overlap is likely (equation 7). This appears to work, with our ${R}^{2}$ marginally increasing, along with the t-values of those genre variables that were already significant. 
+We observe that Action, Romance, and Thriller dummies remain insignificant; inconjunction with our lead actor variable, these are subsequently dropped. This also applies to our duration variable, leading to equation 9. We recognise this is still conditioned on a skewed dependent variable, so equation 10 implements the ${\log {x}}^{4}$ transformation noted above. This results in an adjusted ${R}^{2}$ of 0.443, whilst applying a ${x}^{\frac{1}{4}}$ adjustment to our parameter, before multiplying by 100, provides the percentage impact on y. We can see that a US$1 of revenue will raise IMDB votes by 8%, whilst there are > 500+% increases in votes should a participating actor hold an Oscar, or the film be sci-fi orietated. The negative coefficient for family movies, if considered in absolute terms, would entail a significant decrease in votes. 
 
-We do note that the Action, Romance, and Thriller dummies remain insignificant; inconjunction with our lead actor variable, these are subsequently dropped. This also applies to our duration variable, for the reasons provided above, leading to equation 9. We recognise this is still conditioned on a skewed dependent variable, so equation 10 implements the ${\log {x}}^{4}$ transformation noted above. This results in an adjusted ${R}^{2}$ of 0.443, whilst applying a ${x}^{\frac{1}{4}}$ adjustment to our parameter, before multiplying by 100, provides the percentage impact on y. We can see that a US$1 of revenue will raise IMDB votes by 8%, whilst there are > 500+% increases in votes should a participating actor hold an Oscar, or the film be sci-fi orietated. The negative coefficient for family movies, if considered in absolute terms, would entail a significant decrease in votes. 
-
-Overall, this model should mitigate the effect of statistical bias affecting our standard errors, and is intended to attain specification efficiency. However, it is likely our model violates our independently and identically distribution ("iid") assumptions on our error terms, which is likely to be affected by an omitted variable(s). The high t-value attained on our intercept coefficient might be suggestive of this. We discuss overall model robustness further in section 5.
+Overall, this model should mitigate the effect of statistical bias affecting our standard errors, and is intended to attain specification efficiency. However, it is likely this model violates our independently and identically distribution ("iid") assumptions on our error terms, which is likely to be affected by an omitted variable(s). The high t-value attained on our intercept coefficient may also suggest  this. We discuss overall model robustness further in section 5.
 
 
 ### Commercial: Box office ticket sales
@@ -564,11 +560,12 @@ Another limitation was our inability to specify a single genre for each film. Ou
 
 ##Section 7: Conclusions and next steps
 
-Our conclusion...
+We conclude that both IMDB votes and revenues are suitable metrics to gauge popularity and likelihood of commercial success. Our initial findings suggest both respond positively to scale - "bigger films" seem to generate a far greater interest and following amongst an audience.
 
-In terms of developing our study, we would like to understand how these findings apply to arthouse films.
+However, owing to data limitations, our regression models have been limited in their predictive capabilities, due to wider concerns over serial correlation, omitted variables, and the prospect of multicollinearity. This has made it difficult to judge the outcomes of our hypothesis tests, with our categories each responding differently to types of film genre, and the seeming popularity of actors and directors. 
 
-Predictive analysis on 2016
+In terms of developing our study, we would like to understand how these findings apply within other markets, and if patterns observed for Hollywood, remain applicable elsewhere (e.g. China, India, Western Europe).
+
 
 
 \pagebreak
