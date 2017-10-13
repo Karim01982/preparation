@@ -379,7 +379,15 @@ usereg10 <- lm(data = data11_15, log4numvoted_users ~ gross + actor_oscars + fam
 
 
 
+
 stargazer(usereg1, usereg2, usereg3, usereg4, usereg5, usereg6, usereg7, usereg8, usereg9, usereg10, type = "html", report = "vct*")
+
+log4numvoted_users1 <- (log(data11_15$num_voted_users)^4)
+Usereg11 <- lm(data = data11_15, log4numvoted_users1 ~ gross + actor_oscars + familydummy + scifidummy)
+log4numvoted_users2 <- (log(data16$num_voted_users)^4)
+Usereg12 <- lm(data = data16, log4numvoted_users2 ~ gross + actor_oscars + familydummy + scifidummy)
+
+stargazer(Usereg11, Usereg12, type = 'html',report = "vct*")
 
 library(car)
 #residualPlot(usereg9)
@@ -435,6 +443,13 @@ rev_mod7 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + comedydummy 
 
 
 stargazer(rev_mod1, rev_mod2, rev_mod3, rev_mod4, rev_mod5, rev_mod6, rev_mod7, type = "html", report = "vct*")
+
+
+log6_gross <- (log(data16$gross)^6)
+
+rev_mod8 <- lm(data=data16, log6_gross ~ budget + actiondummy +comedydummy +director_occurence+ actor2_occurence)
+
+stargazer(rev_mod7, rev_mod8, type = "html", report='vct')
 
 ```
 
@@ -492,10 +507,10 @@ We first perform an F-test to contrast the variance between our 2011-15 and 2016
 
 $$H_0 : \frac{\sigma^2_{16}}{\sigma^2_{11-15}} = 1$$
 $$H_1 : \frac{\sigma^2_{16}}{\sigma^2_{11-15}} \neq 1$$
+<<<<<<< HEAD
 ```{r, echo=FALSE} 
 var.test(usereg10, usereg11) # F-test for social popularity
 var.test(rev_mod7, rev_mod8)# F-test for commecial popularity
-
 ```
 
 We can apparently reject our null hypothesis for both regressions at a 5% confidence interval. Given the potential issues we have identified above, this does not seem unreasonable as an assumption, although we note for our social media regression that we could reject our alternate hypothesis at a 1% interval. It may therefore not be entirely clear, with this highlighting the prospect of a Type I error.
