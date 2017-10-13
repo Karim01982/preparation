@@ -549,7 +549,9 @@ Our film genre produce variable results, with sci-fi and comedy film estimators 
 
 Putting aside concerns on model robustness, our results suggest that popularity is a function of how "big" the film is expected to be, based on box-office revenues generated. This is consistent with our revenue model, which points to a larger budget helping to generate higher revenues. This perhaps shouldn't come as a surprise: larger budgets result in better known actors, and an increased marketing presence, appealing to both the loyalty of fans and raising the film's wider profile.
 
-The volatility we saw within our descriptive statistics is partly echoed within our regression models, given the lack of an apparent "ready formula" in targeting either specific genres, actor / director appearance frequency, or the impact of awards in influencing audience reviews or wider ticket sales.  
+The volatility we saw within our descriptive statistics is partly echoed within our regression models, given the lack of an apparent "ready formula" in targeting either specific genres, actor / director appearance frequency, or the impact of awards in influencing audience reviews or wider ticket sales. This was most evident when contrasting the genres affecting popularity (family; sci-fi) relative to revenues (action; comedy).
+
+Realistically, the effectiveness of our analysis has been hindered by the overall quality of data available, and the shortcomings of proxies used to estimate specific characteristics (e.g. actor / supporting actor popularity). We discuss this further in our Limitations section below.
 
 
 \pagebreak
