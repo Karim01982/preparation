@@ -384,10 +384,10 @@ stargazer(usereg1, usereg2, usereg3, usereg4, usereg5, usereg6, usereg7, usereg8
 
 log4numvoted_users1 <- (log(data11_15$num_voted_users)^4)
 Usereg11 <- lm(data = data11_15, log4numvoted_users1 ~ gross + actor_oscars + familydummy + scifidummy)
-log4numvoted_users2 <- (log(data16$num_voted_users)^4)
-Usereg12 <- lm(data = data16, log4numvoted_users2 ~ gross + actor_oscars + familydummy + scifidummy)
+#log4numvoted_users2 <- (log(data16$num_voted_users)^4)
+#Usereg12 <- lm(data = data16, log4numvoted_users2 ~ gross + actor_oscars + familydummy + scifidummy)
 
-stargazer(Usereg11, Usereg12, type = 'html',report = "vct*")
+#stargazer(Usereg11, Usereg12, type = 'html',report = "vct*")
 
 library(car)
 #residualPlot(usereg9)
@@ -445,11 +445,11 @@ rev_mod7 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + comedydummy 
 stargazer(rev_mod1, rev_mod2, rev_mod3, rev_mod4, rev_mod5, rev_mod6, rev_mod7, type = "html", report = "vct*")
 
 
-log6_gross <- (log(data16$gross)^6)
+#log6_gross <- (log(data16$gross)^6)
 
-rev_mod8 <- lm(data=data16, log6_gross ~ budget + actiondummy +comedydummy +director_occurence+ actor2_occurence)
+#rev_mod8 <- lm(data=data16, log6_gross ~ budget + actiondummy +comedydummy +director_occurence+ actor2_occurence)
 
-stargazer(rev_mod7, rev_mod8, type = "html", report='vct')
+#stargazer(rev_mod7, rev_mod8, type = "html", report='vct')
 
 ```
 
@@ -461,8 +461,6 @@ Our final model (equation 7) eliminates any insignificant variables, whilst also
 
 We note a slight improvement in adjusted ${R}^{2}$ of 0.482 relative to equation 6. This benefits from a slight improvement in degrees of freedom, whilst equation 6 illustrates the impact of bias prior to adjusting our y-variable, given the change in significance and co-efficient sign on some variables (e.g. sci-fi dummy; actor 3 occurrence). 
 
-
-====
 
 
 \pagebreak
@@ -485,7 +483,7 @@ We expect this to affect the accuracy of our standard error (and thus our t-valu
 
 ###Hypothesis tests
 
-We start by regressing our 2011-15 model on our Jan-Aug 2016 dataset. This includes [37] data-points. With our log-transformed equations consistent with a normal distribution, we assume that a sample of this size should satisfy the central-limit theorem (ie. a sample > 30-35), enabling meaningful analysis; although we recognise further data-points would provide further comfort.
+We start by regressing our 2011-15 model on our Jan-Aug 2016 dataset. This includes 37 data-points. With our log-transformed equations consistent with a normal distribution, we assume that a sample of this size should satisfy the central-limit theorem (ie. a sample > 30), enabling meaningful analysis; although we recognise further data-points would provide further comfort.
 
 We obtain the following results for our IMDB votes and Revenue regressions:
 
@@ -501,9 +499,9 @@ stargazer(usereg10, usereg11, rev_mod7, rev_mod8, type = 'html',report = "vct*")
 
 ```
 
-Nominally, our models would suggest a good fit with 2016 data, based on high ${R}^{2}$ being attained. However, combined with low t-values generally being observed (with the exception of revenue and budget variables in our social media and revenue regressions respectively), this would normally be a symptom of multi-collinearity, notwithstanding our efforts to achieve the contrary. We give our models the benefit of the doubt, however we must recognise the potential for this to seriously undermine any resulting conclusion. [The material significance of our constants (i.e p values < 0.001)) may also reinforce our suspicion of an omitted variable bias - we discuss this within Section 6].
+Nominally, our social metric model suggests a good fit with 2016 data, based on a high ${R}^{2}$ being attained. Our 2016 revenue model implies a poorer fit. Combined with low t-values generally being observed (with the exception of revenue and budget variables in our social media and revenue regressions respectively), this would normally be a symptom of multi-collinearity, notwithstanding our efforts to achieve the contrary. We give our models the benefit of the doubt, however we recognise the potential for this to seriously undermine any resulting conclusion. These models also suggest omitted variable bias, with potential symptoms including a high t-value for our constant (social metric model), and relatively low adjusted ${R}^{2}$ (revenue model).
 
-We first perform an F-test to contrast the variance between our 2011-15 and 2016 models. Should these variances be similar, enabling the rejection of $H_0$ this would indicate our 2011-15 model may represent a reasonable fit on 2016 data. Formalising our hypothesis:
+We perform an F-test to contrast the variance between our 2011-15 and 2016 models. Should these variances be similar, enabling the rejection of $H_1$ this would indicate our 2011-15 model may represent a reasonable fit on 2016 data. Formalising our hypothesis:
 
 $$H_0 : \frac{\sigma^2_{16}}{\sigma^2_{11-15}} = 1$$
 $$H_1 : \frac{\sigma^2_{16}}{\sigma^2_{11-15}} \neq 1$$
@@ -511,17 +509,16 @@ $$H_1 : \frac{\sigma^2_{16}}{\sigma^2_{11-15}} \neq 1$$
 ```{r, echo=FALSE} 
 var.test(usereg10, usereg11) # F-test for social popularity
 var.test(rev_mod7, rev_mod8)# F-test for commecial popularity
+
 ```
 
-We can apparently reject our null hypothesis for both regressions at a 5% confidence interval. Given the potential issues we have identified above, this does not seem unreasonable as an assumption, although we note for our social media regression that we could reject our alternate hypothesis at a 1% interval. It may therefore not be entirely clear, with this highlighting the prospect of a Type I error.
+We can apparently reject our null hypothesis for our social media model, and the alternate hypothesis for our revenue model, at a 5% confidence interval. Given the potential issues we have identified above, it would not seem unreasonable to reject both null hypothesis. However, the p-values are not decisive for either F-test (0.01 for social media, and 0.18 for revenues), highlighting the prospect of both Type I and II errors respectively. 
 
-We separately examine what our parameter coefficients return across both models. We formulate our hypothesis as follows:
+We separately examine what our parameter coefficients return across both models, to appraise any variation between these models. We formulate our hypothesis as follows:
 
 $$H_0 : \beta_{(i\ , \ 11-15)} = \beta_{(i\ ,\ 16)} \  \ \ or \  \ \ \  \beta_{(i\ ,\ 11-15)} - \beta_{(i\ ,\ 16)} = 0$$
 $$H_1 : \beta_{(i\ , \ 11-15)} \neq \beta_{(i\ ,\ 16)} \  \ \ or \  \ \ \  \beta_{(i\ ,\ 11-15)} - \beta_{(i\ ,\ 16)} \neq 0$$
-                       
-First, we look at results of the Z test for the social popularity model:
-
+                    
 
 ```{r, echo=FALSE, results="asis"}
 
@@ -534,14 +531,6 @@ ztable<- data.frame(name,z_statistics, p_value)
 kable(ztable, caption = "Z Test for co-efficient for Social Popularity Model")
 ```
 
-The z-test for the coefficients of gross and scifidummy variables are significant and we believe that there is no much difference between the effect of these two coefficients. The results, however, for actor_oscars and familydummy variables, are rejecting the null hypothesis. 
-
-One reason why the actor_oscars and familydummy variables are not significant for 2016 data is that the current 2016 dataset is too small (only 37 observations while there are 4 independent variables) and the two datasets on these variables are not consistent based on the t test and F test we conducted previously. 
-
-However, the signs of all coefficients in the 2016 model are the same as 2011-2015 model, which could prove the general correctness of our model.
-
-Second, we look at the commercial success model:
-
 
 ```{r, echo=FALSE, results="asis"}
 name<- c('budget', 'actiondummy', 'comedydummy', 'director_occurence', 'actor2_occurence')
@@ -552,9 +541,17 @@ ztable2<- data.frame(name,z_statistics, p_value)
 kable(ztable2, caption = "Z Test for co-efficient for Commercial Success Model")
 ```
 
-The left column in the regression table stands for the model that was built based on 2011 - 2015 data, and the right one for year 2016. Only the budget variable is highly significant. 
+What appears evident is both our box office figures (within our social metric model), and budget (within our revenue model) result in rejecting our alternate hypothesis. Despite our standard errors potentially being inaccurate, these variables appear to be credible in influencing these models, premised on their significant contribution to ${R}^{2}$ and consistently generating significant t-values. Yet without more complete data, it is still conceivable they do not reflect underlying causality (i.e. a third variable may be a factor).
 
-The z-test for the coefficients, however, shows a slightly more positive result. The coefficients of budget, comedy dummy and director_occurrence variables do not show much difference on dataset 2011-15 and dataset 2016. 
+Our film genre produce variable results, with sci-fi and comedy film estimators rejecting their alternate hypothesis for 2016. Although suggestive of predictive capability, the inconsistency between these models, coupled with our concern over modelling error, would raise doubt on if these can be relied upon.
+
+### What does this all mean?
+
+Putting aside concerns on model robustness, our results suggest that popularity is a function of how "big" the film is expected to be, based on box-office revenues generated. This is consistent with our revenue model, which points to a larger budget helping to generate higher revenues. This perhaps shouldn't come as a surprise: larger budgets result in better known actors, and an increased marketing presence, appealing to both the loyalty of fans and raising the film's wider profile.
+
+The volatility we saw within our descriptive statistics is partly echoed within our regression models, given the lack of an apparent "ready formula" in targeting either specific genres, actor / director appearance frequency, or the impact of awards in influencing audience reviews or wider ticket sales. This was most evident when contrasting the genres affecting popularity (family; sci-fi) relative to revenues (action; comedy).
+
+Realistically, the effectiveness of our analysis has been hindered by the overall quality of data available, and the shortcomings of proxies used to estimate specific characteristics (e.g. actor / supporting actor popularity). We discuss this further in our Limitations section below.
 
 
 \pagebreak
