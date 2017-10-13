@@ -4,11 +4,11 @@ author: Joanna Andari, Karim Awad, Jiye Ren, Nirbhay Sharma, Qiuyue Zhang, Xiaoy
   Zhou
 date: "13 October 2017"
 output:
-  html_document: default
+  html_document:
+    toc: TRUE
   pdf_document: default
 ---
 <style>
-
 table, td, th {
   border: 1pt;
   padding-left: 1em;
@@ -19,8 +19,8 @@ table, td, th {
   margin-top: 1em;
   margin-bottom: 1em;
 }
-
 </style>
+
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
 library(stargazer)
 library(car)
@@ -33,7 +33,6 @@ library(ggplot2)
 library(knitr)
 library(gridExtra)
 library(psych)
-
 
 ```
 
@@ -217,7 +216,7 @@ As this report shall conclude, we identify the number of IMDB votes per film, an
 
 \pagebreak
 
-##Section 2: Data sampling and cleaning
+## Section 2: Data sampling and cleaning
 
 The data compiled for this project/analysis is obtained from 2 different datasets:   
 
@@ -234,9 +233,9 @@ We discuss the merits of this approach throughout the report, along with comment
          
 \pagebreak
 
-##Section 3: How do we measure a film's popularity?
+## Section 3: How do we measure a film's popularity?
 
-###What metrics should we use to determine our dependent variable?
+### What metrics should we use to determine our dependent variable?
 
 Determining what variable should represent popularity, itself a subjective quality, gives rise to several potential proxy variables. These can be divided between those that are financially driven relative to social media metrics, of which we consider each in turn, arriving at five possible variables.
 
@@ -250,22 +249,25 @@ The remaining two metrics concern IMDB scores, and the number of votes received.
 
 We recognise that social media metrics will be lagged indicators of a film's success. Hence, we are likely to depend upon a commercial variable to project future success, although social media can help by identifying film types that are likely to prove popular, which may form the basis of choosing future films to invest within. 
 
-###Descriptive analysis
+### Descriptive analysis
 
 We produce boxplots and density graphs of the five variables above, along with budget to provide a sense-check. These can all separately be found in the appendices.
 
 We summarises some of the key descriptive findings of these graphs, along with illustrating the results of our ROI boxplot (limited to returns up to 5.0x) and IMDB density graph:
 
-``` {r, results = "asis", warning=FALSE, message=FALSE}
+``` {r, results = "asis", warning=FALSE, message=FALSE, echo=FALSE}
 summary_data <- data11_15 %>% select(gross, budget, num_voted_users, imdb_score, movie_facebook_likes, return)
 summary_data = as.data.frame(describe(summary_data, quant = c(.25,.75)))
 summary_data = summary_data[ , !(names(summary_data) %in% c("vars","n","mad","range","kurtosis","se","trimmed"))]
 rownames(summary_data) <- c("Gross Revenue","Budget","Number of voted users","IMDB Score","Movie's Facebook Likes","ROI")
 colnames(summary_data) <- c("Mean","Stan. Dev.","Median","Min","Max","Skew","1st Quar","3rd Quar")
+numeric_columns <- sapply(summary_data, mode) == 'numeric'
+summary_data[numeric_columns] <-  round(summary_data[numeric_columns], 1)
 kable(summary_data)
+
 ```
 
-```{r, results = "asis", warning=FALSE}
+```{r, results = "asis", warning=FALSE, echo=FALSE}
 imdbden <- ggplot(data=data11_15)+geom_density(aes(x=(imdb_score)))+xlab("Imdb score")+ylab("Density")
 roibox <- ggplot(data=data11_15)+geom_boxplot(aes(x=1, y=return)) + ylim(0,5)+ylab("Return/100%")
 grid.arrange(imdbden, roibox,  ncol=2)
@@ -278,7 +280,7 @@ Examining our financial metrics, our ROI has a median return of 1.2x, although t
 Our last observation is the comparative depth of IMDB votes relative to facebook likes. Although uncertainty remains concerning the collection of this data relative to the timing of a film's release, given the negative skew of IMDB ratings, the higher number of votes may prove a more desirable proxy in gauging popularity. We shall confirm this by testing how these variables correlate with each other, to guide our final choice on our dependent variables. 
 
 
-###Correlation analysis
+### Correlation analysis
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 library(Hmisc)
@@ -296,7 +298,7 @@ kable(pvalcor_table$P)
 
 The above correlations are all statistically significant, with the exception of our ROI variable, which comes as quite a surprise. It is unclear why there is not a positive relationship relative to some of the social media metrics above. This may potentially suggest the impact of outliers in our sample, which may be reducing any underlying correlation. 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 A<- filter(RB_data,return<1)
 B<- filter(RB_data, between(return,1,3))
 C<- filter(RB_data, return>3)
@@ -337,13 +339,11 @@ grid.arrange(numden, revden, numadj, revadj, ncol=2)
 ```
 
 
-[^3]: Wikipedia (2017)
-
 \pagebreak
 
-##Section 4: Regression Analysis
+## Section 4: Regression Analysis
 
-###Social media: Number of IMDB votes
+### Social media: Number of IMDB votes
 
 ```{r, echo=FALSE, results = "asis"}
 
@@ -374,7 +374,7 @@ usereg10 <- lm(data = data11_15, log4numvoted_users ~ gross + actor_oscars + fam
 
 
 
-stargazer(usereg1, usereg2, usereg3, usereg4, usereg5, usereg6, usereg7, usereg8, usereg9, usereg10, type = "html", report = "vct*")
+stargazer(usereg1, usereg2, usereg3, usereg4, usereg5, usereg6, usereg7, usereg8, usereg9, usereg10, type = "html", report = "vct*", font.size = 'tiny')
 
 log4numvoted_users1 <- (log(data11_15$num_voted_users)^4)
 Usereg11 <- lm(data = data11_15, log4numvoted_users1 ~ gross + actor_oscars + familydummy + scifidummy)
@@ -395,7 +395,7 @@ From our results, only the 1st actor appears statistically significant, with a n
 
 Our next step examines if long films (i.e. > 150mins) affect audience sentiment. Although expecting this to be negligible, this proved materially significant, increasing our adjusted ${R}^{2}$ to 0.559, whilst rendering our Actor 1 variable insignificant. There is no apparent reason for this. An investigation of the scatterplot below would suggest outliers may be influencing these results. We remove this variable upon commencing our later refinement of our model within equations 8-10, as without any likely proxy, this appears to represent a spurious result.
 
-```{r}
+```{r, echo=FALSE, warning=FALSE}
 ggplot(data11_15, aes(x = duration, y = num_voted_users)) + geom_point() + ggtitle("Duration vs Number of Voted Users") + ylab("Number of Voted Users")
 ```
 
@@ -426,14 +426,7 @@ rev_mod6 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + scifidummy +
 rev_mod7 <- lm(data=data11_15, log6_gross ~ (budget + actiondummy + comedydummy  + director_occurence + actor2_occurence))
 
 
-stargazer(rev_mod1, rev_mod2, rev_mod3, rev_mod4, rev_mod5, rev_mod6, rev_mod7, type = "html", report = "vct*")
-
-
-#log6_gross <- (log(data16$gross)^6)
-
-#rev_mod8 <- lm(data=data16, log6_gross ~ budget + actiondummy +comedydummy +director_occurence+ actor2_occurence)
-
-#stargazer(rev_mod7, rev_mod8, type = "html", report='vct')
+stargazer(rev_mod1, rev_mod2, rev_mod3, rev_mod4, rev_mod5, rev_mod6, rev_mod7, type = "html", report = "vct*", font.size = 'tiny')
 
 ```
 
@@ -448,23 +441,23 @@ We note a slight improvement in adjusted ${R}^{2}$ of 0.482 relative to equation
 
 \pagebreak
 
-##Section 5: Robustness and Hypothesis Tests
+## Section 5: Robustness and Hypothesis Tests
 
-###Robustness
+### Robustness
 
 Prior to backtesting our models, we want to get a sense of overall model robustness. We examine residual plots of our final models to help determine whether our iid assumptions on our error term are valid:
 
 
-```{r, echo=FALSE}
-residualPlot(usereg10) # residual plot for our social media model (with the log)
-residualPlot(rev_mod7) # residual plot for our commercial model (with the log)
+```{r, echo=FALSE, align="center", warning=FALSE, message=FALSE, results='hide'}
+residualPlot(usereg10) + title("Social Popularity model : Residual v/s Fitted values ") # residual plot for our social media model (with the log)
+residualPlot(rev_mod7) + title("Commercial Success model : Residual v/s Fitted values") # residual plot for our commercial model (with the log)
 ```
 
 The trend line on both graphs indicates our iid assumptions are violated, with serial correlation present. This is likely attributable to other variables being omitted, along with potential error within some of our variable estimates. We would validate this with a Durbin-Watson test, although the residual plot is relatively self-evident.
 
 We expect this to affect the accuracy of our standard error (and thus our t-values), increasing the likelihood of Type I and II errors. For the hypothesis tests that follow, we therefore must apply caution to any final result.
 
-###Hypothesis tests
+### Hypothesis tests
 
 We start by regressing our 2011-15 model on our Jan-Aug 2016 dataset. This includes 37 data-points. With our log-transformed equations consistent with a normal distribution, we assume that a sample of this size should satisfy the central-limit theorem (ie. a sample > 30), enabling meaningful analysis; although we recognise further data-points would provide further comfort.
 
@@ -478,7 +471,7 @@ usereg11 <- lm(data = data16, log4numvoted_users ~ gross + actor_oscars + family
 log6_gross <- (log(data16$gross)^6)
 rev_mod8 <- lm(data=data16, log6_gross ~ budget + actiondummy +comedydummy +director_occurence+ actor2_occurence)
 
-stargazer(usereg10, usereg11, rev_mod7, rev_mod8, type = 'html',report = "vct*")
+stargazer(usereg10, usereg11, rev_mod7, rev_mod8, type = 'html',report = "vct*", font.size = 'tiny')
 
 ```
 
@@ -488,7 +481,7 @@ We perform an F-test to contrast the variance between our 2011-15 and 2016 model
 
 $$H_0 : \frac{\sigma^2_{16}}{\sigma^2_{11-15}} = 1$$
 $$H_1 : \frac{\sigma^2_{16}}{\sigma^2_{11-15}} \neq 1$$
-<<<<<<< HEAD
+
 ```{r, echo=FALSE} 
 var.test(usereg10, usereg11) # F-test for social popularity
 var.test(rev_mod7, rev_mod8)# F-test for commecial popularity
@@ -539,7 +532,7 @@ Realistically, the effectiveness of our analysis has been hindered by the overal
 
 \pagebreak
 
-##Section 6: Limitations
+## Section 6: Limitations
 
 Besides the commentary above on robustness, we recognise there are several issues within our data. The original sample, though randomly generated, does not facilitate a more comprehensive assessment of Hollywood and non-Hollywood film statistics over the time horizon. It may also have resulted in the skewness observed within our datasets. 
 
@@ -558,7 +551,7 @@ Another limitation was our inability to specify a single genre for each film. Ou
 
 \pagebreak
 
-##Section 7: Conclusions and next steps
+## Section 7: Conclusions and next steps
 
 We conclude that both IMDB votes and revenues are suitable metrics to gauge popularity and likelihood of commercial success. Our initial findings suggest both respond positively to scale - "bigger films" seem to generate a far greater interest and following amongst an audience.
 
@@ -570,7 +563,9 @@ In terms of developing our study, we would like to understand how these findings
 
 \pagebreak
 
-##Appendix 1 - Source of dataset 
+## Appendix
+                          
+### Appendix 1 - Source of dataset 
 
 The raw dataset comes from Kaggle website[^1], the Dataset section. The steps the data set was acquired are as follows:
 
@@ -618,7 +613,7 @@ kable(variable_table, caption = "Variables", align = c('c', 'l'))
 [^3]: Facebook: <https://www.facebook.com/>.
 \pagebreak
 
-##Appendix 2 - Data Cleaning Methodology
+### Appendix 2 - Data Cleaning Methodology
 
          
 1. **IMDB Movie Dataset:** The raw dataset is the IMDB information about the movies released between 1916 and 2016 (August), scrapted by Kaggle user chuansun76 from IMDB website. It contains 28 variables and 5043 observations. These variables include information about the movie performance on the box office, the actor(s) name, direcor(s) names, movie genre, movie facebook likes and more. 
@@ -629,19 +624,17 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-    * **Step 1 - Cleaning up inconsistent observations:** The raw dataset contained a lot of inconsistencies, namely 'NA' or Blank values for several observations. In order to obtain a consistent data to perform analysis on, we **_removed all the observations with any NA or blank values_**.                
-    * **Step 2 - Removing duplicate values:** We observed that the dataset contained duplicate observations, which were also removed.
-    * **Step 3 - Limiting dataset by time frame and country:** The money-related variables in the dataset would be influenced by inflation, and the consistency of social presence variables is heavily reliant to the social media popularity. Therefore, it is reasonable to **_narrow down the dataset timeframe into 2011 - 2016 (August)_**. Besides, there are certain limit[^1] on the types of box office currency, so we only **_focus on US movie market_** to avoid the influence of exchange rate fluctuation.
-    * **Step 4 - Segregating the movie genres:** The dataset contained the movie genres in the form of a single string, with every genre of the movie, delimited by a '|' symbol. In order to get the actual genres separated and ready to use, we used created flags in order to check whether the movie is of a particular genre. For example: the 'action_genre' column will have a 1 value for an observation, if it is an action movie.
-    * **Step 5 - Calculating the number of occurences of each actor/director:** Another interesting variable that we expect to be of significance to our analysis was the number of times an actor/director has showed up in our dataset. That data would allow us to possibly find interesting points on how an actor/director can impact a movie's performance/success. Thus, we added variables/columns with the **_number of occurences for actors and directors_**.
-    * **Step 6 - Calculating the movie ROI:** We add another variable, 'movie_roi' which contains the **_return on investment for each movie_**. This will help us in our analysis.
-    * **Step 7 - Selecting only the required columns:** The raw dataset consisted of 28 variables, many of which are not required in our analyses. Thus, we remove the unwanted columns and keep only the data that is specific to our analysis. In the process we reduce the size of the dataset leading to better performance. For more details please see data description below.
+  * **Step 1 - Cleaning up inconsistent observations:** The raw dataset contained a lot of inconsistencies, namely 'NA' or Blank values for several observations. In order to obtain a consistent data to perform analysis on, we **_removed all the observations with any NA or blank values_**.                
+  * **Step 2 - Removing duplicate values:** We observed that the dataset contained duplicate observations, which were also removed.
+  * **Step 3 - Limiting dataset by time frame and country:** The money-related variables in the dataset would be influenced by inflation, and the consistency of social presence variables is heavily reliant to the social media popularity. Therefore, it is reasonable to **_narrow down the dataset timeframe into 2011 - 2016 (August)_**. Besides, there are certain limit[^1] on the types of box office currency, so we only **_focus on US movie market_** to avoid the influence of exchange rate fluctuation.
+  * **Step 4 - Segregating the movie genres:** The dataset contained the movie genres in the form of a single string, with every genre of the movie, delimited by a '|' symbol. In order to get the actual genres separated and ready to use, we used created flags in order to check whether the movie is of a particular genre. For example: the 'action_genre' column will have a 1 value for an observation, if it is an action movie.
+  * **Step 5 - Calculating the number of occurences of each actor/director:** Another interesting variable that we expect to be of significance to our analysis was the number of times an actor/director has showed up in our dataset. That data would allow us to possibly find interesting points on how an actor/director can impact a movie's performance/success. Thus, we added variables/columns with the **_number of occurences for actors and directors_**.
+  * **Step 6 - Calculating the movie ROI:** We add another variable, 'movie_roi' which contains the **_return on investment for each movie_**. This will help us in our analysis.
+  * **Step 7 - Selecting only the required columns:** The raw dataset consisted of 28 variables, many of which are not required in our analyses. Thus, we remove the unwanted columns and keep only the data that is specific to our analysis. In the process we reduce the size of the dataset leading to better performance. For more details please see data description below.
     
 After deleting the variables that have N/A values and that are less relevant to the aim of our report, our final variables (in alphabetical order) are:
 
 ```{r results = "asis", echo = FALSE}
-library(knitr)
-
 Variable_name <- c("actor_1_name", 
                    "actor_2_name", 
                    "actor_3_name",
@@ -697,9 +690,6 @@ variable_table <- data.frame(Variable_name, Explanation)
 
 kable(variable_table, caption = "Variables")
 
-#print(xtable::xtable(variable_table, caption = "Variables", type = "html", html.table.attributes = "border=0"))
-
-#stargazer::stargazer(variable_table, type = "html", title = "Variables")
 
 ```
 
@@ -707,24 +697,24 @@ The cleaned movie dataset now has 535 obseravations over 39 variables. Please no
                                    
                                                         
 2. **Oscar winners dataset:** The raw dataset of awards contained 2321 observations over 4 variables. This database consisted the nominees and winners of the Academy Awards (or Oscars) ever since its inception, i.e. from 1927 to 2015.     
-    * **Step 1 - Cleaning up inconsistent observations:** The raw dataset contains some inconsistent observations where the names of the winner and the film were placed in the incorrect column. Since this was the case for the initial few records only, we ignored this and copied the values in the 'film' column to the 'names' column.                
-    * **Step 2 - Limiting dataset:** The dataset included both nominess and winner from every category. We were interested in collecting data about the actors, directors, and the best picture winners only in order to see how that impacts the success of a movie. Therefore, we **_excluded the nomiees and only kept the winners for the awards_** related to Best Actor/Actress in a Lead/Supporting role, Best Director and Best Picutre.
-    * **Step 3 - Counting the awards:** In order to get the data of the number of wins for each individual, we introduced a new column 'num_wins' which counted the **_number of occurences of a name in the winners list_**. Using this data makes sense as in order to assess the impact of this on a movies popularity/success.
-    * **Step 4 - Selecting the required columns:** The raw dataset contains 4 variables, and a count column, out of which only the 'count' and 'name' column is required for our analysis. Thus we select only a small subset of the raw data for our analysis.                   
+  * **Step 1 - Cleaning up inconsistent observations:** The raw dataset contains some inconsistent observations where the names of the winner and the film were placed in the incorrect column. Since this was the case for the initial few records only, we ignored this and copied the values in the 'film' column to the 'names' column.                
+  * **Step 2 - Limiting dataset:** The dataset included both nominess and winner from every category. We were interested in collecting data about the actors, directors, and the best picture winners only in order to see how that impacts the success of a movie. Therefore, we **_excluded the nomiees and only kept the winners for the awards_** related to Best Actor/Actress in a Lead/Supporting role, Best Director and Best Picutre.
+  * **Step 3 - Counting the awards:** In order to get the data of the number of wins for each individual, we introduced a new column 'num_wins' which counted the **_number of occurences of a name in the winners list_**. Using this data makes sense as in order to assess the impact of this on a movies popularity/success.
+  * **Step 4 - Selecting the required columns:** The raw dataset contains 4 variables, and a count column, out of which only the 'count' and 'name' column is required for our analysis. Thus we select only a small subset of the raw data for our analysis.                   
 
 The cleaned awards data now has 434 observations over 2 variables. This data will come handy to check which movies/actors/directors have oscar(s) to their name(s) and how that impacts the success of a movie.
 
 
 3. **Final (Cumulative) Dataset:** In order to get the final working database, we combine the information from the two cleaned datasets.             
-    * **Step 1 - Summarizing the datasets:** We need to get the number of award wins for actors, directors, and movie for each observation in the into the IMDB movie dataset, from the 'Oscar winners dataset'. We do this by introducing new variables that capture **_the count of oscars for each actor, director, and movie for each observation_**.
-    * **Step 2 - Dividing the final data into two datasets:** The aim of our analysis is to create a model that can predict the success of a hollywood movie. To achieve that, we will build a regression model using the data of movies from 2011 to 2015 and then test the consistency of the data for the movies in 2016. This will provide a clear indication of how our model fits with current movies, and a direction of further development. Thus we **_create two subsets of the final data, one for data of movies from 2011 to 2015 and the other with the data of movies for 2016_**.   
+  * **Step 1 - Summarizing the datasets:** We need to get the number of award wins for actors, directors, and movie for each observation in the into the IMDB movie dataset, from the 'Oscar winners dataset'. We do this by introducing new variables that capture **_the count of oscars for each actor, director, and movie for each observation_**.
+  * **Step 2 - Dividing the final data into two datasets:** The aim of our analysis is to create a model that can predict the success of a hollywood movie. To achieve that, we will build a regression model using the data of movies from 2011 to 2015 and then test the consistency of the data for the movies in 2016. This will provide a clear indication of how our model fits with current movies, and a direction of further development. Thus we **_create two subsets of the final data, one for data of movies from 2011 to 2015 and the other with the data of movies for 2016_**.   
 
 [^1]: Please see the limitation part and Appendix 1 for more information about the raw data limitation.
 
 
-##Appendix 3 - Boxplots and Density graphs
+### Appendix 3 - Boxplots and Density graphs
 
-```{r, echo =FALSE}
+```{r, echo =FALSE, warning=FALSE, message=FALSE}
 #density plots
 
 
@@ -762,7 +752,7 @@ grid.arrange(imdbbox, fbbox, revbox, roibox, budbox, numuserbox, ncol=2)
 ```
 \pagebreak
 
-##Bibliography and references
+## Bibliography and references
 
 We have made reference to various forums on coding best-practices, notably including Stackoverflow.com, and other relevant sources of R studio information available online. These have been cited during the main document, where they have been specific to our study, or represent the application of coding practices not within the Maths and Statistics Foundations for Analytics module. We have not referenced general R studio packages applied within this module (e.g. dplyr; stargazer; etc). 
 
@@ -806,7 +796,6 @@ We obtained the original dataset, in conjunction with information on Oscar acade
 In terms of documents we have referenced:
 
 [1-2] "Film industry in the US", Statista, Dossier (2016) <https://www.statista.com/study/11472/film-industry-in-the-united-states-statista-dossier/>
-[3] "The Interview", Wikipedia page (2017) <https://en.wikipedia.org/wiki/The_Interview#Pre-release_reaction>
 [4] "How to tell the greatness of a movie before it is released in cinema", NYC Data Science Academy, Chuansun76 (2016) <https://chuansun76.com/2016/09/23/how-to-tell-the-greatness-of-a-movie-before-it-is-released-in-cinema/>
 
 
