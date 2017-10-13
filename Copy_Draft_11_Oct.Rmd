@@ -423,6 +423,12 @@ We do note that the Action, Romance, and Thriller dummies remain insignificant; 
 
 Overall, this model should mitigate the effect of statistical bias affecting our standard errors, and is intended to attain specification efficiency. However, it is likely our model violates our independently and identically distribution ("iid") assumptions on our error terms, which is likely to be affected by an omitted variable(s). The high t-value attained on our intercept coefficient might be suggestive of this. We discuss overall model robustness further in section 5.
 
+The final derived model for social popularity is:
+
+$$
+Number\_Voted\_Users\ = 13520\ +\ 0.00004432*Revenue\ +\ 1982*Actor\_Oscars\ -\ 3619*Family\_Genre\ +\ 1771*Scifi\_Genre
+$$
+
 
 ### Commercial: Box office ticket sales
 
@@ -461,6 +467,11 @@ Our final model (equation 7) eliminates any insignificant variables, whilst also
 
 We note a slight improvement in adjusted ${R}^{2}$ of 0.482 relative to equation 6. This benefits from a slight improvement in degrees of freedom, whilst equation 6 illustrates the impact of bias prior to adjusting our y-variable, given the change in significance and co-efficient sign on some variables (e.g. sci-fi dummy; actor 3 occurrence). 
 
+The final regression model for commercial success is:
+
+$$
+Revenue\_Log^6 = 1140000 + 0.1766*Budget - 2832000*Action\_Genre + 2865000*Comedy\_Genre + 3550000*Director\_Occurence + 3181000*Actor2\_Occurence
+$$
 
 
 \pagebreak
