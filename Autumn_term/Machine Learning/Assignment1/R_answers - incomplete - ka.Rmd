@@ -1,0 +1,77 @@
+---
+title: "Machine Learning - Assignment 1"
+author: "Karim Awad (01446402)"
+date: "30 November 2017"
+output: html_document
+---
+
+####Question 2.a
+
+1. Loading the data
+```{r, echo=FALSE}
+rm(list=ls())
+setwd('C:/Users/karim/Documents/Imperial/Machine Learning/ProblemSets/Assignment1')
+ww_data <- read.csv('winequality-white.csv', sep = ";")
+
+```
+
+2. Constructing a binary column
+
+```{r, echo=FALSE}
+ww_data[,"good_wine"] <- ifelse(ww_data[,"quality"] >= 6, 1, 0)
+ww_data$good_wine <- factor(ww_data$good_wine, levels = c(1,0), labels = c("good_wine", "bad_wine"))
+head(ww_data)
+
+```
+
+3. Split the data into a training, validation, and test data sets
+
+```{r, echo=FALSE}
+library(caTools)
+#shuffling our sample data
+ww_data1 <- ww_data[sample(nrow(ww_data)),]
+head(ww_data)
+head(ww_data1)
+#Splitting our data into our data sets
+set.seed(100)
+ww_sep1 <- sample.split(ww_data1, SplitRatio = 0.4)
+ww_training <- subset(ww_data1,  ww_sep1==TRUE)
+ww_remainder <- subset(ww_data1, ww_sep1==FALSE)
+
+ww_sep2 <- sample.split(ww_remainder, SplitRatio = 0.5)
+ww_validation <- subset(ww_remainder, ww_sep2==TRUE)
+ww_test <- subset(ww_remainder, ww_sep2==FALSE)
+
+ww_training_label <- ww_training$good_wine
+ww_valid_label <- ww_validation$good_wine
+ww_test_label <- ww_test$good_wine
+##check sample numbers
+
+```
+
+4. Z-score normalisation
+
+```{r, echo=FALSE}
+ww_training_z <- as.data.frame(scale(ww_training[1:11]))
+ww_validation_z <- as.data.frame(scale(ww_validation[1:11]))
+ww_test_z <- as.data.frame(scale(ww_test[1:11]))
+
+```
+
+5.k-Nearest Neighbours for k=1 to 80
+
+```{r, echo=FALSE}
+library(class)
+library(gmodels)
+ww_training_pred <- knn(train = ww_training_z, test = ww_training_z, cl = ww_training_label, k = 80)
+
+```
+
+6. Evaluating each classifier on the validation set
+
+```{r, echo=FALSE}
+
+ww_valid_pred <- knn(train = ww_training_z, test = ww_validation_z, cl = ww_training_label, k = 80)
+CrossTable (x=ww_valid_label, y=ww_valid_pred, prop.chisq = FALSE)
+
+```
