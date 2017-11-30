@@ -1,4 +1,5 @@
 install.packages("Ecdat")
+rm(list=ls())
 library("Ecdat")
 data("Cigarette")
 tail(Cigarette)
