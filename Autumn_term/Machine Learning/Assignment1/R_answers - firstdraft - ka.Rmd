@@ -104,7 +104,6 @@ for (i in 1:80){
 }
 
 print(e)
-
 ```
 
 ```{r, echo=False}
@@ -113,6 +112,7 @@ ww_test_pred <- knn(train = ww_validation_z, test = ww_test_z, cl = ww_valid_lab
 CrossTable (x=ww_test_label, y=ww_test_pred, prop.chisq = FALSE)
 
 gen_tbl <- table(ww_test_pred,ww_test_label)
+ggplot(data=e, aes(x=k_count_1, misclass_err_1))+geom_line()+geom_line(data=d, aes(x=k_count, y=missclass_err))
 accuracy <- (tbl[1, 1] + tbl[2, 2])/NROW(ww_validation_z)
 
 ```
