@@ -29,19 +29,20 @@ wine_quality['good_wine'] = wine_quality.quality.apply(decide_good_wine)
 
 # 3. splits the data set into a training data set (~50%) and a test data set (~50%) 
 # — make sure you shuffle the record before the split;
-random_seed = 100
-wine_quality_shuffled = shuffle(wine_quality, random_state = random_seed)
-training_set = wine_quality_shuffled[0:round(len(wine_quality_shuffled.axes[0])/2)]
-test_set = wine_quality_shuffled[round(len(wine_quality_shuffled.axes[0])/2):len(wine_quality_shuffled.axes[0])]
-
+# and,
 # 4. normalises the data according to the Z-score transform;
-wine_mean_training = np.mean(training_set.iloc[:, 0:11], axis=0)
-wine_std_training = np.std(training_set.iloc[:, 0:11], axis=0)
-training_set_normal = pd.DataFrame()
+wine_quality_mean = np.mean(wine_quality.iloc[:, 0:11], axis = 0)
+wine_quality_std = np.std(wine_quality.iloc[:, 0:11], axis = 0)
+wine_quality_normal = pd.DataFrame()
 for i in list(range(11)):
-    ap = ((training_set.iloc[:, i] - np.array(np.zeros(len(training_set.axes[0])) + wine_mean_training[i])) / np.array(np.zeros(len(training_set.axes[0])) + wine_std_training[i]))
-    training_set_normal = pd.concat([training_set_normal, ap], axis = 1)
-training_set_normal = pd.concat([training_set_normal, training_set.iloc[:, 11:13]], axis = 1)
+    ap = ((wine_quality.iloc[:, i] - np.array(np.zeros(len(wine_quality.axes[0])) + wine_quality_mean[i])) / np.array(np.zeros(len(wine_quality.axes[0])) + wine_quality_std[i]))
+    wine_quality_normal = pd.concat([wine_quality_normal, ap], axis = 1)
+wine_quality_normal = pd.concat([wine_quality_normal, wine_quality.iloc[:, 11:13]], axis = 1)    
+
+random_seed = 100
+wine_quality_normal_shuffled = shuffle(wine_quality_normal, random_state = random_seed)
+training_set_normal = wine_quality_normal_shuffled[0:round(len(wine_quality_normal_shuffled.axes[0])/2)]
+test_set_normal = wine_quality_normal_shuffled[round(len(wine_quality_normal_shuffled.axes[0])/2):len(wine_quality_normal_shuffled.axes[0])]
 
 # 5. loads and trains the k-Nearest Neighbours classifiers for k = 1, 6, 11, 16, ..., 500;
 KNN_wine_classifier = []
@@ -66,17 +67,8 @@ print('The best performed classifier (with random seed set as ' + str(random_see
 # train this classifier again using all data (here the training_set_normal)
 KNN_wine_classifier[max_score_pos].fit(training_set_normal.iloc[:, 0:11], training_set_normal.iloc[:, 12])
 
-# normalise test_set (seperate from training_set)
-wine_mean_test = np.mean(test_set.iloc[:, 0:11], axis=0)
-wine_std_test = np.std(test_set.iloc[:, 0:11], axis=0)
-test_set_normal = pd.DataFrame()
-for i in list(range(11)):
-    ap = ((test_set.iloc[:, i] - np.array(np.zeros(len(test_set.axes[0])) + wine_mean_test[i])) / np.array(np.zeros(len(test_set.axes[0])) + wine_std_test[i]))
-    test_set_normal = pd.concat([test_set_normal, ap], axis = 1)
-test_set_normal = pd.concat([test_set_normal, test_set.iloc[:, 11:13]], axis = 1)
-
 # prediction
-test_score = KNN_wine_classifier[max_score_pos].predict(test_set.iloc[:, 0:11])
+test_score = KNN_wine_classifier[max_score_pos].predict(test_set_normal.iloc[:, 0:11])
 print('Classification Report')
 print(classification_report(y_true = test_set_normal.iloc[:, 12],
                             y_pred = test_score,
