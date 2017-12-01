@@ -113,6 +113,6 @@ ww_test_pred <- knn(train = ww_validation_z, test = ww_test_z, cl = ww_valid_lab
 CrossTable (x=ww_test_label, y=ww_test_pred, prop.chisq = FALSE)
 
 gen_tbl <- table(ww_test_pred,ww_test_label)
-generalisation_error <- (tbl[1, 1] + tbl[2, 2])/NROW(ww_validation_z)
+accuracy <- (tbl[1, 1] + tbl[2, 2])/NROW(ww_validation_z)
 
 ```
