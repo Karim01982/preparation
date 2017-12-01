@@ -101,9 +101,7 @@ accuracy_k <- data.frame(k = 1:80, misclassification_rate_t = rep(0,80),misclass
 
 for( i in 1:nrow(accuracy_k)){
    knn_i1 <- knn(train =traind, test = traind, cl = train_labels, k = i)
-   knn_i2 <- knn(train =traind, test = traind, cl = train_labels, k = i)
-   knn_i3 <- knn(train =traind, test = traind, cl = train_labels, k = i)
-   mean_a <-(mean(train_labels == knn_i1)+mean(train_labels == knn_i2)+mean(train_labels == knn_i3))/3
+   mean_a <-mean(train_labels == knn_i1)
    accuracy_k[i, "misclassification_rate_t"] <- 1- mean_a
  
 }
@@ -117,22 +115,21 @@ for( i in 1:nrow(accuracy_k)){
 
 for( i in 1:nrow(accuracy_k)){
    knn_i1 <- knn(train =traind, test = valid, cl = train_labels, k = i)
-   knn_i2 <- knn(train =traind, test = valid, cl = train_labels, k = i)
-   knn_i3 <- knn(train =traind, test = valid, cl = train_labels, k = i)
-   mean_a <-(mean(valid_labels == knn_i1)+mean(valid_labels == knn_i2)+mean(valid_labels == knn_i3))/3
+   mean_a <-mean(valid_labels == knn_i1)
    accuracy_k[i, "misclassification_rate_v"] <- 1- mean_a
  
 }
 
 
 #find the optimal k with the largest accuracy rate
-accuracy_k_order <- accuracy_k[order(accuracy_k[ , "misclassification_rate_v"]), ]
-accuracy_k_order[1, ] # the optimal model is the model with k =24, and the mean accuracy after repeating 3 times is 0.734.
+accuracy_k_optimal <- accuracy_k[order(-accuracy_k[ , "misclassification_rate_v"]), ]
+accuracy_k_optimal[1, ] # the optimal model is the model with k =24, and the mean accuracy after repeating 3 times is 0.734.
 
+accuracy_k_order <- accuracy_k[order(-accuracy_k[ , "k"]), ]
 
 
 library(ggplot2)
-ggplot(accuracy_k) + geom_line(aes(x = k, y = misclassification_rate_v)) +geom_line(aes(x = k, y = misclassification_rate_t)) +ggtitle('misclassification_rate for Different K')
+ggplot(accuracy_k_order) + geom_line(aes(x = k, y = misclassification_rate_v)) +geom_line(aes(x = k, y = misclassification_rate_t)) +ggtitle('misclassification_rate for Different K')
 knn_24 <- knn(train =traind, test = valid, cl = train_labels, k = 24)
 CrossTable( x = valid_labels, y = knn_24, prop.chisp = FALSE)
 mean(valid_labels == knn_24)
@@ -157,6 +154,14 @@ and the test_labels agree that the good_wine is "1". A total of 885 of
 predict24 <- knn(train = traind, test = testd, cl = train_labels, k =24)
 CrossTable( x = test_labels, y = predict24, prop.chisp = FALSE)
 mean(test_labels == predict24)
+
+predict10 <- knn(train = traind, test = testd, cl = train_labels, k =10)
+CrossTable( x = test_labels, y = predict10, prop.chisp = FALSE)
+mean(test_labels == predict10)
+
+predict40 <- knn(train = traind, test = testd, cl = train_labels, k =10)
+CrossTable( x = test_labels, y = predict40, prop.chisp = FALSE)
+mean(test_labels == predict40)
 
 ```
 
