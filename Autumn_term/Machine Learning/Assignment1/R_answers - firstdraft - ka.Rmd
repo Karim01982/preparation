@@ -52,7 +52,6 @@ ww_test_label <- ww_test$good_wine
 
 ```
 
-
 5.k-Nearest Neighbours for k=1 to 80
 
 ```{r, echo=FALSE}
