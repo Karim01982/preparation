@@ -1,3 +1,4 @@
+
 ---
 title: "Machine Learning - Assignment 1"
 author: "Karim Awad (01446402)"
@@ -23,19 +24,21 @@ ww_data$good_wine <- factor(ww_data$good_wine, levels = c(1,0), labels = c("good
 
 ```
 
-3. Split the data into a training, validation, and test data sets
+3. Split the data into a training, validation, and test data sets and 4. Z-score normalisation
 
 ```{r, echo=FALSE}
 library(caTools)
 library(dplyr)
 library(caret)
-#shuffling our sample data (formally)
+#shuffling our sample data (formally) and Z-score normalising across the entire dataset
 ww_data1 <- ww_data[sample(nrow(ww_data)),]
+ww_data1 <- as.data.frame(scale(ww_data1[1:11]))
 #Splitting our data into our data sets
 set.seed(100)
 ww_sep1 <- sample(seq_len(nrow(ww_data1)), size = 0.4*nrow(ww_data1)) #this does shuffle our sample again
 ww_training <- ww_data1[ww_sep1,]
 ww_remainder <- ww_data1[-ww_sep1,]
+head(ww_remainder)
 
 set.seed(100)
 ww_sep2 <- sample(seq_len(nrow(ww_remainder)), size = 0.5*nrow(ww_remainder))
@@ -49,14 +52,6 @@ ww_test_label <- ww_test$good_wine
 
 ```
 
-4. Z-score normalisation
-
-```{r, echo=FALSE}
-ww_training_z <- as.data.frame(scale(ww_training[1:11]))
-ww_validation_z <- as.data.frame(scale(ww_validation[1:11]))
-ww_test_z <- as.data.frame(scale(ww_test[1:11]))
-
-```
 
 5.k-Nearest Neighbours for k=1 to 80
 
