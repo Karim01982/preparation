@@ -26,15 +26,11 @@ for i in range(n):
 #Printing the distance matrix
 print (dist_matrix)
 
-#Checking the shape of the matrix
-dist_matrix.shape
-
 # Creating Index for Dictionary 
-index = list(range(0, 38))
+index = list(range(0, n))
 
 #Dictionary
 cities_dict = {k: v for k, v in zip(index, x_y)}
-
 
 #Part a
 lat = tsp_df['latitude'].values.tolist()
@@ -51,3 +47,4 @@ for i in list(range(n)):
     m.plot(x, y, marker = 'o', color = 'red')
 plt.figure(figsize=(18,18))
 plt.show()
+
