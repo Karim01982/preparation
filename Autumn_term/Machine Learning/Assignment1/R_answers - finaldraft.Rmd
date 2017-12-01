@@ -118,7 +118,7 @@ ww_test_pred <- knn(train = ww_training_z, test = ww_test_z, cl = ww_training_la
 #CrossTable (x=ww_test_label, y=ww_test_pred, prop.chisq = FALSE)
 
 gen_tbl <- table(ww_test_pred,ww_test_label)
-ggplot(data=e, aes(x=k_count_1, misclass_err_1))+geom_line()+geom_line(data=d, aes(x=k_count, y=missclass_err))
+ggplot(data=e, aes(x=k_count_1, misclass_err_1))+geom_line()+geom_point(data=d, aes(x=k_count, y=missclass_err)) +ylab("mis-classification error")+xlab("K number")
 accuracy <- (tbl[1, 1] + tbl[2, 2])/NROW(ww_validation_z)
 
 predict10 <- knn(train = ww_training_z, test =  ww_test_z, cl = ww_training_label, k =10)
@@ -138,14 +138,16 @@ sensitivity_18<-tbl18[1,1]/(tbl18[1,1]+tbl18[1,2])
 tbl30 <- table(ww_test_label,predict30)
 specificity_30<-tbl30[2,2]/(tbl30[2,1]+tbl30[2,2])
 sensitivity_30<-tbl30[1,1]/(tbl30[1,1]+tbl30[1,2])
-
+print(tbl10)
+print(tbl18)
+print(tbl30)
 
 
 ```
 
 How do you judge whether the classifier is well-suited for the data set?
 
-The graph plot contrasts the misclassification error between the training and validation set. From a visual examination, identifying where this is lowest for the validation set would suggest a k-value range of between 10-30. This would correspond with where the lowest points upon the training set is observed. We chose k=18, although this value can vary in practice within this range.
+The graph plot contrasts the misclassification error between the training (dotted line) and validation set (solid line). From a visual examination, identifying where this is lowest for the validation set would suggest a k-value range of between 10-30. This would correspond with where the lowest points upon the training set is observed. We chose k=18, although this value can vary in practice within this range.
 
-We rely on this to obtain a suitable balance between minimising our variance and bias respectively. Insofar as judging the classifier, we want this to be optimally placed to ascertain if a wine is deemed good or bad. This aspect will depend on what's most important to the end-user. When we examine the sensitivity of K between k=10, k=18, and k=30, we notice this sensitivity ratio varies between 0.86 (k=30) and 0.87(k=18). If it is important that we identify a good wine, then a k-value of 18 appears sensible. We do note that this affects our specificity measure by a marginal level compared to k=10, and marginally increasing our risk of false-positivies (i.e. actual bad wine vs predicted good wine). Striking a balance between these different concerns is what a K-value should achieve, which we feel k=18 attains in this context.
+We rely on this to obtain a suitable balance between minimising our variance and bias respectively. Insofar as judging the classifier, we want this to be optimally placed to ascertain if a wine is deemed good or bad. This aspect will depend on what's most important to the end-user. When we examine the sensitivity of K between k=10, k=18, and k=30 (shown in the tables), we notice this sensitivity ratio varies between 0.86 (k=30) and 0.87(k=18). If it is important that we identify a good wine, then a k-value of 18 appears sensible. We do note that this affects our specificity measure by a marginal level compared to k=10, and marginally increasing our risk of false-positivies (i.e. actual bad wine vs predicted good wine). Striking a balance between these different concerns is what a K-value should achieve, which we feel k=18 attains in this context.
 
