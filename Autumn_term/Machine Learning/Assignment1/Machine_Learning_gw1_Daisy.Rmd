@@ -187,6 +187,8 @@ sensitivity_30<-tbl30[2,2]/(tbl30[2,1]+tbl30[2,2])
 specificity_30<-tbl30[1,1]/(tbl30[1,1]+tbl30[1,2])
 ```
 ```{r}
+
+# for the final problem
 ww_test_pred <- knn(train = ww_training_z, test = ww_test_z, cl = ww_train_label, k = 18)
 CrossTable (x=ww_test_label, y=ww_test_pred, prop.chisq = FALSE)
 
