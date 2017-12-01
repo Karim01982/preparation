@@ -132,7 +132,7 @@ accuracy_k_order[1, ] # the optimal model is the model with k =24, and the mean 
 
 
 library(ggplot2)
-ggplot(accuracy_k) + geom_line(aes(x = k, y = misclassification_rate_v)) +geom_line(aes(x = k, y = misclassification_rate_t)) +ggtitle('Accuracy for Different K')
+ggplot(accuracy_k) + geom_line(aes(x = k, y = misclassification_rate_v)) +geom_line(aes(x = k, y = misclassification_rate_t)) +ggtitle('misclassification_rate for Different K')
 knn_24 <- knn(train =traind, test = valid, cl = train_labels, k = 24)
 CrossTable( x = valid_labels, y = knn_24, prop.chisp = FALSE)
 mean(valid_labels == knn_24)
