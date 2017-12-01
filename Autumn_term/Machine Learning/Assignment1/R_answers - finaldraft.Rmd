@@ -55,6 +55,7 @@ ww_test_label <- ww_test$ww_quality
 4. Z-score normalisation - based on calculations above
 
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
+set.seed(1001)
 ww_training_z <- ww_training[1:11]
 ww_validation_z <- ww_validation[1:11]
 ww_test_z <- ww_test[1:11]
@@ -67,6 +68,7 @@ ww_test_z <- ww_test[1:11]
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
 library(class)
 library(gmodels)
+set.seed(100)
 ww_training_pred <- knn(train = ww_training_z, test = ww_training_z, cl = ww_training_label, k = 80)
 #CrossTable(x = ww_training_label, y=ww_training_pred, prop.chisq = FALSE)
 #table_prac <- table(ww_training_pred,ww_training_label)
@@ -91,7 +93,7 @@ ggplot(data = d,aes(x=k_count, y=missclass_err))+geom_line()
 6. Evaluating each classifier on the validation set
 
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
-
+set.seed(100)
 ww_valid_pred <- knn(train = ww_training_z, test = ww_validation_z, cl = ww_training_label, k = 80)
 #CrossTable (x=ww_valid_label, y=ww_valid_pred, prop.chisq = FALSE)
 
@@ -113,7 +115,7 @@ accuracy_k_order <- e[order(e[ , "misclass_err_1"]), ]
 7. predicts the generalisation error using the test data set, as well as outputs the result in a confusion matrix.
 
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
-
+set.seed(100)
 ww_test_pred <- knn(train = ww_training_z, test = ww_test_z, cl = ww_training_label, k = 18)
 #CrossTable (x=ww_test_label, y=ww_test_pred, prop.chisq = FALSE)
 
