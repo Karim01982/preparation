@@ -70,12 +70,17 @@ KNN_wine_classifier[max_score_pos].fit(training_set_normal.iloc[:, 0:11], traini
 # prediction
 test_score = KNN_wine_classifier[max_score_pos].predict(test_set_normal.iloc[:, 0:11])
 print('Classification Report')
+
 print(classification_report(y_true = test_set_normal.iloc[:, 12],
                             y_pred = test_score,
                             target_names = ['Not good wine', 'Good wine']))
+
+x = confusion_matrix(y_true = test_set_normal.iloc[:, 12],
+                     y_pred = test_score)
 print('Confusion Matrix')
-print(confusion_matrix(y_true = test_set_normal.iloc[:, 12],
-                       y_pred = test_score))
-
-
+print(x)
+print('Total Error Rate = ' + str((x[0, 1] + x[1, 0]) / sum(sum(x))))
+print('Accuracy = ' + str(1 - (x[0, 1] + x[1, 0]) / sum(sum(x))))
+print('Sensitivity = ' + str(x[0, 0] / (x[0, 0] + x[0, 1])))
+print('Specificity = ' + str(x[1, 0] / (x[1, 0] + x[1, 1])))
 
