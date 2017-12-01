@@ -20,7 +20,6 @@ ww_data <- read.csv('winequality-white.csv', sep = ";")
 ```{r, echo=FALSE}
 ww_data[,"good_wine"] <- ifelse(ww_data[,"quality"] >= 6, 1, 0)
 ww_data$good_wine <- factor(ww_data$good_wine, levels = c(1,0), labels = c("good_wine", "bad_wine"))
-head(ww_data)
 
 ```
 
@@ -28,24 +27,25 @@ head(ww_data)
 
 ```{r, echo=FALSE}
 library(caTools)
-#shuffling our sample data
+library(dplyr)
+library(caret)
+#shuffling our sample data (formally)
 ww_data1 <- ww_data[sample(nrow(ww_data)),]
-head(ww_data)
-head(ww_data1)
 #Splitting our data into our data sets
 set.seed(100)
-ww_sep1 <- sample.split(ww_data1, SplitRatio = 0.4)
-ww_training <- subset(ww_data1,  ww_sep1==TRUE)
-ww_remainder <- subset(ww_data1, ww_sep1==FALSE)
+ww_sep1 <- sample(seq_len(nrow(ww_data1)), size = 0.4*nrow(ww_data1)) #this does shuffle our sample again
+ww_training <- ww_data1[ww_sep1,]
+ww_remainder <- ww_data1[-ww_sep1,]
 
-ww_sep2 <- sample.split(ww_remainder, SplitRatio = 0.5)
-ww_validation <- subset(ww_remainder, ww_sep2==TRUE)
-ww_test <- subset(ww_remainder, ww_sep2==FALSE)
+set.seed(100)
+ww_sep2 <- sample(seq_len(nrow(ww_remainder)), size = 0.5*nrow(ww_remainder))
+ww_validation <- ww_remainder[ww_sep2,]
+ww_test <- ww_remainder[-ww_sep2,]
 
 ww_training_label <- ww_training$good_wine
 ww_valid_label <- ww_validation$good_wine
 ww_test_label <- ww_test$good_wine
-##check sample numbers
+
 
 ```
 
@@ -80,7 +80,7 @@ for (i in 1:80){
 }
 
 print(d)
-
+ggplot(data = d,aes(x=k_count, y=missclass_err))+geom_line()
   
 ```
 
