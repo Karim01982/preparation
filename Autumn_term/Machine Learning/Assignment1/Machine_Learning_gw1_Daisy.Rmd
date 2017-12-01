@@ -186,3 +186,34 @@ tbl30 <- table(test_labels,predict30)
 sensitivity_30<-tbl30[2,2]/(tbl30[2,1]+tbl30[2,2])
 specificity_30<-tbl30[1,1]/(tbl30[1,1]+tbl30[1,2])
 ```
+```{r}
+ww_test_pred <- knn(train = ww_training_z, test = ww_test_z, cl = ww_train_label, k = 18)
+CrossTable (x=ww_test_label, y=ww_test_pred, prop.chisq = FALSE)
+
+gen_tbl <- table(ww_test_pred,ww_test_label)
+ggplot(data=e, aes(x=k_count_1, misclass_err_1))+geom_line()+geom_line(data=d, aes(x=k_count, y=missclass_err))
+accuracy <- (tbl[1, 1] + tbl[2, 2])/NROW(ww_validation_z)
+
+predict10 <- knn(train = ww_training_z, test =  ww_test_z, cl = train_labels, k =10)
+CrossTable( x = ww_test_label, y = predict20, prop.chisp = FALSE)
+mean(test_labels == predict10)
+
+predict30 <- knn(train =  ww_training_z, test =  ww_test_z, cl = train_labels, k =30)
+CrossTable( x = ww_test_label, y = predict30, prop.chisp = FALSE)
+mean(test_labels == predict30)
+
+table(train_labels) # good quality is important class
+
+tbl10 <- table(ww_test_label,predict10)
+sensitivity_10<-tbl24[2,2]/(tbl15[2,1]+tbl15[2,2])
+specificity_10<-tbl15[1,1]/(tbl[1,1]+tbl15[1,2])
+
+
+tbl18 <- table(ww_test_label,ww_test_pred)
+sensitivity_20<-tbl18[2,2]/(tbl18[2,1]+tbl18[2,2])
+specificity_20<-tbl18[1,1]/(tbl18[1,1]+tbl18[1,2])
+
+tbl30 <- table(ww_test_label,predict30)
+sensitivity_30<-tbl30[2,2]/(tbl30[2,1]+tbl30[2,2])
+specificity_30<-tbl30[1,1]/(tbl30[1,1]+tbl30[1,2])
+```
