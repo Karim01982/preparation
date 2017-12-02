@@ -1,7 +1,8 @@
 
 ---
 title: "Machine Learning - Assignment 1"
-author: "Karim Awad (01446402)"
+author: Joanna Andari, Karim Awad, Jiye Ren, Nirbhay Sharma, Qiuyue Zhang, Xiaoyan
+  Zhou
 date: "30 November 2017"
 output: html_document
 ---
@@ -9,7 +10,7 @@ output: html_document
 ####Question 2.a
 
 1. Loading the data
-```{r, echo=FALSE}
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
 rm(list=ls())
 setwd('C:/Users/karim/Documents/Imperial/Machine Learning/ProblemSets/Assignment1')
 ww_data <- read.csv('winequality-white.csv', sep = ";")
@@ -18,7 +19,7 @@ ww_data <- read.csv('winequality-white.csv', sep = ";")
 
 2. Constructing a binary column
 
-```{r, echo=FALSE}
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
 ww_data[,"good_wine"] <- ifelse(ww_data[,"quality"] >= 6, 1, 0)
 ww_data$good_wine <- factor(ww_data$good_wine, levels = c(1,0), labels = c("good_wine", "bad_wine"))
 
@@ -26,13 +27,12 @@ ww_data$good_wine <- factor(ww_data$good_wine, levels = c(1,0), labels = c("good
 
 3. Split the data into a training, validation, and test data sets and 4. Z-score normalisation
 
-```{r, echo=FALSE}
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
 library(caTools)
 library(dplyr)
 library(caret)
 #shuffling our sample data (formally) and Z-score normalising across the entire dataset
 ww_data1 <- ww_data[sample(nrow(ww_data)),]
-head(ww_data1)
 ww_quality <- ww_data1[,13]
 ww_data1 <- as.data.frame(scale(ww_data1[1:11])) #normalising across our entire dataset
 ww_data1 <- data.frame(ww_data1, ww_quality)
@@ -43,7 +43,7 @@ ww_training <- ww_data1[ww_sep1,]
 ww_remainder <- ww_data1[-ww_sep1,]
 
 set.seed(100)
-ww_sep2 <- sample(seq_len(nrow(ww_remainder)), size = 0.5*nrow(ww_remainder))
+ww_sep2 <- sample(seq_len(nrow(ww_remainder)), size = 0.5*nrow(ww_remainder)) #this assigns 30% of our sample each to validation and test sets 
 ww_validation <- ww_remainder[ww_sep2,]
 ww_test <- ww_remainder[-ww_sep2,]
 
@@ -54,7 +54,8 @@ ww_test_label <- ww_test$ww_quality
 ```
 4. Z-score normalisation - based on calculations above
 
-```{r, echo=FALSE}
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+set.seed(1001)
 ww_training_z <- ww_training[1:11]
 ww_validation_z <- ww_validation[1:11]
 ww_test_z <- ww_test[1:11]
@@ -64,13 +65,14 @@ ww_test_z <- ww_test[1:11]
 
 5.k-Nearest Neighbours for k=1 to 80
 
-```{r, echo=FALSE}
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
 library(class)
 library(gmodels)
+set.seed(100)
 ww_training_pred <- knn(train = ww_training_z, test = ww_training_z, cl = ww_training_label, k = 80)
-CrossTable(x = ww_training_label, y=ww_training_pred, prop.chisq = FALSE)
-table_prac <- table(ww_training_pred,ww_training_label)
-(table_prac[1, 2] + table_prac[2, 1])/NROW(ww_training_z)
+#CrossTable(x = ww_training_label, y=ww_training_pred, prop.chisq = FALSE)
+#table_prac <- table(ww_training_pred,ww_training_label)
+#(table_prac[1, 2] + table_prac[2, 1])/NROW(ww_training_z)
 
 set.seed(101)
 d=NULL
@@ -83,7 +85,6 @@ for (i in 1:80){
   d=rbind(d,data.frame(k_count,missclass_err))
 }
 
-print(d)
 ggplot(data = d,aes(x=k_count, y=missclass_err))+geom_line()
   
 ```
@@ -91,10 +92,10 @@ ggplot(data = d,aes(x=k_count, y=missclass_err))+geom_line()
 
 6. Evaluating each classifier on the validation set
 
-```{r, echo=FALSE}
-
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+set.seed(100)
 ww_valid_pred <- knn(train = ww_training_z, test = ww_validation_z, cl = ww_training_label, k = 80)
-CrossTable (x=ww_valid_label, y=ww_valid_pred, prop.chisq = FALSE)
+#CrossTable (x=ww_valid_label, y=ww_valid_pred, prop.chisq = FALSE)
 
 set.seed(101)
 e=NULL
@@ -107,26 +108,26 @@ for (i in 1:80){
   e=rbind(e,data.frame(k_count_1,misclass_err_1))
 }
 
-print(e)
 accuracy_k_order <- e[order(e[ , "misclass_err_1"]), ]
-print(accuracy_k_order)
 
 ```
 
-```{r, echo=False}
+7. predicts the generalisation error using the test data set, as well as outputs the result in a confusion matrix.
 
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+set.seed(100)
 ww_test_pred <- knn(train = ww_training_z, test = ww_test_z, cl = ww_training_label, k = 18)
-CrossTable (x=ww_test_label, y=ww_test_pred, prop.chisq = FALSE)
+#CrossTable (x=ww_test_label, y=ww_test_pred, prop.chisq = FALSE)
 
 gen_tbl <- table(ww_test_pred,ww_test_label)
-ggplot(data=e, aes(x=k_count_1, misclass_err_1))+geom_line()+geom_line(data=d, aes(x=k_count, y=missclass_err))
+ggplot(data=e, aes(x=k_count_1, misclass_err_1))+geom_line()+geom_point(data=d, aes(x=k_count, y=missclass_err)) +ylab("mis-classification error")+xlab("K number")
 accuracy <- (tbl[1, 1] + tbl[2, 2])/NROW(ww_validation_z)
 
 predict10 <- knn(train = ww_training_z, test =  ww_test_z, cl = ww_training_label, k =10)
-CrossTable( x = ww_test_label, y = predict10, prop.chisp = FALSE)
+#CrossTable( x = ww_test_label, y = predict10, prop.chisp = FALSE)
 
 predict30 <- knn(train =  ww_training_z, test =  ww_test_z, cl = ww_training_label, k =30)
-CrossTable( x = ww_test_label, y = predict30, prop.chisp = FALSE)
+#CrossTable( x = ww_test_label, y = predict30, prop.chisp = FALSE)
 
 tbl10 <- table(ww_test_label,predict10)
 specificity_10<-tbl10[2,2]/(tbl10[2,1]+tbl10[2,2])
@@ -139,14 +140,16 @@ sensitivity_18<-tbl18[1,1]/(tbl18[1,1]+tbl18[1,2])
 tbl30 <- table(ww_test_label,predict30)
 specificity_30<-tbl30[2,2]/(tbl30[2,1]+tbl30[2,2])
 sensitivity_30<-tbl30[1,1]/(tbl30[1,1]+tbl30[1,2])
-
+print(tbl10)
+print(tbl18)
+print(tbl30)
 
 
 ```
 
 How do you judge whether the classifier is well-suited for the data set?
 
-The graph plot contrasts the misclassification error between the training and validation set. From a visual examination, identifying where this is lowest for the validation set would suggest a k-value range of between 10-30. This would correspond with where the lowest points upon the training set is observed. We chose k=18, although this value can vary in practice within this range.
+The graph plot contrasts the misclassification error between the training (dotted line) and validation set (solid line). From a visual examination, identifying where this is lowest for the validation set would suggest a k-value range of between 10-30. This would correspond with where the lowest points upon the training set is observed. We chose k=18, although this value can vary in practice within this range.
 
-We rely on this to obtain a suitable balance between minimising our variance and bias respectively. Insofar as judging the classifier, we want this to be optimally placed to ascertain if a wine is deemed good or bad. This aspect will depend on what's most important to the end-user. When we examine the sensitivity of K between k=10, k=18, and k=30, we notice this sensitivity ratio varies between 0.86 (k=30) and 0.87(k=18). If it is important that we identify a good wine, then a k-value of 18 appears sensible. We do note that this affects our specificity measure by a marginal level compared to k=10, and marginally increasing our risk of false-positivies (i.e. actual bad wine vs predicted good wine). Striking a balance between these different concerns is what a K-value should achieve, which we feel k=18 attains in this context.
+We rely on this to obtain a suitable balance between minimising our variance and bias respectively. Insofar as judging the classifier, we want this to be optimally placed to ascertain if a wine is deemed good or bad. This aspect will depend on what's most important to the end-user. When we examine the sensitivity of K between k=10, k=18, and k=30 (shown in the tables), we notice this sensitivity ratio varies between 0.86 (k=30) and 0.87(k=18). If it is important that we identify a good wine, then a k-value of 18 appears sensible. We do note that this affects our specificity measure by a marginal level compared to k=10, and marginally increasing our risk of false-positivies (i.e. actual bad wine vs predicted good wine). Striking a balance between these different concerns is what a K-value should achieve, which we feel k=18 attains in this context.
 
