@@ -73,6 +73,15 @@ for i in range(1,500,5):
 kfold_output = pd.DataFrame(list(zip(counter_fold, fold_accuracy)), columns = labels)
 #Optimal K-range between k=76 and k=121
 
+##Side-test: comparing classification / confusion matrix with 7
+knn_total=KNeighborsClassifier(n_neighbors=71)
+knn_total.fit(total_data, total_y)
+total_predict=knn_total.predict(total_data)
+
+print(classification_report(total_y, total_predict, labels=None))
+print(confusion_matrix(total_y, total_predict, labels=None))
+
+
 
 #6b. 5-fold cross validation - on training dataset
 training_data=train.iloc[:,0:11]
@@ -92,6 +101,13 @@ for i in range(1,500,5):
 kfold_outputb = pd.DataFrame(list(zip(bcounter_fold, bfold_accuracy)), columns = labels)
 #Optimal K-range between k=101 and k=126
 
+##Side-test: comparing classification / confusion matrix with 7
+knn_training=KNeighborsClassifier(n_neighbors=116)
+knn_training.fit(training_data, training_y)
+training_predict=knn_total.predict(training_data)
+
+print(classification_report(training_y, training_predict, labels=None))
+print(confusion_matrix(training_y, training_predict, labels=None))
 
 #7 Predict generalisation error using the test set and outputs confusion matrix
 
