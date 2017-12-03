@@ -13,6 +13,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.cross_validation import cross_val_score
 from sklearn.metrics import classification_report 
 from sklearn.metrics import confusion_matrix 
+import matplotlib.pyplot as plt
 
 # 1. loads the data file;
 wine_quality = pd.read_csv('/Users/Veronique/Desktop/ICBA/Nov_Dec Term/Machine Learning/Assignment/Assignment1/GroupWork_Data/winequality-red.csv',
