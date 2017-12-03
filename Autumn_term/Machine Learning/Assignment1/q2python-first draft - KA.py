@@ -106,14 +106,13 @@ for i in range(1,500,5):
     count = i
     ccounter_fold.append(count)
     knn=KNeighborsClassifier(n_neighbors=i)
-    k_predict = knn.predict(test_data)
     k_score = cross_val_score(knn, test_data, test_y, cv=5, scoring = 'accuracy')
     cfold_accuracy.append(k_score.mean())
 
-kfold_outputc = pd.DataFrame(list(zip(bcounter_fold, bfold_accuracy)), columns = labels)
-#Optimal k=116
+kfold_outputc = pd.DataFrame(list(zip(ccounter_fold, cfold_accuracy)), columns = labels)
+#Optimal k=71
 
-knn_final=KNeighborsClassifier(n_neighbors=116)
+knn_final=KNeighborsClassifier(n_neighbors=71)
 knn_final.fit(test_data, test_y)
 final_predict=knn_final.predict(test_data)
 
