@@ -16,7 +16,7 @@ from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 
 # 1. loads the data file;
-wine_quality = pd.read_csv('/Users/Veronique/Desktop/ICBA/Nov_Dec Term/Machine Learning/Assignment/Assignment1/GroupWork_Data/winequality-red.csv',
+wine_quality = pd.read_csv('C:/Users/karim/Documents/Imperial/Machine Learning/ProblemSets/Assignment1/winequality-red.csv',
                           sep = ';')
 # 2. construct a new binary column “good wine” that indicates whether the wine is good 
 # (which we define as having a quality of 6 or higher) or not;
@@ -56,13 +56,22 @@ for i in list(range(1, 500, 5)):
 # 6. evaluates each classifier using 5-fold cross validation and selects the best classifier;
 # 100 items, each item contains a list of (five) cross-validation scores
 scores = list()
+counter=[]
 for i in list(range(len(KNN_wine_classifier))):
+    count=i
+    counter.append(count)
     scores.append(list(cross_val_score(KNN_wine_classifier[i], training_set_normal.iloc[:, 0:11], training_set_normal.iloc[:, 12], cv = 5)))
+
 # select the classifier with the higherest average score on the five folds
 avg_scores = [sum(scores[i])/5 for i in list(range(len(scores)))]
 max_score = max(avg_scores)
 max_score_pos = np.argmax(avg_scores)
 print('The best performed classifier (with random seed set as ' + str(random_seed) + ') is the ' + str(max_score_pos + 1) + 'th' + ' classifier, with an average validation score of ' + str(max_score) + '.')
+
+plt.plot(counter, avg_scores)
+plt.xlabel("No of k-tests undertaken from 1 to 500 with an interval of 5")
+plt.ylabel("accuracy")
+
 
 # 7. predicts the generalisation error using the test data set, as well as outputs the result in a confusion matrix.
 # train this classifier again using all data (here the training_set_normal)
