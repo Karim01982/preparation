@@ -143,7 +143,7 @@ plt.legend([plot2, plot1], ['Cross Validation - Training set', 'Accuracy on vali
 plt.xlabel("k-value")
 plt.ylabel("accuracy")
 
-#Optimal k=56
+#Optimal k=56 from 6b)
 
 knn_final=KNeighborsClassifier(n_neighbors=56)
 knn_final.fit(test_data, test_y)
