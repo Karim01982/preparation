@@ -16,6 +16,7 @@ from sklearn import metrics
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
+import random
 
 #1. Importing the data
 data_set = pd.read_csv("C:/Users/karim/Documents/Imperial/Machine Learning/ProblemSets/Assignment1/winequality-red.csv", sep=";")
@@ -26,6 +27,7 @@ data_set['ww_quality'] = data_set.quality.apply(lambda x: "good_wine" if x>=6 el
 data_set.head(5)
 #3. & 4. Normalise the data using the Z-score transform and Split the data 50:50 between training and test data
 
+random.seed(100)
 sorted_data = shuffle(data_set, random_state=0)
 sorted_data.head(5)
 quality_column=sorted_data.iloc[:,12]
@@ -33,8 +35,10 @@ data_excqual = sorted_data.iloc[:,0:11]
 z_score_transform = data_excqual.apply(zscore)
 z_score_transform['ww_quality']=quality_column
 
+random.seed(100)
 train, test = sklearn.model_selection.train_test_split(z_score_transform, test_size=0.5, random_state=0)
 train.head(5)
+
 #5.Load and train K-nearest neighbours
 x_columns = ["fixed acidity", "volatile acidity", "citric acid", "residual sugar", "chlorides", "free sulfur dioxide", "total sulfur dioxide", "density", "pH", "sulphates", "alcohol"]
 y_column=["ww_quality"]
@@ -71,7 +75,7 @@ for i in range(1,500,5):
     fold_accuracy.append(k_score.mean())
 
 kfold_output = pd.DataFrame(list(zip(counter_fold, fold_accuracy)), columns = labels)
-#Optimal K-range between k=76 and k=136
+#Optimal K=116
 
 ##Side-test: comparing classification / confusion matrix with 7
 knn_total=KNeighborsClassifier(n_neighbors=116)
@@ -102,10 +106,10 @@ kfold_outputb = pd.DataFrame(list(zip(bcounter_fold, bfold_accuracy)), columns =
 plt.plot(bcounter_fold, bfold_accuracy)
 plt.xlabel("k-value")
 plt.ylabel("accuracy")
-#Optimal K-range between k=56 and k=71
+#Optimal k=56 
 
 ##Side-test: comparing classification / confusion matrix with 7
-knn_training=KNeighborsClassifier(n_neighbors=61)
+knn_training=KNeighborsClassifier(n_neighbors=56)
 knn_training.fit(training_data, training_y)
 training_predict=knn_training.predict(training_data)
 
@@ -124,21 +128,27 @@ count=0
 for i in range(1,500,5):
     count = i
     ccounter_fold.append(count)
-    knn=KNeighborsClassifier(n_neighbors=i)
-    k_score = cross_val_score(knn, test_data, test_y, cv=5, scoring = 'accuracy')
-    cfold_accuracy.append(k_score.mean())
+    knn_final=KNeighborsClassifier(n_neighbors=i)
+    knn_final.fit(test_data, test_y)
+    k_predict = knn_final.predict(test_data)
+    cfold_accuracy.append(metrics.accuracy_score(test_y, k_predict))
 
 kfold_outputc = pd.DataFrame(list(zip(ccounter_fold, cfold_accuracy)), columns = labels)
 
-plt.plot(ccounter_fold, cfold_accuracy)
+
+plt.figure(1)
+plot1, = plt.plot(ccounter_fold, cfold_accuracy)
+plot2, = plt.plot(ccounter_fold, bfold_accuracy)
+plt.legend([plot2, plot1], ['Cross Validation - Training set', 'Accuracy on validation set'])
 plt.xlabel("k-value")
 plt.ylabel("accuracy")
-#Optimal k=71
 
-knn_final=KNeighborsClassifier(n_neighbors=71)
+#Optimal k=56
+
+knn_final=KNeighborsClassifier(n_neighbors=56)
 knn_final.fit(test_data, test_y)
 final_predict=knn_final.predict(test_data)
 
 print(classification_report(test_y, final_predict, labels=None))
-print(confusion_matrix(test_y, final_predict, labels=None)
+print(confusion_matrix(test_y, final_predict, labels=None))
 

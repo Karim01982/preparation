@@ -94,3 +94,30 @@ print('Accuracy = ' + str(1 - (x[0, 1] + x[1, 0]) / sum(sum(x))))
 print('Sensitivity = ' + str(x[0, 0] / (x[0, 0] + x[0, 1])))
 print('Specificity = ' + str(x[1, 0] / (x[1, 0] + x[1, 1])))
 
+
+
+#Additional content - KA
+
+
+test_data=test_set_normal.iloc[:, 0:11]
+test_y=test_set_normal.iloc[:, 12]
+
+cfold_accuracy = []
+ccounter_fold=[]
+count=0    
+
+for i in range(1,500,5):
+    count = i
+    ccounter_fold.append(count)
+    knn_final=KNeighborsClassifier(n_neighbors=i)
+    knn_final.fit(test_data, test_y)
+    k_predict = knn_final.predict(test_data)
+    cfold_accuracy.append(metrics.accuracy_score(test_y, k_predict))
+
+
+plt.figure(1)
+plot1, = plt.plot(ccounter_fold, cfold_accuracy)
+plot2, = plt.plot(ccounter_fold, avg_scores)
+plt.legend([plot2, plot1], ['Cross Validation - Training set', 'Accuracy on validation set'])
+plt.xlabel("k-value")
+plt.ylabel("accuracy")
