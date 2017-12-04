@@ -16,7 +16,8 @@ from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 
 # 1. loads the data file;
-wine_quality = pd.read_csv('/Users/Veronique/Desktop/ICBA/Nov_Dec Term/Machine Learning/Assignment/Assignment1/GroupWork_Data/winequality-red.csv', sep = ';')
+wine_quality = pd.read_csv('C:/Users/karim/Documents/Imperial/Machine Learning/ProblemSets/Assignment1/winequality-red.csv',
+                          sep = ';')
 # 2. construct a new binary column “good wine” that indicates whether the wine is good 
 # (which we define as having a quality of 6 or higher) or not;
 def decide_good_wine(x):
