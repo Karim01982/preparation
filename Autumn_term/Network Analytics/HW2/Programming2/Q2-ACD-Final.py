@@ -11,7 +11,7 @@ import networkx as nx
 
 # CREATING THE CITIES DATAFRAME
 # storing the path of the data file
-raw_data = r'C:/Users/Nirbhay Sharma/Coursework/02-Autumn Term/05-Nework Analytics/Homework/2/HW2_tsp.txt'
+raw_data = r'./HW2_tsp.txt'
 # creating the dataframe
 dj_tsp_df = pd.read_table(raw_data, header=None, skiprows=10, sep=" ")
 # renaming the columns, and dropping the no.
