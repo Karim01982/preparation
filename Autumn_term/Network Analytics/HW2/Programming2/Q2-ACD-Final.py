@@ -1,8 +1,8 @@
 # ==================================================== 2(a) ==================================================== #
 
 # IMPORTING THE PACKAGES
-import pandas as pd
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from haversine import haversine
 from gurobipy import *
