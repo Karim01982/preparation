@@ -19,7 +19,7 @@ from sklearn.metrics import classification_report, f1_score, accuracy_score, con
 from sklearn.learning_curve import learning_curve
 
 #Data loading
-messages = pd.read_csv('C:/Users/Ryan/Desktop/BA/Machine/smsspamcollection/SMSSpamCollection.txt',sep='\t', header=None,
+messages = pd.read_csv('C:/Users/karim/Documents/Imperial/Machine Learning/ProblemSets/Assignment2/SMSSpamCollection.txt',sep='\t', header=None,
                            names=["label", "messages"])
 
 #Data processing
@@ -45,6 +45,11 @@ training_set = clean_messages_shuffled [0:round(len(clean_messages_shuffled.axes
 validation_set =clean_messages_shuffled [round(len(clean_messages_shuffled.axes[0])/2.23):round(len(clean_messages_shuffled.axes[0])/1.592)]
 
 test_set=clean_messages_shuffled[round(len(clean_messages_shuffled.axes[0])/1.5925):round(len(clean_messages_shuffled.axes[0])/1)]
+len(test_set)
+
+istrain_ham = list(test_set[test_set['label'] == 'ham']['label'])
+len(istrain_ham)
+
 
 print(len(training_set),len(validation_set),len(test_set))
 

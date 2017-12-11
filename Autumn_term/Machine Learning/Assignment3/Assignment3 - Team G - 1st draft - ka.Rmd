@@ -1,0 +1,154 @@
+---
+title: "Assignment 3 - Group Project"
+author: "Team G"
+date: "11 December 2017"
+output: html_document
+---
+
+####2.1 Pre-Processing
+
+Refer to the Loans_processed.csv file to confirm these instructions have been implemented
+
+####2.2 Prediction
+
+##### Question 1
+```{r}
+new_data <- read.csv('C:/Users/karim/Documents/Imperial/Machine Learning/ProblemSets/Assignment3/Loans_processed.csv')
+head(new_data)
+summary(new_data)
+
+set.seed(123)
+shuffle_data <- new_data[sample(nrow(new_data)),]
+training <- shuffle_data[1:20000,]
+validation <- shuffle_data[20001:28000,]
+test <- shuffle_data[28001:nrow(shuffle_data),]
+
+prop.table(table(training$loan_status))
+table(validation$loan_status)
+
+
+```
+
+######Question 2
+
+```{r}
+library(C50)
+library(gmodels)
+
+#Calculating accuracy on the total sample
+accuracytab <- table(new_data$loan_status)
+accuracy_num <- as.vector(accuracytab)
+accuracy <- accuracy_num[2]/(accuracy_num[1]+accuracy_num[2])
+error <- 1-accuracy
+print(accuracy)
+print(error)
+
+train_data <- C5.0(training[,-8],training[,8])
+train_outcome <- predict(train_data, training, type = "class")
+summary(train_data)
+table(train_outcome)
+
+validation_outcome <- predict(train_data, validation, type="class")
+table(validation_outcome)
+
+CrossTable(training$loan_status, train_outcome, prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE, dnn = c('actual default', 'predicted default'))
+
+CrossTable(validation$loan_status, validation_outcome, prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE, dnn = c('actual default', 'predicted default'))
+
+
+
+```
+Assessing our total sample, we have an accuracy level of 85.9% with a corresponding misclassification error of 14.1%.
+
+When running the C50 algorithm, this only predicts that all loans will be fully repaid. The corresponding errors shown within the confusion matrix, reflects how none of the charged-off loans have been correctly predicted.
+
+######Question 3
+
+```{r}
+
+#To obtain results that generate a sensitivity of c.25% on charged-off loans
+cost_matrix25 <- matrix(c(NA, 1,
+                         3.15, NA), 2, byrow=TRUE)
+train_data25 <- C5.0(training[,-8],training[,8], costs = cost_matrix25)
+
+validation_outcome25 <- predict(train_data25, validation, type="class")
+CrossTable(validation$loan_status, validation_outcome25, prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE, dnn = c('actual default', 'predicted default'))
+
+sensitivity25 <- 276 / (276+821)
+print(sensitivity25)
+
+#To obtain results that generate a sensitivity of c.40% on charged-off loans
+cost_matrix40 <- matrix(c(NA, 1,
+                         3.7, NA), 2, byrow=TRUE)
+train_data40 <- C5.0(training[,-8],training[,8], costs = cost_matrix40)
+
+validation_outcome40 <- predict(train_data40, validation, type="class")
+x40 <- CrossTable(validation$loan_status, validation_outcome40, prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE, dnn = c('actual default', 'predicted default'))
+
+x40$tbl['FULLY PAID', 'FULLY PAID']
+
+sensitivity40 <- 437 / (437+660)
+print(sensitivity40)
+
+
+#To obtain results that generate a sensitivity of c.50% on charged-off loans
+cost_matrix50 <- matrix(c(NA, 1,
+                         4.7, NA), 2, byrow=TRUE)
+train_data50 <- C5.0(training[,-8],training[,8], costs = cost_matrix50)
+
+validation_outcome50 <- predict(train_data50, validation, type="class")
+x40 <- CrossTable(validation$loan_status, validation_outcome50, prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE, dnn = c('actual default', 'predicted default'))
+
+
+sensitivity50 <- 561 / (561+536)
+print(sensitivity50)
+
+
+
+
+
+```
+
+######Question 4
+
+```{r}
+
+cost_matrix_opt <- matrix(c(NA, 1,
+                         2.25, NA), 2, byrow=TRUE)
+train_data_opt <- C5.0(training[,-8],training[,8], costs = cost_matrix_opt)
+
+validation_outcome_opt <- predict(train_data_opt, validation, type="class")
+CrossTable(validation$loan_status, validation_outcome_opt, prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE, dnn = c('actual default', 'predicted default'))
+
+misclasserror <- (999+266) / (999+266+98+6637)
+print(misclasserror)
+
+```
+
+This depends heavily on our level of risk aversion. A higher multiple will help reduce false positives (predicted repayments against actual charge-off), at the cost of far higher false negatives (i.e. loans predicted to generate a charge-off compared to actual repayment). The latter will result in loans not being made, undermining potential profitability. 
+
+It is assumed striking a balance between both will require us to minimise our misclassification error. Hence applying a multiple of 2x weighting to loans in default, can help minimise this, albeit warranting at least a minimum of 991 applications being reviewed.
+
+
+######Question 5
+
+```{r}
+
+cost_matrix_A <- matrix(c(NA, 1,
+                         4, NA), 2, byrow=TRUE)
+train_data_A <- C5.0(training[,-8],training[,8], costs = cost_matrix_A)
+
+test_outcome_A <- predict(train_data_A, test, type="class")
+CrossTable(test$loan_status, test_outcome_A, prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE, dnn = c('actual default', 'predicted default'))
+
+
+cost_matrix_opt <- matrix(c(NA, 1,
+                         2.25, NA), 2, byrow=TRUE)
+train_data_opt <- C5.0(training[,-8],training[,8], costs = cost_matrix_opt)
+
+test_outcome_opt <- predict(train_data_opt, test, type="class")
+CrossTable(test$loan_status, test_outcome_opt, prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE, dnn = c('actual default', 'predicted default'))
+
+
+```
+
