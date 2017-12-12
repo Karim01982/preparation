@@ -11,8 +11,6 @@ import glob # for looping file in an document
 import re # for filename extract
 
 
-cs = pd.read_stata('cross_sectional.dta')
-p = pd.read_stata('panel.dta')
 
 village1 = pd.read_csv('adj_allVillageRelationships_HH_vilno_55.csv', header = None)
 village1.info()
@@ -60,12 +58,12 @@ for i in range(len(eigenvector_centrality)):
     
 # convert to a csv file
 df.to_csv("eigenvector_centrality.csv", sep=',', encoding='utf-8')
-# adding leader column and HHsurvey column into the file
+# adding leader column and HHsurvey column into the file by hand and form "eigenvector_centrality_withleader.csv"
 #compute leader eigenvector centrality
 ec = pd.read_csv('eigenvector_centrality_withleader.csv', index_col = 0)
 sc = pd.read_csv('cross_sectional.csv')
 leader_ec = ec.loc[(ec['leader'] == 1)][['village', 'eigenvalue_centrality', 'hhSurveyed','leader']]
-bss_vil = leader_ec.loc[leader_ec['village'].isin(sc['village'].tolist())]
+bss_vil = leader_ec.loc[leader_ec['village'].isin(sc['village'].tolist())]# use the 45 villages in cross_sectional.xlsx
 cross_sectional1 = bss_vil.groupby(['village']).mean()
 # the cross_sectional table with leader eigenvector centrality
 cross_sectional = cross_sectional1[['eigenvalue_centrality']] 
@@ -84,7 +82,7 @@ for fname in glob.glob(path):
         for j in range(village.shape[1]):
             village_adjacency_matrix[i, j] = village.iloc[i,j]
     G=nx.from_numpy_matrix(village_adjacency_matrix)
-    degree =dict(G.degree())
+    degree = dict(G.degree())
     res = re.findall("vilno_(\d+).csv", fname)
     dict1 = {}
     dict1[res[0]] = degree
@@ -112,7 +110,7 @@ bss_vil_de = leader_degree.loc[leader_degree['village'].isin(sc['village'].tolis
 cross_sectional_de = bss_vil_de.groupby(['village']).mean()
 
 
-# add--the cross_sectional table with leader eigenvector centrality
+# add--the cross_sectional table with leader degrees
 cross_sectional['leader_degrees'] = cross_sectional_de[['degrees']] 
 
 #3.numbers of household
@@ -190,6 +188,9 @@ cross_sectional['mf_rate_nonleader'] = takeup_non_leader['take_up']
 
 
 #9.regression
+cross_sectional.columns = ['leader_eigenvector_centrality', 'leader_degrees', 'household',
+       'mf_rate_nonleader', 'fraction_of_taking_leaders',
+       'Eigenvector_centrality_taking_leader']
 cross_sectional.to_csv("cross_sectional_45_gw.csv")
 
 #10.write the report
