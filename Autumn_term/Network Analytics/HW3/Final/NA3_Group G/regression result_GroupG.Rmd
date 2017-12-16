@@ -1,0 +1,32 @@
+---
+title: "network analytics"
+author: "xiaoyan zhou"
+date: "2017Äê12ÔÂ10ÈÕ"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(readr)
+library(stargazer)
+cross_sectional_45_gw <- read_csv("~/IC/Network Analytics/homewrok3/cross_sectional_45_gw.csv")
+summary(cross_sectional_45_gw)
+
+m1 <- lm(mf_rate_nonleader~ leader_eigenvector_centrality, data = cross_sectional_45_gw)
+m2 <- lm(mf_rate_nonleader~ leader_eigenvector_centrality + household, data = cross_sectional_45_gw)
+m3 <- lm(mf_rate_nonleader~ household + leader_degrees, data = cross_sectional_45_gw)
+m4 <- lm(mf_rate_nonleader~ leader_eigenvector_centrality + household + leader_degrees, data = cross_sectional_45_gw)
+m5 <- lm(mf_rate_nonleader~ leader_eigenvector_centrality + household + fraction_of_taking_leaders + Eigenvector_centrality_taking_leader, data = cross_sectional_45_gw)
+stargazer(list( m2, m3, m4, m5), type = "text", digits = 6, title = "Table 1: Leader/Injection points", no.space = TRUE)
+
+
+
+```
+
+
+
+
