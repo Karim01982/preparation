@@ -13,6 +13,8 @@ Refer to the Loans_processed.csv file to confirm these instructions have been im
 
 ##### Question 1
 ```{r}
+
+rm(list=ls())
 new_data <- read.csv('C:/Users/karim/Documents/Imperial/Machine Learning/ProblemSets/Assignment3/Loans_processed.csv')
 head(new_data)
 summary(new_data)
@@ -34,6 +36,7 @@ table(validation$loan_status)
 ```{r}
 library(C50)
 library(gmodels)
+
 
 #Calculating accuracy on the total sample
 accuracytab <- table(new_data$loan_status)
@@ -74,6 +77,10 @@ train_data25 <- C5.0(training[,-8],training[,8], costs = cost_matrix25)
 validation_outcome25 <- predict(train_data25, validation, type="class")
 CrossTable(validation$loan_status, validation_outcome25, prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE, dnn = c('actual default', 'predicted default'))
 
+output25 <- table(validation[,8],validation_outcome25, dnn=c("actual", "predicted"))
+kable(output25$byClass, caption = "Important Ratios")
+
+
 sensitivity25 <- 276 / (276+821)
 print(sensitivity25)
 
@@ -109,7 +116,7 @@ print(sensitivity50)
 
 ```
 
-######Question 4
+#####Question 4
 
 ```{r}
 

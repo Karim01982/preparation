@@ -1,0 +1,225 @@
+---
+title: "Assignment 3 - Group Project"
+author: "Team G"
+date: "11 December 2017"
+output: html_document
+---
+
+####2.1 Pre-Processing
+
+Refer to the Loans_processed.csv file to confirm these instructions have been implemented
+
+####2.2 Prediction
+
+Please refer to the .RMD file to see the relevant code applied to answering each question.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+rm(list=ls())
+library(knitr)
+library(lattice)
+library(ggplot2)
+library(e1071)
+library(caret)
+library(dplyr)
+library(C50)
+library(gmodels)
+library(grid)
+library(gridExtra)
+library(gtable)
+library(kableExtra)
+
+```
+
+
+##### Question 1
+```{r, echo=FALSE}
+setwd('C:/Users/karim/Documents/Imperial/Machine Learning/ProblemSets/Assignment3/')
+new_data <- read.csv('Loans_processed.csv')
+
+set.seed(123)
+shuffle_data <- new_data[sample(nrow(new_data)),]
+training <- shuffle_data[1:20000,]
+validation <- shuffle_data[20001:28000,]
+test <- shuffle_data[28001:nrow(shuffle_data),]
+
+#prop.table(table(training$loan_status))
+#table(validation$loan_status)
+
+```
+Please refer to the .RMD file for the applicable code. 
+
+#####Question 2
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+#Calculating accuracy on the total sample
+accuracytab <- table(new_data$loan_status)
+accuracy_num <- as.vector(accuracytab)
+accuracy <- accuracy_num[2]/(accuracy_num[1]+accuracy_num[2])
+error <- 1-accuracy
+result1 <- matrix(c(accuracy, error), nrow=1, dimnames=list(('output'),c('accuracy', 'error')))
+
+kable(result1, format="html", digits=3, align='c') %>%
+  kable_styling(full_width = F) 
+
+```
+
+Assessing our total sample, we have an accuracy level of 85.9% with a corresponding misclassification error of 14.1%.
+When reviewing our training and validation sets, we obtain the following outputs respectively:
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#Accuracy on the training set
+set.seed(123)
+train_data <- C5.0(training[,-8],training[,8])
+train_outcome <- predict(train_data, training, type = "class")
+#summary(train_data)
+#table(train_outcome)
+
+#CrossTable(training$loan_status, train_outcome, prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE, dnn = c('actual default', 'predicted default'))
+
+table1 <- table(training[,8],train_outcome, dnn=c("actual", "predicted"))
+
+kable(table1, format="html",caption = "Training Set",align='c') %>%
+  kable_styling(full_width = F) 
+        
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#Accuracy on the validation set
+validation_outcome <- predict(train_data, validation, type="class")
+
+#CrossTable(validation$loan_status, validation_outcome, prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE, dnn = c('actual default', 'predicted default'))
+
+
+table2 <- table(validation[,8],validation_outcome, dnn=c("actual", "predicted"))
+
+kable(table2, format="html",caption = "Validation Set",align='c') %>%
+  kable_styling(full_width = F) 
+        
+```
+
+When running the C50 algorithm, this only predicts that all loans will be fully repaid (the predictions for 'charged off' loans is zero for both tables). This is due to the nature of the C50 algorithm, which is concerned with identifying the majority case, which in this case, is whether loans have been fully paid. 
+
+Consequently, none of the charged-off loans have been correctly / incorrectly predicted. Instead we have an accuracy of 86.0% for the training set and 85.8% on the validation set (both calculations based on dividing actual fully paid loans by the total number of loans made)), which is entirely attributable to the composition of our respective samples. Hence, we are unable to improve upon the initial accuracy levels above, without resorting to additional means (e.g. boosting, as demonstrated below)
+
+#####Question 3
+
+Note: All Actual labels are on the vertical axis of the table (and read going across), with all Predicted labels on the horizontal axis (and read vertically)
+
+```{r,echo=FALSE, warning=FALSE, message=FALSE}
+
+#To obtain results that generate a sensitivity of c.25% on charged-off loans
+set.seed(123)
+cost_matrix25 <- matrix(c(NA, 1,
+                         3.4, NA), 2, byrow=TRUE)
+
+train_data25 <- C5.0(training[,-8],training[,8], costs = cost_matrix25)
+
+validation_outcome25 <- predict(train_data25, validation, type="class")
+#CrossTable(validation$loan_status, validation_outcome25, prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE, dnn = c('actual default', 'predicted default'))
+
+output_25 <- table(validation[,8],validation_outcome25, dnn=c("actual", "predicted"))
+
+kable(output_25, format="html",caption = "Sensitivity at 25%",align='c') %>%
+  kable_styling(full_width = F) 
+
+sensitivity25 <- output_25[1,1] / (output_25[1,1]+output_25[1,2]) 
+precision25 <- output_25[1,1] / (output_25[1,1]+output_25[2,1])
+misclass25 <- (output_25[1,2]+output_25[2,1]) / 
+  (output_25[1,1]+output_25[1,2]+output_25[2,1]+output_25[2,2])
+
+```
+
+```{r,echo=FALSE,warning=FALSE, message=FALSE}
+#To obtain results that generate a sensitivity of c.40% on charged-off loans
+set.seed(123)
+
+cost_matrix40 <- matrix(c(NA, 1,
+                         4.475, NA), 2, byrow=TRUE)
+train_data40 <- C5.0(training[,-8],training[,8], costs = cost_matrix40)
+
+validation_outcome40 <- predict(train_data40, validation, type="class")
+#CrossTable(validation$loan_status, validation_outcome40, prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE, dnn = c('actual default', 'predicted default'))
+
+output_40 <- table(validation[,8],validation_outcome40, dnn=c("actual", "predicted"))
+
+kable(output_40, format="html",caption = "Sensitivity at 40%",align='c') %>%
+  kable_styling(full_width = F) 
+
+sensitivity40 <- output_40[1,1] / (output_40[1,1]+output_40[1,2]) 
+precision40 <- output_40[1,1] / (output_40[1,1]+output_40[2,1])
+misclass40 <- (output_40[1,2]+output_40[2,1]) / 
+  (output_40[1,1]+output_40[1,2]+output_40[2,1]+output_40[2,2])
+
+```
+
+```{r,echo=FALSE,warning=FALSE, message=FALSE}
+#To obtain results that generate a sensitivity of c.50% on charged-off loans
+set.seed(123)
+cost_matrix50 <- matrix(c(NA, 1, 5, NA), 2, byrow=TRUE)
+train_data50 <- C5.0(training[,-8],training[,8], costs = cost_matrix50)
+
+validation_outcome50 <- predict(train_data50, validation, type="class")
+#CrossTable(validation$loan_status, validation_outcome50, prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE, dnn = c('actual default', 'predicted default'))
+
+output_50 <- table(validation[,8],validation_outcome50, dnn=c("actual", "predicted"))
+
+kable(output_50, format="html", caption = "Sensitivity at 50%",align='c') %>% kable_styling(full_width = F) 
+
+sensitivity50 <- output_50[1,1] / (output_50[1,1]+output_50[1,2]) 
+precision50 <- output_50[1,1] / (output_50[1,1]+output_50[2,1])
+misclass50 <- (output_50[1,2]+output_50[2,1]) / 
+  (output_50[1,1]+output_50[1,2]+output_50[2,1]+output_50[2,2])
+
+outputs1 <- matrix(data=c(3.4, 4.475, 5.0, sensitivity25, sensitivity40, sensitivity50, precision25, precision40, precision50, misclass25, misclass40, misclass50), byrow=TRUE, nrow = 4, ncol = 3, dimnames=list(c('multiplier on charged off loans', 'sensitivity', 'precision', 'misclassification error'),c('@25% sensitivity', '@40% sensitivity', '@50% sensitivity')))
+
+kable(outputs1, format="html",caption = "Overview of Recall and Precision Ratios",align='c', digits = 3) %>% kable_styling(full_width = F) 
+
+```
+
+As we increase our cost matrix multiples to obtain sensitivity levels of 25%, 40% and 50% respectively (i.e. we apply a cost weighting on charged-off loans of 3.4, 4.475, and 5.0 respectively), we note that our precision level steadily decreases, stabilising at above 21.1%. 
+
+Based on these findings, it would appear management should evaluate between 20-24% of loans predicted to be charged off, based on our varying cost multipliers above. 
+
+#####Question 4
+
+```{r,echo=FALSE,warning=FALSE, message=FALSE}
+kable(outputs1, format="html",caption = "Overview of Recall and Precision Ratios",align='c', digits = 3) %>% kable_styling(full_width = F) 
+```
+
+We want to maximise our precision estimate, to help predict which loans are likely to be charged-off (and thus to avoid making these loans). However, we also want to balance this with acceptable lending risk, otherwise we will be making fewer loans (which may impact on profitability depending on the levels of loan profits vs expected loss* from defaulted loans).
+
+Referring to the table above, our precision estimates are higher at a cost multiple of 3.4x on charged-off loans. Our corresponding misclassification error is also lower, compared to higher multiples, although this reflects a greater number of loans being charged off compared to those predicted to be repaid (in contrast to higher cost multiples, where the misclassification rate is driven by loans repaid that were predicted to be charged off).
+
+The final multiple depends on the level of risk-taking / risk aversion that the lender wishes to assume. We recommend a cost multiple of 3.4, as this generates a higher precision level, whilst enabling the highest number of [fully paid, fully paid] loan levels to be achieved, compared to other cost multipliers. Although we recognise this increases our exposure to loans that may not perform (i.e. [predicted fully paid, actual charged off]), we assume this is offset from making more loans that are profitable, compared to not otherwise not issuing loans (which we assume to be the case with [predicted charged off, actual fully paid]).
+
+
+
+#####Question 5
+
+```{r,echo=FALSE,warning=FALSE, message=FALSE}
+
+cost_matrix_A <- matrix(c(NA, 1,
+                         3.4, NA), 2, byrow=TRUE)
+train_data_A <- C5.0(training[,-8],training[,8], costs = cost_matrix_A)
+
+test_outcome_A <- predict(train_data_A, test, type="class")
+#CrossTable(test$loan_status, test_outcome_A, prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE, dnn = c('actual default', 'predicted default'))
+
+test_table <- table(test[,8],test_outcome_A, dnn=c("actual", "predicted"))
+
+kable(test_table, format="html", caption = "Test output",align='c') %>% kable_styling(full_width = F) 
+
+sensitivitytest <- test_table[1,1] / (test_table[1,1]+test_table[1,2]) 
+precisiontest <- test_table[1,1] / (test_table[1,1]+test_table[2,1])
+misclasstest <- (test_table[1,2]+test_table[2,1]) / 
+  (test_table[1,1]+test_table[1,2]+test_table[2,1]+test_table[2,2])
+
+outputs2 <- matrix(data=c(sensitivity25, sensitivitytest, precision25, precisiontest, misclass25, misclasstest), byrow=TRUE, nrow = 3, ncol = 2, dimnames=list(c('sensitivity', 'precision', 'misclassification error'),c('validation-set', 'test set')))
+
+kable(outputs2, format="html",caption = "Comparison between validation and test set",align='c', digits = 3) %>% kable_styling(full_width = F) 
+
+```
+
+Comparing the performance with our ratios from the validation set, suggests this has performed reasonably well, given the lack of difference between these ratios. However, we may want to continue testing the robustness of these findings, as notwithstanding boosting, there may still be a risk of over-fitting (given the nature of classification trees), along with checking the nature and representativeness of our sample (e.g. ensuring this data remains consistent with more recent consumer patterns, etc).
